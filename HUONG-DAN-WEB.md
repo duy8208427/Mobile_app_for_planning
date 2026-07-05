@@ -101,14 +101,14 @@ Repo có sẵn [`render.yaml`](render.yaml) để deploy backend lặp lại d�
 
 ### Bước 0 — Đẩy code lên GitHub
 
+Repo đã có git local. Tạo repo mới trên https://github.com/new rồi chạy:
+
 ```powershell
 cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main
-git init
-git add .
-git commit -m "Initial commit — QuyHoach web + backend"
+.\scripts\push-github.ps1 -GitHubUser "<user>" -RepoName "Mobile_app_for_planning"
 ```
 
-Tạo repo mới trên GitHub (private hoặc public), rồi:
+Hoặc thủ công:
 
 ```powershell
 git remote add origin https://github.com/<user>/<repo>.git
@@ -117,6 +117,8 @@ git push -u origin main
 ```
 
 **Không** commit file `.env` — đã có trong `.gitignore`. Chỉ dùng `.env.example` làm mẫu.
+
+**Lưu ý Render:** `backend/requirements.txt` đã bỏ `emergentintegrations` (không có trên PyPI) — web admin deploy bình thường; tính năng AI compare trên mobile cần cài package riêng khi dev local.
 
 ---
 
