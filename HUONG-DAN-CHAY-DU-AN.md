@@ -106,3 +106,83 @@ Trình duyệt: http://localhost:5173 — đăng nhập `admin@quyhoach.vn` / `A
 ## Dừng
 
 `Ctrl+C` Terminal web (nếu có) → Terminal 3 (Expo) → Terminal 2 (backend) → tắt emulator → Terminal 1 (mongod, nếu có)
+
+---
+
+## Demo app công dân trên iPhone (không cần App Store)
+
+### Khuyên dùng: Link web (khách khác WiFi / 4G)
+
+Gửi khách link — **không cần** cùng WiFi, Expo Go, hay máy dev bật terminal:
+
+**https://quyhoach-citizen.vercel.app**
+
+1. Mở link trên **Safari** iPhone (Chrome iOS cũng được).
+2. Đăng nhập: `citizen@quyhoach.vn` / `Citizen@123`.
+3. (Tuỳ chọn) Safari → Share → **Add to Home Screen** để có icon trên màn hình chính.
+
+App chạy trong trình duyệt (giao diện giống mobile). Đủ cho demo UI/luồng cơ bản từ xa.
+
+| Thành phần | URL |
+|------------|-----|
+| App công dân (web) | https://quyhoach-citizen.vercel.app |
+| API | https://quyhoach-api-production.up.railway.app |
+| Web quản trị | https://quyhoach-web.vercel.app |
+
+**Deploy lại app công dân web** (từ thư mục `frontend/`):
+
+```powershell
+vercel deploy --prod
+```
+
+Biến môi trường Vercel (`EXPO_PUBLIC_BACKEND_URL`) đã cấu hình sẵn trên project `quyhoach-citizen`.
+
+---
+
+### Phương án khác: Expo Go (cùng WiFi hoặc tunnel)
+
+Dùng khi cần trải nghiệm gần app native hơn (GPS, chọn ảnh).
+
+#### Trên iPhone (người demo)
+
+1. Cài **Expo Go** từ App Store (miễn phí).
+2. Quét mã QR do máy dev hiển thị (Camera hoặc trong Expo Go).
+3. Đăng nhập: `citizen@quyhoach.vn` / `Citizen@123`.
+
+#### Trên máy dev (Windows)
+
+**Không cần** chạy MongoDB/backend local nếu dùng API production (Railway).
+
+1. Trong `frontend/.env` (xem `frontend/.env.example`):
+
+   ```
+   EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api-production.up.railway.app
+   ```
+
+2. Chạy Expo:
+
+   ```powershell
+   cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main\frontend
+   npm install
+   npx expo start
+   ```
+
+3. **Cùng WiFi** với iPhone: quét QR trong terminal.
+
+4. **Khác WiFi / 4G:** thử tunnel (có thể lỗi ngrok trên một số mạng):
+
+   ```powershell
+   $env:NGROK_AUTHTOKEN = "your-ngrok-token"
+   npx expo start --tunnel
+   ```
+
+   Nếu tunnel lỗi → dùng link web ở trên.
+
+### Lưu ý
+
+- Link web: không cần giữ máy dev bật.
+- Expo Go: giữ terminal Expo **mở** trong lúc demo.
+- Admin web: https://quyhoach-web.vercel.app (`admin@quyhoach.vn` / `Admin@123`).
+- Thêm domain Vercel mới → cập nhật `CORS_ORIGINS` trên Railway (service `quyhoach-api`).
+
+Production mobile + web: xem [HUONG-DAN-WEB.md](HUONG-DAN-WEB.md).

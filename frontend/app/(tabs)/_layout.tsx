@@ -1,12 +1,8 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../src/theme";
-import { useAuth } from "../../src/auth";
 
 export default function TabsLayout() {
-  const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
-
   return (
     <Tabs
       screenOptions={{
@@ -38,17 +34,12 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
         }}
       />
-      {isAdmin && (
-        <Tabs.Screen
-          name="admin"
-          options={{
-            title: "Quản trị",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="shield-checkmark-outline" size={size} color={color} />
-            ),
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="admin"
+        options={{
+          href: null,
+        }}
+      />
       <Tabs.Screen
         name="profile"
         options={{

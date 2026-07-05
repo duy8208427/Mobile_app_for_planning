@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../src/auth";
+import { confirmAction } from "../../src/confirm";
 import { api } from "../../src/api";
 import { colors, spacing } from "../../src/theme";
 
@@ -52,18 +53,11 @@ export default function Profile() {
     })();
   }, [user]);
 
-  const onLogout = () => {
-    Alert.alert("Đăng xuất", "Bạn có chắc muốn đăng xuất?", [
-      { text: "Huỷ", style: "cancel" },
-      {
-        text: "Đăng xuất",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-          router.replace("/login");
-        },
-      },
-    ]);
+  const onLogout = async () => {
+    const ok = await confirmAction("Đăng xuất", "Bạn có chắc muốn đăng xuất?");
+    if (!ok) return;
+    await logout();
+    router.replace("/login");
   };
 
   const onSaveProfile = async () => {
