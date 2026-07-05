@@ -1,0 +1,137 @@
+{
+  "app_metadata": {
+    "name": "QuyHoạch AI (Urban Planning & Construction Order Management)",
+    "language": "Vietnamese",
+    "domain": "Government/Civic Tech",
+    "platform": "mobile_web_app"
+  },
+  "theme": {
+    "archetype": "Archetype 4 (Swiss & High-Contrast)",
+    "mode": "light",
+    "description": "Authority, clarity, and function-first. Clean Stark White base with Signal Red and Architectural Blue. Minimal gradients, high-contrast borders.",
+    "colors": {
+      "primary": "#0A4ABF",
+      "primary_hover": "#003699",
+      "accent_alert": "#FF3B30",
+      "accent_warning": "#FF9500",
+      "accent_success": "#34C759",
+      "background_base": "#F8F9FA",
+      "surface_white": "#FFFFFF",
+      "text_main": "#09090B",
+      "text_muted": "#64748B",
+      "border_subtle": "#E2E8F0",
+      "border_strong": "#09090B"
+    }
+  },
+  "typography": {
+    "heading_font": "Work Sans",
+    "body_font": "IBM Plex Sans",
+    "scales": {
+      "h1": "text-3xl md:text-4xl tracking-tight font-bold",
+      "h2": "text-2xl md:text-3xl tracking-tight font-semibold",
+      "h3": "text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "caption": "text-sm tracking-wide text-muted"
+    },
+    "guidelines": [
+      "No Inter or standard fonts for headings.",
+      "Headings must have tight tracking (-0.02em).",
+      "Overlines and labels must be uppercase with wide spacing."
+    ]
+  },
+  "layout_and_spacing": {
+    "philosophy": "Generous Spacing Philosophy with Swiss Brutalist tension. Use dense spacing (Control Room Grid) for Admin Dashboard, but generous spacing (p-6, p-8) for Citizen facing forms.",
+    "mobile_container": "w-full max-w-md mx-auto h-[100dvh] relative bg-background_base flex flex-col overflow-hidden shadow-2xl",
+    "grid_system": "grid-cols-1 or grid-cols-2 (for quick action buttons on mobile)",
+    "surfaces": [
+      "Glassmorphism: Use backdrop-blur-xl bg-white/80 for sticky bottom navigation and headers.",
+      "Cards: Flat surfaces, 1px solid border (#E2E8F0 or #09090B for emphasis), 0px border-radius (sharp) or max 4px."
+    ]
+  },
+  "components": {
+    "bottom_navigation": {
+      "style": "fixed bottom-0 w-full max-w-md bg-white/90 backdrop-blur-xl border-t border-border_subtle z-50",
+      "layout": "flex justify-around items-center h-16 pb-safe",
+      "items": [
+        {
+          "icon": "House",
+          "label": "Trang chủ"
+        },
+        {
+          "icon": "Bell",
+          "label": "Thông báo"
+        },
+        {
+          "icon": "User",
+          "label": "Cá nhân"
+        }
+      ],
+      "active_state": "text-primary stroke-2",
+      "inactive_state": "text-text_muted"
+    },
+    "map_slider_comparison": {
+      "description": "Swipeable vertical divider to compare Satellite vs Planning maps.",
+      "ui_structure": "Relative container taking full available height. Two absolute image/map layers. The top layer has a clip-path driven by the slider position.",
+      "slider_handle": "44x44px minimum touch target, white circle with shadow and two vertical arrows, centered on a 2px vertical white line.",
+      "ai_anomalies": "Overlay SVG polygons with pulsing animation (accent_alert) to highlight construction violations."
+    },
+    "action_cards": {
+      "style": "bg-white border border-border_subtle p-5 hover:-translate-y-1 transition-transform",
+      "typography": "h3 for title, caption for description. Left aligned.",
+      "icon_treatment": "24x24px icon in top left, colored primary."
+    }
+  },
+  "screens": {
+    "citizen_home": {
+      "name": "Trang chủ (Home)",
+      "layout": [
+        "Header: Greeting (Xin chào, Nguyễn Văn A) with a clean Swiss typography.",
+        "Hero Feature: 'So sánh quy hoạch' (Map Compare) - A large 16:9 card showing a preview of the map slider. Click to expand full screen.",
+        "Grid Actions: 2-column grid for 'Báo cáo vi phạm' (Report Violation) and 'Văn bản pháp luật' (Legal Docs).",
+        "Recent Updates List: Vertical stack of recent neighborhood planning news."
+      ]
+    },
+    "map_compare_full": {
+      "name": "So sánh AI (Map Compare)",
+      "layout": [
+        "Full screen map view (excluding bottom nav).",
+        "Floating top-left back button.",
+        "Interactive Slider (Satellite vs Zoning Map).",
+        "Floating bottom-right button: 'Phân tích AI' (AI Analyze) which reveals pulsing red zones where actual construction doesn't match zoning."
+      ]
+    },
+    "report_violation": {
+      "name": "Báo cáo vi phạm (Report)",
+      "layout": [
+        "Scrollable form with generous p-6 padding.",
+        "Photo Upload Area: Large dashed border rectangle (h-40) with Camera icon.",
+        "Location Auto-fetch: Read-only input styled like a technical readout (e.g. 'Tọa độ: 10.7626° N, 106.6602° E').",
+        "Description Textarea (Shadcn).",
+        "Submit CTA: Full width, solid primary background, bold white text."
+      ]
+    },
+    "admin_dashboard": {
+      "name": "Quản lý báo cáo (Admin View)",
+      "layout": [
+        "Control Room Grid style: Dense, highly scannable.",
+        "Stats row: Tổng số (Total), Cần xử lý (Pending), Đã duyệt (Approved).",
+        "Report List: Cards with thumbnail, timestamp, address, and Status Badge.",
+        "Filter Chips: Horizontal scrollable row for filtering by status or violation type."
+      ]
+    }
+  },
+  "media_urls": {
+    "satellite_map": "https://images.unsplash.com/photo-1754797007234-65f6025a55a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwzfHx2aWV0bmFtJTIwY2l0eSUyMHN0cmVldCUyMG1hcCUyMGFlcmlhbHxlbnwwfHx8fDE3Nzg0MTY1OTZ8MA&ixlib=rb-4.1.0&q=85",
+    "planning_map": "https://images.unsplash.com/photo-1593449226895-cc469c86c9b0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwyfHx2aWV0bmFtJTIwY2l0eSUyMHN0cmVldCUyMG1hcCUyMGFlcmlhbHxlbnwwfHx8fDE3Nzg0MTY1OTZ8MA&ixlib=rb-4.1.0&q=85",
+    "citizen_avatar": "https://images.unsplash.com/photo-1543355890-20bc0a26fda1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHw0fHx2aWV0bmFtJTIwY2l0eSUyMHN0cmVldCUyMG1hcCUyMGFlcmlhbHxlbnwwfHx8fDE3Nzg0MTY1OTZ8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "style": "Duotone weight"
+  },
+  "interactive_rules": [
+    "All buttons must have a clear hover and active (press) state.",
+    "Map slider must support touch events (onTouchMove/onTouchStart).",
+    "Add 'data-testid' to all buttons, tabs, and form inputs (e.g. 'data-testid=\"report-submit-button\"')."
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "name": "planning_zones_demo",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_code": "ODT",
+        "zone_name": "Đất ở đô thị",
+        "allow_build": true,
+        "max_floor": 5,
+        "legal_doc": "QH-DEMO-001",
+        "updated_at": "2026-01-15"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [105.628, 10.452],
+            [105.638, 10.452],
+            [105.638, 10.462],
+            [105.628, 10.462],
+            [105.628, 10.452]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_code": "GT",
+        "zone_name": "Giao thông",
+        "allow_build": false,
+        "max_floor": 0,
+        "legal_doc": "QH-DEMO-001",
+        "updated_at": "2026-01-15"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [105.638, 10.452],
+            [105.645, 10.452],
+            [105.645, 10.458],
+            [105.638, 10.458],
+            [105.638, 10.452]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "zone_code": "CTCC",
+        "zone_name": "Cây xanh công cộng",
+        "allow_build": false,
+        "max_floor": 0,
+        "legal_doc": "QH-DEMO-001",
+        "updated_at": "2026-01-15"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [105.628, 10.462],
+            [105.638, 10.462],
+            [105.638, 10.468],
+            [105.628, 10.468],
+            [105.628, 10.462]
+          ]
+        ]
+      }
+    }
+  ]
+}

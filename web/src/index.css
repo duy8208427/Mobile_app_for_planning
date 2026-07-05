@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@theme {
+  --color-primary: #0a4abf;
+  --color-primary-hover: #003699;
+  --color-accent-alert: #ff3b30;
+  --color-accent-warning: #ff9500;
+  --color-accent-success: #34c759;
+  --color-background-base: #f8f9fa;
+  --color-surface-white: #ffffff;
+  --color-text-main: #09090b;
+  --color-text-muted: #64748b;
+  --color-border-subtle: #e2e8f0;
+  --color-border-strong: #09090b;
+  --font-heading: "Work Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-background-base);
+  color: var(--color-text-main);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
