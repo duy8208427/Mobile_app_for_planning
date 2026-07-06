@@ -1,5 +1,9 @@
 # Chạy dự án — thứ tự các bước
 
+**Local vs Production:** Bảng so sánh đầy đủ trong [HUONG-DAN-WEB.md](HUONG-DAN-WEB.md#local-vs-production-đọc-trước).  
+**Bước 1–5 bên dưới = LOCAL only** (cần bật terminal trên PC).  
+**Demo từ xa (iPhone 4G, không cần PC):** xem mục [Demo app công dân trên iPhone](#demo-app-công-dân-trên-iphone-không-cần-app-store) — link `quyhoach-citizen.vercel.app`.
+
 **Mobile:** cần 3 terminal (+ emulator), thứ tự 1 → 2 → 3 → 4 → 5.  
 **Web quản trị:** xem [HUONG-DAN-WEB.md](HUONG-DAN-WEB.md) — thêm Terminal 4 (`web/`, port 5173).
 

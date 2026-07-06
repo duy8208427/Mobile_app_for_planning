@@ -4,6 +4,21 @@ Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, nghi vấn
 
 ---
 
+## Local vs Production (đọc trước)
+
+| | **Local (dev trên PC)** | **Production (link online)** |
+|--|-------------------------|------------------------------|
+| Khi nào dùng | Sửa code, test trên máy | Demo khách, iPhone 4G, không cần PC bật |
+| MongoDB | `mongod.exe` local **hoặc** Atlas | **MongoDB Railway** (service trong project) **hoặc** Atlas — qua `MONGO_URL` trên Railway |
+| Backend API | `http://localhost:8000` | `https://quyhoach-api-production.up.railway.app` |
+| Web admin | `http://localhost:5173` | `https://quyhoach-web.vercel.app` |
+| App công dân | Expo / emulator | `https://quyhoach-citizen.vercel.app` |
+| Cần terminal bật? | **Có** | **Không** |
+
+Mục **LOCAL** bên dưới **không** áp dụng cho link Vercel/Railway online. Xem [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md) cho mobile local vs demo remote.
+
+---
+
 ## Cấu trúc
 
 ```
@@ -14,9 +29,11 @@ backend/             # FastAPI (port 8000)
 
 ---
 
-## Chạy local (dev)
+## LOCAL — Chạy trên máy dev (không dùng cho Vercel/Railway online)
 
-**Terminal 1 — MongoDB** (nếu chưa chạy service):
+> **Chỉ khi sửa code trên PC.** Link production (`quyhoach-*.vercel.app`) **không** cần bật MongoDB/backend local.
+
+**Terminal 1 — MongoDB** (chỉ dev local; production dùng MongoDB cloud trên Railway/Atlas):
 
 ```powershell
 cd D:\mongodb-win32-x86_64-windows-8.3.2\bin
@@ -50,7 +67,7 @@ Mở trình duyệt: http://localhost:5173
 
 ---
 
-## Biến môi trường
+## Biến môi trường (local)
 
 | File | Biến | Mô tả |
 |------|------|--------|
@@ -71,7 +88,7 @@ Mở trình duyệt: http://localhost:5173
 
 ---
 
-## Production — Atlas + Railway + Vercel (truy cập từ xa)
+## PRODUCTION — Deploy online (Vercel + Railway)
 
 Khách/cán bộ truy cập web qua internet, **không cần cùng WiFi** với máy dev.
 
@@ -82,18 +99,18 @@ flowchart LR
   VercelWeb["Vercel web/"]
   VercelFrontend["Vercel frontend/"]
   Railway["Railway API"]
-  Atlas["MongoDB Atlas M0"]
+  MongoCloud["MongoDB Railway hoac Atlas"]
 
   UserAdmin --> VercelWeb
   UserCitizen --> VercelFrontend
   VercelWeb --> Railway
   VercelFrontend --> Railway
-  Railway --> Atlas
+  Railway --> MongoCloud
 ```
 
 | Thành phần | Host | URL production |
 |------------|------|----------------|
-| MongoDB | [MongoDB Atlas M0](https://www.mongodb.com/cloud/atlas/register) | (connection string nội bộ) |
+| MongoDB | MongoDB Railway (trong project) **hoặc** [MongoDB Atlas M0](https://www.mongodb.com/cloud/atlas/register) | `MONGO_URL` trên service `quyhoach-api` |
 | API | [Railway](https://railway.com) — [`backend/Dockerfile`](backend/Dockerfile), Root Directory `backend` | `https://quyhoach-api-production.up.railway.app` |
 | Web quản trị | [Vercel](https://vercel.com) — thư mục `web/` | `https://quyhoach-web.vercel.app` |
 | App công dân (web) | [Vercel](https://vercel.com) — thư mục `frontend/` | `https://quyhoach-citizen.vercel.app` |
@@ -125,7 +142,11 @@ git push -u origin main
 
 ---
 
-### Bước 1 — MongoDB Atlas
+### Bước 1 — MongoDB (Railway hoặc Atlas)
+
+**Khuyên dùng:** thêm service **MongoDB** trong cùng Railway project → biến `MONGO_URL` = `${{MongoDB.MONGO_URL}}` (reference).
+
+**Hoặc MongoDB Atlas:**
 
 1. Đăng ký [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register).
 2. **Create deployment** → chọn **M0 FREE**, region **Singapore (`ap-southeast-1`)**.
@@ -145,20 +166,25 @@ Backend tự **seed** user admin và dữ liệu demo khi DB trống. Đăng nh�
 ### Bước 2 — Deploy Backend (Railway)
 
 1. [railway.com](https://railway.com) → **New Project** → **Deploy from GitHub repo** → chọn repo.
-2. Service **quyhoach-api** — cấu hình Source:
+2. Service **quyhoach-api** — cấu hình Source (**bắt buộc** — tránh lỗi `railpack process exited`):
 
 | Mục | Giá trị |
 |-----|---------|
-| Root Directory | `backend` |
-| Dockerfile | [`backend/Dockerfile`](backend/Dockerfile) (Railway tự phát hiện) |
+| Root Directory | **`backend`** (không để trống / repo root) |
+| Builder | **Dockerfile** |
+| Dockerfile | [`backend/Dockerfile`](backend/Dockerfile) |
 
-**Lưu ý:** [`Dockerfile`](Dockerfile) ở thư mục gốc dùng cho Fly.io / build từ repo root. Railway service `quyhoach-api` phải dùng Root Directory **`backend`** — nếu dùng root `Dockerfile` với context `backend/` sẽ lỗi `COPY backend/requirements.txt` khi build.
+Repo có [`backend/railway.toml`](backend/railway.toml) cố định builder Dockerfile (chỉ có hiệu lực khi Root Directory = `backend`).
+
+**Lỗi thường gặp:** Root Directory = `.` → Railpack build cả monorepo → fail. Service vẫn **Online** vì bản deploy cũ chưa bị thay.
+
+**Lưu ý:** [`Dockerfile`](Dockerfile) ở thư mục gốc dùng cho Fly.io / build từ repo root — **không** dùng cho Railway service `quyhoach-api`.
 
 3. **Environment Variables** (service `quyhoach-api`):
 
 | Biến | Giá trị |
 |------|---------|
-| `MONGO_URL` | Connection string Atlas (bước 1) |
+| `MONGO_URL` | Connection string MongoDB Railway hoặc Atlas (bước 1) |
 | `DB_NAME` | `quyhoach` |
 | `JWT_SECRET` | Chuỗi ngẫu nhiên 32+ ký tự (khác `dev-secret-change-me`) |
 | `CORS_ORIGINS` | `https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app` |
@@ -240,10 +266,10 @@ vercel deploy --prod
 ### Biến môi trường production (tóm tắt)
 
 ```
-MongoDB Atlas        → MONGO_URL, DB_NAME=quyhoach
-Railway (backend)    → MONGO_URL, DB_NAME, JWT_SECRET, CORS_ORIGINS
-Vercel (web admin)   → VITE_API_URL=https://quyhoach-api-production.up.railway.app
-Vercel (citizen)     → EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api-production.up.railway.app
+MongoDB (Railway/Atlas) → MONGO_URL, DB_NAME=quyhoach
+Railway (backend)       → MONGO_URL, DB_NAME, JWT_SECRET, CORS_ORIGINS
+Vercel (web admin)      → VITE_API_URL=https://quyhoach-api-production.up.railway.app
+Vercel (citizen)        → EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api-production.up.railway.app
 ```
 
 ---
