@@ -50,9 +50,9 @@ if ($envTracked) {
     Write-Host $envTracked
 }
 
-Write-Host "Tao repo trong tren https://github.com/new (KHONG tick README)."
-Write-Host "Roi chay:"
-Write-Host "  .\scripts\push-github.ps1 -GitHubUser `"TEN_GITHUB`" -RepoName `"Mobile_app_for_planning`""
+Write-Host "Repo GitHub da co: https://github.com/duy8208427/Mobile_app_for_planning"
+Write-Host "Neu chua push commit moi, chay (se hoi dang nhap GitHub):"
+Write-Host "  git push -u origin main"
 Write-Host ""
 
 Write-Host "===== 3. Render ====="
