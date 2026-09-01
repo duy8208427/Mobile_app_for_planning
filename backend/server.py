@@ -713,7 +713,7 @@ DEMO_USERS = [
     {
         "email": "manager@quyhoach.vn",
         "password": "Manager@123",
-        "full_name": "Lê Thị Thực Hiện",
+        "full_name": "Phạm Văn Thực",
         "phone": "0902222333",
         "role": "manager",
     },
@@ -749,6 +749,8 @@ async def seed_data():
                 {"$set": {
                     "password_hash": password_hash,
                     "role": demo["role"],
+                    "full_name": demo["full_name"],
+                    "phone": demo["phone"],
                 }},
             )
 
