@@ -123,14 +123,34 @@ export default function Home() {
               <Text style={styles.hello}>Xin chào,</Text>
               <Text style={styles.name}>{user?.full_name || "Người dùng"}</Text>
             </View>
-            <View style={[styles.roleBadge, user?.role === "admin" && styles.roleAdmin]}>
+            <View
+              style={[
+                styles.roleBadge,
+                (user?.role === "manager" || user?.role === "admin") && styles.roleAdmin,
+              ]}
+            >
               <Ionicons
-                name={user?.role === "admin" ? "shield-checkmark-outline" : "person-outline"}
+                name={
+                  user?.role === "manager" || user?.role === "admin"
+                    ? "shield-checkmark-outline"
+                    : "person-outline"
+                }
                 size={14}
-                color={user?.role === "admin" ? "#fff" : colors.primary}
+                color={
+                  user?.role === "manager" || user?.role === "admin" ? "#fff" : colors.primary
+                }
               />
-              <Text style={[styles.roleText, user?.role === "admin" && { color: "#fff" }]}>
-                {user?.role === "admin" ? "Quản lý" : "Người dân"}
+              <Text
+                style={[
+                  styles.roleText,
+                  (user?.role === "manager" || user?.role === "admin") && { color: "#fff" },
+                ]}
+              >
+                {user?.role === "manager"
+                  ? "Người thực hiện"
+                  : user?.role === "admin"
+                    ? "Admin"
+                    : "Người dân"}
               </Text>
             </View>
           </View>
@@ -209,7 +229,7 @@ export default function Home() {
           ))}
         </View>
 
-        {user?.role === "admin" && (
+        {user?.role === "manager" && (
           <View style={styles.sectionWrap}>
             <Text style={styles.sectionTitle}>QUẢN TRỊ</Text>
             <TouchableOpacity
@@ -258,7 +278,7 @@ export default function Home() {
                 style={styles.reportRow}
                 onPress={() =>
                   router.push(
-                    user?.role === "admin"
+                    user?.role === "manager"
                       ? { pathname: "/admin-report", params: { id: r.id } }
                       : { pathname: "/report-detail", params: { id: r.id } }
                   )

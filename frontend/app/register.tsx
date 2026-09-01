@@ -15,6 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../src/auth";
 import { colors, spacing } from "../src/theme";
 
+function showNotice(title: string, message: string) {
+  if (Platform.OS !== "web") {
+    Alert.alert(title, message);
+  }
+}
+
 export default function Register() {
   const router = useRouter();
   const { register } = useAuth();
@@ -22,22 +28,31 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<"citizen" | "admin">("citizen");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const onSubmit = async () => {
     if (!email || !password || !fullName) {
-      return Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ");
+      const msg = "Vui lòng nhập đầy đủ";
+      setError(msg);
+      showNotice("Thiếu thông tin", msg);
+      return;
     }
     if (password.length < 6) {
-      return Alert.alert("Mật khẩu yếu", "Mật khẩu cần ít nhất 6 ký tự");
+      const msg = "Mật khẩu cần ít nhất 6 ký tự";
+      setError(msg);
+      showNotice("Mật khẩu yếu", msg);
+      return;
     }
+    setError("");
     setLoading(true);
     try {
-      await register(email.trim(), password, fullName, phone, role);
+      await register(email.trim(), password, fullName, phone);
       router.replace("/(tabs)");
     } catch (e: any) {
-      Alert.alert("Đăng ký thất bại", e.message || "Vui lòng thử lại");
+      const msg = e.message || "Vui lòng thử lại";
+      setError(msg);
+      showNotice("Đăng ký thất bại", msg);
     } finally {
       setLoading(false);
     }
@@ -95,27 +110,11 @@ export default function Register() {
               placeholderTextColor={colors.textMuted}
             />
 
-            <Text style={styles.label}>VAI TRÒ</Text>
-            <View style={styles.roleRow}>
-              <TouchableOpacity
-                testID="register-role-citizen"
-                style={[styles.roleBtn, role === "citizen" && styles.roleBtnActive]}
-                onPress={() => setRole("citizen")}
-              >
-                <Text style={[styles.roleText, role === "citizen" && styles.roleTextActive]}>
-                  Người dân
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                testID="register-role-admin"
-                style={[styles.roleBtn, role === "admin" && styles.roleBtnActive]}
-                onPress={() => setRole("admin")}
-              >
-                <Text style={[styles.roleText, role === "admin" && styles.roleTextActive]}>
-                  Người phụ trách
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {error ? (
+              <Text testID="register-error" style={styles.error}>
+                {error}
+              </Text>
+            ) : null}
 
             <TouchableOpacity
               testID="register-submit-button"
@@ -161,18 +160,16 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     backgroundColor: "#fff",
   },
-  roleRow: { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.md },
-  roleBtn: {
-    flex: 1,
-    paddingVertical: 12,
+  error: {
+    color: colors.alert,
+    fontSize: 13,
+    marginBottom: spacing.sm,
+    backgroundColor: "#FEF2F2",
     borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    backgroundColor: "#fff",
+    borderColor: "#FECACA",
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 8,
   },
-  roleBtnActive: { borderColor: colors.primary, backgroundColor: "#EEF2FF" },
-  roleText: { color: colors.text, fontWeight: "600" },
-  roleTextActive: { color: colors.primary },
   btn: { backgroundColor: colors.primary, paddingVertical: 14, alignItems: "center", marginTop: spacing.sm },
   btnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
   footer: { flexDirection: "row", justifyContent: "center", marginTop: spacing.lg },

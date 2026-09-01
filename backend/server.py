@@ -24,7 +24,7 @@ JWT_SECRET = os.environ['JWT_SECRET']
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
 # DB
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
 db = client[DB_NAME]
 
 app = FastAPI(title="QuyHoạch AI API")
@@ -41,7 +41,7 @@ class UserPublic(BaseModel):
     id: str
     email: str
     full_name: str
-    role: Literal["citizen", "admin"]
+    role: Literal["citizen", "manager", "admin"]
     phone: Optional[str] = None
     address: Optional[Address] = None
     created_at: datetime
@@ -51,7 +51,7 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: str
     phone: Optional[str] = None
-    role: Optional[Literal["citizen", "admin"]] = "citizen"
+    # Public register always creates citizen; role in body is ignored if sent
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -70,6 +70,20 @@ class UpdateProfileRequest(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     address: Optional[Address] = None
+
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    phone: Optional[str] = None
+    role: Literal["citizen", "manager", "admin"] = "citizen"
+
+class AdminUserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    role: Optional[Literal["citizen", "manager", "admin"]] = None
 
 class ReportCreate(BaseModel):
     title: str
@@ -197,9 +211,19 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
     return user
 
 async def require_admin(user=Depends(get_current_user)):
+    """Web Admin CMS — chỉ role admin."""
     if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Chỉ quản lý mới có quyền truy cập")
+        raise HTTPException(status_code=403, detail="Chỉ quản trị viên mới có quyền truy cập")
     return user
+
+async def require_staff(user=Depends(get_current_user)):
+    """Xử lý báo cáo — admin (web) hoặc manager (app Người thực hiện)."""
+    if user.get("role") not in ("admin", "manager"):
+        raise HTTPException(status_code=403, detail="Chỉ cán bộ mới có quyền truy cập")
+    return user
+
+def is_staff(user: dict) -> bool:
+    return user.get("role") in ("admin", "manager")
 
 def user_to_public(u: dict) -> dict:
     return {
@@ -225,7 +249,7 @@ async def register(payload: RegisterRequest):
         "password_hash": hash_password(payload.password),
         "full_name": payload.full_name,
         "phone": payload.phone,
-        "role": payload.role or "citizen",
+        "role": "citizen",
         "created_at": now_utc(),
     }
     await db.users.insert_one(user_doc)
@@ -330,7 +354,7 @@ async def list_my_reports(user=Depends(get_current_user)):
     return await cursor.to_list(500)
 
 @api_router.get("/reports", response_model=List[Report])
-async def list_all_reports(status: Optional[str] = None, _admin=Depends(require_admin)):
+async def list_all_reports(status: Optional[str] = None, _staff=Depends(require_staff)):
     q = {}
     if status:
         q["status"] = status
@@ -342,19 +366,19 @@ async def get_report(report_id: str, user=Depends(get_current_user)):
     r = await db.reports.find_one({"id": report_id}, {"_id": 0})
     if not r:
         raise HTTPException(status_code=404, detail="Không tìm thấy báo cáo")
-    if user["role"] != "admin" and r["user_id"] != user["id"]:
+    if not is_staff(user) and r["user_id"] != user["id"]:
         raise HTTPException(status_code=403, detail="Không có quyền")
     return r
 
 @api_router.put("/reports/{report_id}", response_model=Report)
-async def update_report(report_id: str, payload: ReportUpdate, admin=Depends(require_admin)):
+async def update_report(report_id: str, payload: ReportUpdate, staff=Depends(require_staff)):
     r = await db.reports.find_one({"id": report_id})
     if not r:
         raise HTTPException(status_code=404, detail="Không tìm thấy báo cáo")
     update = {
         "status": payload.status,
         "admin_response": payload.admin_response,
-        "handled_by": admin["full_name"],
+        "handled_by": staff["full_name"],
         "updated_at": now_utc(),
     }
     await db.reports.update_one({"id": report_id}, {"$set": update})
@@ -572,9 +596,9 @@ async def mark_all_read(user=Depends(get_current_user)):
     )
     return {"ok": True}
 
-# ---------- Stats (admin) ----------
+# ---------- Stats (staff: admin web + manager app) ----------
 @api_router.get("/admin/stats")
-async def admin_stats(_admin=Depends(require_admin)):
+async def admin_stats(_staff=Depends(require_staff)):
     total = await db.reports.count_documents({})
     pending = await db.reports.count_documents({"status": "received"})
     processing = await db.reports.count_documents({"status": "processing"})
@@ -588,29 +612,145 @@ async def admin_stats(_admin=Depends(require_admin)):
         "rejected": rejected,
     }
 
+# ---------- Users CMS (admin only) ----------
+@api_router.get("/admin/users", response_model=List[UserPublic])
+async def list_users(
+    role: Optional[Literal["citizen", "manager", "admin"]] = None,
+    _admin=Depends(require_admin),
+):
+    query: dict = {}
+    if role:
+        query["role"] = role
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+    return [user_to_public(u) for u in users]
+
+@api_router.post("/admin/users", response_model=UserPublic)
+async def create_user(payload: AdminUserCreate, _admin=Depends(require_admin)):
+    email = str(payload.email).strip().lower()
+    full_name = payload.full_name.strip()
+    if not full_name:
+        raise HTTPException(status_code=400, detail="Họ và tên không được để trống")
+    if not payload.password or len(payload.password) < 6:
+        raise HTTPException(status_code=400, detail="Mật khẩu phải có ít nhất 6 ký tự")
+    existing = await db.users.find_one({"email": email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email đã được sử dụng")
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "email": email,
+        "password_hash": hash_password(payload.password),
+        "full_name": full_name,
+        "phone": payload.phone.strip() if isinstance(payload.phone, str) and payload.phone.strip() else payload.phone,
+        "role": payload.role,
+        "created_at": now_utc(),
+    }
+    await db.users.insert_one(user_doc)
+    return user_to_public(user_doc)
+
+@api_router.put("/admin/users/{user_id}", response_model=UserPublic)
+async def update_user(user_id: str, payload: AdminUserUpdate, admin=Depends(require_admin)):
+    target = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not target:
+        raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+
+    is_self = user_id == admin["id"]
+    update: dict = {}
+
+    if payload.full_name is not None:
+        full_name = payload.full_name.strip()
+        if not full_name:
+            raise HTTPException(status_code=400, detail="Họ và tên không được để trống")
+        update["full_name"] = full_name
+
+    if payload.email is not None:
+        email = str(payload.email).strip().lower()
+        if not email:
+            raise HTTPException(status_code=400, detail="Email không được để trống")
+        if is_self and email != target["email"]:
+            raise HTTPException(status_code=400, detail="Không thể đổi email tài khoản đang đăng nhập")
+        existing = await db.users.find_one({"email": email, "id": {"$ne": user_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email đã được sử dụng")
+        update["email"] = email
+
+    if payload.phone is not None:
+        update["phone"] = payload.phone.strip() if isinstance(payload.phone, str) else payload.phone
+
+    if payload.role is not None:
+        if is_self and payload.role != "admin":
+            raise HTTPException(status_code=400, detail="Không thể hạ quyền tài khoản đang đăng nhập")
+        update["role"] = payload.role
+
+    if payload.password is not None and payload.password != "":
+        if len(payload.password) < 6:
+            raise HTTPException(status_code=400, detail="Mật khẩu phải có ít nhất 6 ký tự")
+        update["password_hash"] = hash_password(payload.password)
+
+    if update:
+        await db.users.update_one({"id": user_id}, {"$set": update})
+
+    updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    return user_to_public(updated)
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin=Depends(require_admin)):
+    if user_id == admin["id"]:
+        raise HTTPException(status_code=400, detail="Không thể xóa tài khoản đang đăng nhập")
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Người dùng không tồn tại")
+    return {"ok": True}
+
 # ---------- Seed ----------
+DEMO_USERS = [
+    {
+        "email": "admin@quyhoach.vn",
+        "password": "Admin@123",
+        "full_name": "Trần Văn Quản",
+        "phone": "0901111222",
+        "role": "admin",
+    },
+    {
+        "email": "manager@quyhoach.vn",
+        "password": "Manager@123",
+        "full_name": "Lê Thị Thực Hiện",
+        "phone": "0902222333",
+        "role": "manager",
+    },
+    {
+        "email": "citizen@quyhoach.vn",
+        "password": "Citizen@123",
+        "full_name": "Nguyễn Văn An",
+        "phone": "0903333444",
+        "role": "citizen",
+    },
+]
+
+
 async def seed_data():
-    # Seed admin & test citizen
-    if not await db.users.find_one({"email": "admin@quyhoach.vn"}):
-        await db.users.insert_one({
-            "id": str(uuid.uuid4()),
-            "email": "admin@quyhoach.vn",
-            "password_hash": hash_password("Admin@123"),
-            "full_name": "Trần Văn Quản",
-            "phone": "0901111222",
-            "role": "admin",
-            "created_at": now_utc(),
-        })
-    if not await db.users.find_one({"email": "citizen@quyhoach.vn"}):
-        await db.users.insert_one({
-            "id": str(uuid.uuid4()),
-            "email": "citizen@quyhoach.vn",
-            "password_hash": hash_password("Citizen@123"),
-            "full_name": "Nguyễn Văn An",
-            "phone": "0903333444",
-            "role": "citizen",
-            "created_at": now_utc(),
-        })
+    # Insert demo accounts if missing; always reset demo passwords/roles so
+    # documented credentials keep working after someone changes them in CMS.
+    for demo in DEMO_USERS:
+        existing = await db.users.find_one({"email": demo["email"]})
+        password_hash = hash_password(demo["password"])
+        if not existing:
+            await db.users.insert_one({
+                "id": str(uuid.uuid4()),
+                "email": demo["email"],
+                "password_hash": password_hash,
+                "full_name": demo["full_name"],
+                "phone": demo["phone"],
+                "role": demo["role"],
+                "created_at": now_utc(),
+            })
+        else:
+            await db.users.update_one(
+                {"email": demo["email"]},
+                {"$set": {
+                    "password_hash": password_hash,
+                    "role": demo["role"],
+                }},
+            )
 
     # Seed legal docs if empty
     if await db.legal_docs.count_documents({}) == 0:
@@ -821,27 +961,49 @@ api_router.include_router(_violations_router)
 
 @app.on_event("startup")
 async def on_startup():
-    await seed_data()
-    await seed_planning_data()
+    try:
+        await seed_data()
+        await seed_planning_data()
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "Seed failed — API still starts so health checks can pass"
+        )
+
+def _health_payload():
+    return {"app": "QuyHoạch AI", "ok": True}
+
+@app.get("/")
+@app.get("/health")
+async def health():
+    """Railway/Render health checks hit `/`, not `/api/`."""
+    return _health_payload()
 
 @api_router.get("/")
-async def root():
-    return {"app": "QuyHoạch AI", "ok": True}
+async def api_root():
+    return _health_payload()
 
 # Include router
 app.include_router(api_router)
 
+_PRODUCTION_ORIGINS = [
+    "https://quyhoach-web.vercel.app",
+    "https://quyhoach-citizen.vercel.app",
+]
 _cors_raw = os.environ.get("CORS_ORIGINS", "*").strip()
-_cors_origins = (
-    ["*"]
-    if _cors_raw == "*"
-    else [o.strip() for o in _cors_raw.split(",") if o.strip()]
-)
-
+if _cors_raw == "*":
+    _cors_origins = ["*"]
+else:
+    _cors_origins = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+    for origin in _PRODUCTION_ORIGINS:
+        if origin not in _cors_origins:
+            _cors_origins.append(origin)
+_allow_all_origins = _cors_origins == ["*"]
+# Browsers reject Access-Control-Allow-Origin: * together with credentials.
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
+    allow_credentials=not _allow_all_origins,
     allow_origins=_cors_origins,
+    allow_origin_regex=None if _allow_all_origins else r"https://([a-z0-9-]+\.)+vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )

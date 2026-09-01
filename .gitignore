@@ -50,7 +50,14 @@ dump.rdb
 __pycache__/
 *pyc*
 venv/
+venv_local/
 .venv/
+
+# Local portable MongoDB used for screenshot capture
+tools/mongodb/
+tools/mongodb-data/
+tools/mongodb-extract/
+tools/*.zip
 
 # Development tools
 chainlit.md

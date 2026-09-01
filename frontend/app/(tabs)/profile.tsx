@@ -111,9 +111,25 @@ export default function Profile() {
           </View>
           <Text style={styles.name}>{user?.full_name}</Text>
           <Text style={styles.email}>{user?.email}</Text>
-          <View style={[styles.roleBadge, user?.role === "admin" && { backgroundColor: colors.primary }]}>
-            <Text style={[styles.roleText, user?.role === "admin" && { color: "#fff" }]}>
-              {user?.role === "admin" ? "Người phụ trách" : "Người dân"}
+          <View
+            style={[
+              styles.roleBadge,
+              (user?.role === "manager" || user?.role === "admin") && {
+                backgroundColor: colors.primary,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.roleText,
+                (user?.role === "manager" || user?.role === "admin") && { color: "#fff" },
+              ]}
+            >
+              {user?.role === "manager"
+                ? "Người thực hiện"
+                : user?.role === "admin"
+                  ? "Admin"
+                  : "Người dân"}
             </Text>
           </View>
         </View>
@@ -122,7 +138,7 @@ export default function Profile() {
           <View style={styles.statItem}>
             <Text style={styles.statNum}>{reportCount}</Text>
             <Text style={styles.statLabel}>
-              {user?.role === "admin" ? "Tổng báo cáo" : "Báo cáo của tôi"}
+              {user?.role === "manager" ? "Tổng báo cáo" : "Báo cáo của tôi"}
             </Text>
           </View>
         </View>
@@ -219,7 +235,7 @@ export default function Profile() {
             label="Báo cáo đã gửi"
             onPress={() => router.push({ pathname: "/admin", params: { mine: "1" } })}
             testID="menu-my-reports"
-            hidden={user?.role === "admin"}
+            hidden={user?.role === "manager"}
           />
           <Row
             icon="key-outline"

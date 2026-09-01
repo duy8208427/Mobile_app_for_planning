@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hướng dẫn người dân — QuyHoạch AI v1.2</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --primary: #0A4ABF;
+      --text: #1a1a1a;
+      --muted: #555;
+      --border: #d0d7de;
+      --bg-soft: #f6f8fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      line-height: 1.55;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      background: #fff;
+      font-size: 11pt;
+    }
+    .cover {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      border-bottom: 3px solid var(--primary);
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      page-break-after: always;
+    }
+    .cover .brand {
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .cover h1 {
+      font-size: 2rem;
+      margin: 0.4rem 0 0.6rem;
+      color: var(--primary);
+    }
+    .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
+    .cover-meta {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 480px;
+    }
+    .cover-meta th, .cover-meta td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .cover-meta th { background: var(--bg-soft); width: 38%; }
+    h2 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 0.25rem;
+      margin-top: 2rem;
+      page-break-after: avoid;
+    }
+    h3 { color: #0d3a8f; margin-top: 1.35rem; page-break-after: avoid; }
+    h4 { margin-top: 1rem; page-break-after: avoid; color: #333; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.95em;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      vertical-align: top;
+    }
+    th { background: var(--bg-soft); text-align: left; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88em;
+      background: var(--bg-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 0.25rem 0; }
+    a { color: var(--primary); }
+    .toc {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 2rem;
+      page-break-after: always;
+    }
+    .toc ol { margin: 0.4rem 0 0; }
+    .toc a { text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .feature {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      margin: 0.9rem 0 1.2rem;
+      page-break-inside: avoid;
+      background: #fff;
+    }
+    .feature .label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--primary);
+      margin-right: 0.5rem;
+    }
+    .note {
+      background: #fff8e6;
+      border-left: 4px solid #e6a700;
+      padding: 0.55rem 0.85rem;
+      margin: 0.6rem 0 0;
+      font-size: 0.95em;
+    }
+    .empty { color: var(--muted); font-style: italic; }
+    .shot {
+      margin: 0.85rem 0 1.1rem;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+    .shot img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      background: #fff;
+    }
+    .shot.mobile img { max-width: 280px; }
+    .shot figcaption {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .part-banner {
+      background: var(--primary);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin: 2rem 0 1rem;
+      page-break-before: always;
+    }
+    .part-banner:first-of-type { page-break-before: auto; }
+    .part-banner h2 {
+      color: #fff;
+      border: none;
+      margin: 0;
+      padding: 0;
+      font-size: 1.25rem;
+    }
+    .part-banner p { margin: 0.35rem 0 0; opacity: 0.9; font-size: 0.95rem; }
+    .mermaid {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 1rem 0;
+      overflow-x: auto;
+      page-break-inside: avoid;
+    }
+    footer.doc-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media print {
+      body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
+      .cover { min-height: auto; }
+      a { color: inherit; text-decoration: none; }
+      .feature, .part-banner, .shot, .mermaid { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+    }
+    @page { size: A4; margin: 14mm 12mm; }
+  </style>
+</head>
+<body>
+
+  <section class="cover">
+    <div class="brand">QuyHoạch AI</div>
+    <h1>Hướng dẫn người dân</h1>
+    <p class="subtitle">Ba quy trình trên app công dân: vào hệ thống · báo cáo vi phạm · tra cứu thông tin</p>
+    <table class="cover-meta">
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch &amp; trật tự xây dựng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Hướng dẫn sử dụng — vị trí Người dân</td></tr>
+      <tr><th>Phiên bản</th><td>1.2</td></tr>
+      <tr><th>Ngày</th><td>31/08/2026</td></tr>
+      <tr><th>Ứng dụng</th><td>App công dân (điện thoại hoặc trình duyệt)</td></tr>
+      <tr><th>Địa chỉ</th><td><code>https://quyhoach-citizen.vercel.app</code></td></tr>
+      <tr><th>Tài khoản demo</th><td><code>citizen@quyhoach.vn</code> / <code>Citizen@123</code></td></tr>
+    </table>
+  </section>
+
+  <nav class="toc" id="muc-luc">
+    <strong>Mục lục</strong>
+    <ol>
+      <li><a href="#qt1">Quy trình 1 — Vào hệ thống</a></li>
+      <li><a href="#qt2">Quy trình 2 — Báo cáo vi phạm</a></li>
+      <li><a href="#qt3">Quy trình 3 — Tra cứu thông tin</a></li>
+    </ol>
+    <p style="margin: 0.75rem 0 0; font-size: 0.9em; color: var(--muted);">Tài liệu này có đúng 3 quy trình.</p>
+  </nav>
+
+  <p>Tài liệu này dành cho tài khoản <strong>Người dân</strong> trên app. Cán bộ dùng web: xem <a href="HUONG-DAN-ADMIN.html">Hướng dẫn Admin</a>. Cán bộ xử lý trên điện thoại: xem <a href="HUONG-DAN-NGUOI-THUC-HIEN.html">Hướng dẫn Người thực hiện</a>.</p>
+  <p>Thanh tab dưới màn hình: <strong>Trang chủ · Thông báo · Cá nhân</strong>.</p>
+
+  <!-- ========== QT1 ========== -->
+  <div class="part-banner" id="qt1">
+    <h2>Quy trình 1 — Vào hệ thống</h2>
+    <p>Đăng nhập hoặc đăng ký (mặc định Người dân), dùng trang chủ, hồ sơ và đăng xuất.</p>
+  </div>
+
+  <p><span class="label">Mục đích</span> Mở app, xác thực tài khoản và quản lý thông tin cá nhân.</p>
+
+  <div class="mermaid">
+flowchart TD
+  MoApp["Mở app"] --> CoPhien{"Đã có phiên?"}
+  CoPhien -->|Có| TrangChu["Trang chủ"]
+  CoPhien -->|Không| DangNhap["Đăng nhập"]
+  DangNhap --> CoTK{"Đã có tài khoản?"}
+  CoTK -->|Chưa có| DangKy["Đăng ký Người dân"]
+  DangKy --> TrangChu
+  CoTK -->|Có| NhapTT["Nhập email và mật khẩu"]
+  NhapTT --> HopLe{"Đủ và đúng thông tin?"}
+  HopLe -->|Thiếu| CanhBao["Cảnh báo Thiếu thông tin"]
+  CanhBao --> NhapTT
+  HopLe -->|Sai| ThatBai["Đăng nhập thất bại"]
+  ThatBai --> NhapTT
+  HopLe -->|Đúng| TrangChu
+  TrangChu --> TabThongBao["Tab Thông báo"]
+  TrangChu --> TabCaNhan["Tab Cá nhân"]
+  TabCaNhan --> LuuHoSo["Lưu thông tin"]
+  TabCaNhan --> DoiMK["Đổi mật khẩu"]
+  TabCaNhan --> DangXuat["Đăng xuất"]
+  </div>
+
+  <div class="feature">
+    <h3>1.1. Đăng nhập</h3>
+    <p><strong>Đường vào:</strong> Mở app hoặc <code>https://quyhoach-citizen.vercel.app</code> → màn Đăng nhập.</p>
+    <figure class="shot mobile">
+      <img src="images/citizen-login.png" alt="Màn hình đăng nhập app công dân" />
+      <figcaption>Hình 1.1 — Đăng nhập (app công dân)</figcaption>
+    </figure>
+    <ol>
+      <li>Nhập EMAIL và MẬT KHẨU.</li>
+      <li>Nhấn <strong>Đăng nhập</strong> → vào Trang chủ.</li>
+    </ol>
+    <p>Trên màn hình có mục <strong>Tài khoản dùng thử</strong>: Người dân <code>citizen@quyhoach.vn</code> / <code>Citizen@123</code>.</p>
+    <div class="note">Thiếu thông tin → cảnh báo <em>Thiếu thông tin</em>. Sai thông tin → <em>Đăng nhập thất bại</em>. Chưa có tài khoản → <strong>Chưa có tài khoản? Đăng ký ngay</strong>.</div>
+  </div>
+
+  <div class="feature">
+    <h3>1.2. Đăng ký tài khoản Người dân</h3>
+    <ol>
+      <li>Họ và tên, Email (bắt buộc); Số điện thoại (tùy chọn).</li>
+      <li>Mật khẩu tối thiểu 6 ký tự.</li>
+      <li>Nhấn <strong>Đăng ký</strong> → hệ thống gán vai trò <strong>Người dân</strong> (không có mục chọn vai trò) và đăng nhập tự động vào Trang chủ. Huy hiệu hiển thị <strong>Người dân</strong>.</li>
+    </ol>
+    <div class="note">Mật khẩu dưới 6 ký tự → <em>Mật khẩu yếu</em>. Tài khoản Người thực hiện / Admin do cán bộ tạo trên web Admin (mục Người dùng) hoặc seed — không tự đăng ký trên app.</div>
+  </div>
+
+  <div class="feature">
+    <h3>1.3. Trang chủ</h3>
+    <p>Điểm xuất phát tới tiện ích và báo cáo của bạn.</p>
+    <figure class="shot mobile">
+      <img src="images/citizen-home.png" alt="Trang chủ app công dân" />
+      <figcaption>Hình 1.3 — Trang chủ</figcaption>
+    </figure>
+    <table>
+      <thead><tr><th>Khu vực</th><th>Nội dung</th><th>Đi tới</th></tr></thead>
+      <tbody>
+        <tr><td>Lời chào</td><td>Tên + huy hiệu Người dân</td><td>—</td></tr>
+        <tr><td>Tiện ích nhanh</td><td>Báo cáo; Nhà ở xã hội</td><td>Các màn tương ứng</td></tr>
+        <tr><td>Tra cứu chuyên sâu</td><td>Giấy phép xây dựng; Văn bản pháp luật; Thủ tục hành chính</td><td>Các màn tương ứng</td></tr>
+        <tr><td>Báo cáo của tôi</td><td>Tối đa 5 báo cáo gần nhất</td><td>Chi tiết báo cáo</td></tr>
+      </tbody>
+    </table>
+    <p>Kéo xuống để làm mới. <span class="empty">Trống: Chưa có báo cáo nào.</span></p>
+    <div class="note">Người dân không thấy mục <strong>QUẢN TRỊ / Trung tâm Quản trị</strong>. Mục đó chỉ hiện với tài khoản quản lý.</div>
+  </div>
+
+  <div class="feature">
+    <h3>1.4. Cá nhân, đổi mật khẩu, đăng xuất</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-profile.png" alt="Cá nhân" />
+      <figcaption>Hình 1.4 — Cá nhân</figcaption>
+    </figure>
+    <p><strong>Cập nhật:</strong> họ tên*, email*, điện thoại, tỉnh / quận / phường / đường → nhấn <strong>Lưu thông tin</strong> → <em>Đã cập nhật thông tin tài khoản</em>.</p>
+    <table>
+      <thead><tr><th>Menu</th><th>Hành vi</th></tr></thead>
+      <tbody>
+        <tr><td>Báo cáo đã gửi</td><td>Danh sách báo cáo của bạn</td></tr>
+        <tr><td>Đổi mật khẩu</td><td>Mật khẩu cũ → mật khẩu mới (tối thiểu 6 ký tự)</td></tr>
+        <tr><td>Cài đặt thông báo / Ngôn ngữ / Quyền riêng tư</td><td><em>Sắp ra mắt</em></td></tr>
+      </tbody>
+    </table>
+    <p>Đăng xuất cần xác nhận. Phiên bản dưới cùng: <em>QuyHoạch AI · v1.0.0</em>.</p>
+  </div>
+
+  <!-- ========== QT2 ========== -->
+  <div class="part-banner" id="qt2">
+    <h2>Quy trình 2 — Báo cáo vi phạm</h2>
+    <p>Gửi phản ánh, theo dõi trạng thái và nhận thông báo khi cán bộ xử lý.</p>
+  </div>
+
+  <p><span class="label">Mục đích</span> Gửi báo cáo tới cơ quan quản lý và xem phản hồi. Người dân không tự đổi trạng thái.</p>
+
+  <div class="mermaid">
+flowchart TD
+  Home["Trang chủ"] --> Form["Báo cáo vi phạm"]
+  Form --> Check{"Đủ tiêu đề, mô tả, địa chỉ?"}
+  Check -->|Không| Thieu["Cảnh báo Thiếu thông tin"]
+  Thieu --> Form
+  Check -->|Có| Gui["Gửi báo cáo"]
+  Gui --> Received["Trạng thái: Tiếp nhận"]
+  Received --> Mine["Báo cáo của tôi"]
+  Mine --> Detail["Chi tiết báo cáo"]
+  Detail --> Wait["Chờ cán bộ xử lý"]
+  Wait --> Notif["Tab Thông báo"]
+  Notif --> Detail
+  </div>
+
+  <p>Vòng đời trạng thái (người dân chỉ xem, không bấm chuyển):</p>
+  <div class="mermaid">
+stateDiagram-v2
+  [*] --> received: Gui_bao_cao
+  received --> processing: Can_bo_tiep_nhan
+  processing --> resolved: Duyet
+  processing --> rejected: Tu_choi
+  received --> resolved: Duyet_truc_tiep
+  received --> rejected: Tu_choi_truc_tiep
+  </div>
+
+  <div class="feature">
+    <h3>2.1. Gửi báo cáo</h3>
+    <p><strong>Đường vào:</strong> Trang chủ → <strong>Báo cáo</strong>.</p>
+    <figure class="shot mobile">
+      <img src="images/citizen-report.png" alt="Form gửi báo cáo vi phạm" />
+      <figcaption>Hình 2.1 — Gửi báo cáo vi phạm</figcaption>
+    </figure>
+    <ol>
+      <li>Tiêu đề (ví dụ: Nhà 4 tầng xây không phép).</li>
+      <li>Loại: Xây dựng trái phép / Lấn chiếm / Sai quy hoạch / Khác.</li>
+      <li>Địa chỉ (bắt buộc).</li>
+      <li>(Tùy chọn) Lấy tọa độ GPS hiện tại; Chọn ảnh từ thư viện.</li>
+      <li>Mô tả chi tiết → nhấn <strong>Gửi báo cáo</strong>.</li>
+    </ol>
+    <p>Thành công: <em>Báo cáo đã được gửi đến cơ quan quản lý</em> — trạng thái <strong>Tiếp nhận</strong>.</p>
+    <div class="note">Chỉ chọn ảnh từ thư viện (chưa chụp camera trực tiếp). Không chọn vị trí bằng ghim bản đồ — chỉ GPS tùy chọn.</div>
+  </div>
+
+  <div class="feature">
+    <h3>2.2. Chi tiết và theo dõi</h3>
+    <p><strong>Đường vào:</strong> Báo cáo của tôi trên trang chủ, menu <strong>Báo cáo đã gửi</strong> ở tab Cá nhân, hoặc một thông báo liên quan.</p>
+    <p>Hiển thị: tiêu đề, trạng thái, địa chỉ, thời gian, ảnh, mô tả, <strong>PHẢN HỒI TỪ QUẢN LÝ</strong> (khi cán bộ đã ghi).</p>
+    <table>
+      <thead><tr><th>Nhãn trên app</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td>Tiếp nhận</td><td>Cơ quan đã nhận</td></tr>
+        <tr><td>Đang xử lý</td><td>Đang được xem xét</td></tr>
+        <tr><td>Đã duyệt</td><td>Đã xử lý / chấp nhận (web gọi là Đã giải quyết)</td></tr>
+        <tr><td>Từ chối</td><td>Không chấp nhận</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Người dân không tự đổi trạng thái báo cáo. Chỉ cán bộ (web Admin hoặc app Người thực hiện) mới cập nhật.</div>
+  </div>
+
+  <div class="feature">
+    <h3>2.3. Thông báo</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-notifications.png" alt="Thông báo" />
+      <figcaption>Hình 2.3 — Thông báo</figcaption>
+    </figure>
+    <ol>
+      <li>Mở tab <strong>Thông báo</strong>.</li>
+      <li>Nhấn một mục → đánh dấu đã đọc; mở báo cáo nếu có liên kết.</li>
+      <li>Nhấn <strong>Đánh dấu đã đọc</strong> để đọc tất cả.</li>
+    </ol>
+    <p class="empty">Trống: Chưa có thông báo nào.</p>
+    <p>Hệ thống gửi thông báo khi báo cáo được tiếp nhận và khi cán bộ đổi trạng thái / ghi phản hồi.</p>
+  </div>
+
+  <!-- ========== QT3 ========== -->
+  <div class="part-banner" id="qt3">
+    <h2>Quy trình 3 — Tra cứu thông tin</h2>
+    <p>Tra cứu pháp luật, thủ tục hành chính, giấy phép xây dựng và nhà ở xã hội.</p>
+  </div>
+
+  <p><span class="label">Mục đích</span> Dùng các tiện ích tra cứu trên trang chủ.</p>
+
+  <div class="mermaid">
+flowchart TD
+  TrangChu["Trang chủ"] --> NOXH["Nhà ở xã hội"]
+  TrangChu --> GPXD["Giấy phép xây dựng"]
+  TrangChu --> VBPL["Văn bản pháp luật"]
+  TrangChu --> TTHC["Thủ tục hành chính"]
+  </div>
+
+  <div class="feature">
+    <h3>3.1. Văn bản pháp luật</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-legal.png" alt="Văn bản pháp luật" />
+      <figcaption>Hình 3.1 — Văn bản pháp luật</figcaption>
+    </figure>
+    <ol>
+      <li>Trang chủ → <strong>Văn bản pháp luật</strong>.</li>
+      <li>Gõ từ khóa tìm kiếm.</li>
+      <li>Mở văn bản → TÓM TẮT, NỘI DUNG, cơ quan / ngày.</li>
+    </ol>
+    <p class="empty">Trống: Không tìm thấy văn bản.</p>
+  </div>
+
+  <div class="feature">
+    <h3>3.2. Thủ tục hành chính</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-procedures.png" alt="Thủ tục hành chính" />
+      <figcaption>Hình 3.2 — Thủ tục hành chính</figcaption>
+    </figure>
+    <ol>
+      <li>Trang chủ → <strong>Thủ tục hành chính</strong>.</li>
+      <li>Tìm kiếm; mở nhóm danh mục (+/−).</li>
+      <li>Xem chi tiết: hồ sơ cần nộp, thời hạn, lệ phí, cơ quan tiếp nhận, căn cứ pháp lý. Trường trống hiện <em>Đang cập nhật</em>.</li>
+    </ol>
+    <p class="empty">Trống: Không có thủ tục phù hợp.</p>
+  </div>
+
+  <div class="feature">
+    <h3>3.3. Giấy phép xây dựng</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-permits.png" alt="Giấy phép xây dựng" />
+      <figcaption>Hình 3.3 — Giấy phép xây dựng</figcaption>
+    </figure>
+    <ol>
+      <li>Trang chủ → <strong>Giấy phép xây dựng</strong>.</li>
+      <li>Chọn mục → THÔNG TIN GIẤY PHÉP, CHỦ ĐẦU TƯ &amp; ĐỊA ĐIỂM, GHI CHÚ.</li>
+    </ol>
+    <div class="note">Dữ liệu mẫu cố định; chưa tìm kiếm / lọc nâng cao. ID không hợp lệ → <em>Không tìm thấy giấy phép</em>.</div>
+  </div>
+
+  <div class="feature">
+    <h3>3.4. Nhà ở xã hội</h3>
+    <figure class="shot mobile">
+      <img src="images/citizen-housing.png" alt="Nhà ở xã hội" />
+      <figcaption>Hình 3.4 — Nhà ở xã hội</figcaption>
+    </figure>
+    <ol>
+      <li>Trang chủ → <strong>Nhà ở xã hội</strong>.</li>
+      <li>Lọc Tất cả quận/huyện hoặc một khu vực.</li>
+      <li>Xem tên, địa chỉ, chủ đầu tư.</li>
+    </ol>
+    <p class="empty">Trống: Không có dự án cho khu vực đã chọn.</p>
+    <div class="note">Chưa có màn hình chi tiết từng dự án (chỉ danh sách).</div>
+  </div>
+
+  <footer class="doc-footer">Hết hướng dẫn người dân — QuyHoạch AI v1.2 · Mở file này trong trình duyệt rồi In → PDF nếu cần nộp giấy. Xem thêm: <a href="HUONG-DAN-NGUOI-DUNG.html">Mục lục hướng dẫn</a>.</footer>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", flowchart: { htmlLabels: false }, securityLevel: "loose" });
+  </script>
+</body>
+</html>

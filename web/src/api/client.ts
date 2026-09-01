@@ -1,4 +1,13 @@
-const API_BASE = `${(import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "")}/api`;
+const RENDER_API_ORIGIN = "https://quyhoach-api.onrender.com";
+
+function resolveApiHost(): string {
+  const raw = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  if (raw && !raw.includes("railway.app")) return raw;
+  if (import.meta.env.DEV) return raw || "http://localhost:8000";
+  return RENDER_API_ORIGIN;
+}
+
+const API_BASE = `${resolveApiHost()}/api`;
 
 const TOKEN_KEY = "qh_web_token";
 const USER_KEY = "qh_web_user";
@@ -43,11 +52,24 @@ export async function api<T>(
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
   }
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (
+      msg === "Failed to fetch" ||
+      msg.includes("NetworkError") ||
+      err instanceof TypeError
+    ) {
+      throw new Error("Không kết nối được máy chủ. Kiểm tra API hoặc mạng.");
+    }
+    throw err;
+  }
   const text = await res.text();
   let data: unknown;
   try {
@@ -56,8 +78,15 @@ export async function api<T>(
     data = { detail: text };
   }
   if (!res.ok) {
+    const railwayDown =
+      res.status === 404 &&
+      typeof data === "object" &&
+      data !== null &&
+      ("status" in data || "message" in data);
     const detail =
-      typeof data === "object" && data !== null && "detail" in data
+      railwayDown
+        ? "Máy chủ API đang tắt hoặc không tìm thấy. Liên hệ quản trị để bật lại backend."
+        : typeof data === "object" && data !== null && "detail" in data
         ? String((data as { detail: unknown }).detail)
         : `Lỗi ${res.status}`;
     throw new Error(detail);

@@ -9,12 +9,14 @@ export default function AdminTab() {
   const router = useRouter();
   const { user } = useAuth();
 
-  if (user?.role !== "admin") {
+  if (user?.role !== "manager") {
     return (
       <SafeAreaView style={styles.container} testID="admin-tab-no-access">
         <View style={styles.noAccessWrap}>
           <Text style={styles.noAccessTitle}>Bạn không có quyền truy cập</Text>
-          <Text style={styles.noAccessText}>Khu vực này chỉ dành cho tài khoản quản trị.</Text>
+          <Text style={styles.noAccessText}>
+            Khu vực này chỉ dành cho tài khoản Người thực hiện (manager).
+          </Text>
         </View>
       </SafeAreaView>
     );

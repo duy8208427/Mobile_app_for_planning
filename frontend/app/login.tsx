@@ -13,7 +13,13 @@ import {
 import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../src/auth";
-import { colors, spacing, radius } from "../src/theme";
+import { colors, spacing } from "../src/theme";
+
+function showNotice(title: string, message: string) {
+  if (Platform.OS !== "web") {
+    Alert.alert(title, message);
+  }
+}
 
 export default function Login() {
   const router = useRouter();
@@ -21,15 +27,24 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const onSubmit = async () => {
-    if (!email || !password) return Alert.alert("Thiếu thông tin", "Vui lòng nhập email và mật khẩu");
+    if (!email || !password) {
+      const msg = "Vui lòng nhập email và mật khẩu";
+      setError(msg);
+      showNotice("Thiếu thông tin", msg);
+      return;
+    }
+    setError("");
     setLoading(true);
     try {
-      const u = await login(email.trim(), password);
+      await login(email.trim(), password);
       router.replace("/(tabs)");
     } catch (e: any) {
-      Alert.alert("Đăng nhập thất bại", e.message || "Vui lòng thử lại");
+      const msg = e.message || "Vui lòng thử lại";
+      setError(msg);
+      showNotice("Đăng nhập thất bại", msg);
     } finally {
       setLoading(false);
     }
@@ -58,7 +73,10 @@ export default function Login() {
               placeholder="email@quyhoach.vn"
               placeholderTextColor={colors.textMuted}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(v) => {
+                setEmail(v);
+                if (error) setError("");
+              }}
             />
             <Text style={styles.label}>MẬT KHẨU</Text>
             <TextInput
@@ -68,8 +86,16 @@ export default function Login() {
               placeholder="••••••••"
               placeholderTextColor={colors.textMuted}
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => {
+                setPassword(v);
+                if (error) setError("");
+              }}
             />
+            {error ? (
+              <Text testID="login-error" style={styles.error}>
+                {error}
+              </Text>
+            ) : null}
             <TouchableOpacity
               testID="login-submit-button"
               style={[styles.btn, loading && { opacity: 0.6 }]}
@@ -83,7 +109,8 @@ export default function Login() {
           <View style={styles.helperBox}>
             <Text style={styles.helperTitle}>Tài khoản dùng thử</Text>
             <Text style={styles.helperLine}>Người dân: citizen@quyhoach.vn / Citizen@123</Text>
-            <Text style={styles.helperLine}>Quản lý: admin@quyhoach.vn / Admin@123</Text>
+            <Text style={styles.helperLine}>Người thực hiện: manager@quyhoach.vn / Manager@123</Text>
+            <Text style={styles.helperLine}>Admin (web): admin@quyhoach.vn / Admin@123</Text>
           </View>
 
           <View style={styles.footer}>
@@ -134,6 +161,16 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.md,
     backgroundColor: "#fff",
+  },
+  error: {
+    color: colors.alert,
+    fontSize: 13,
+    marginBottom: spacing.sm,
+    backgroundColor: "#FEF2F2",
+    borderWidth: 1,
+    borderColor: "#FECACA",
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 8,
   },
   btn: {
     backgroundColor: colors.primary,

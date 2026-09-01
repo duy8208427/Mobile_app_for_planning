@@ -1,6 +1,5 @@
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import type { Violation } from "../api/types";
 
 const DEMO_CENTER: [number, number] = [105.634, 10.457];
 
@@ -12,16 +11,10 @@ const ZONE_COLORS: Record<string, string> = {
 };
 
 interface PlanningMapProps {
-  violations?: Violation[];
-  onSelectViolation?: (v: Violation) => void;
   className?: string;
 }
 
-export function PlanningMap({
-  violations = [],
-  onSelectViolation,
-  className = "",
-}: PlanningMapProps) {
+export function PlanningMap({ className = "" }: PlanningMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [selectedProps, setSelectedProps] = useState<Record<string, unknown> | null>(
@@ -112,70 +105,6 @@ export function PlanningMap({
       mapRef.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-
-    const syncViolations = () => {
-      const fc = {
-        type: "FeatureCollection" as const,
-        features: violations.map((v) => ({
-          type: "Feature" as const,
-          geometry: {
-            type: "Point" as const,
-            coordinates: [v.longitude, v.latitude],
-          },
-          properties: {
-            id: v.id,
-            severity: v.severity,
-            reason: v.reason,
-            status: v.status,
-          },
-        })),
-      };
-
-      if (map.getSource("violations")) {
-        (map.getSource("violations") as maplibregl.GeoJSONSource).setData(fc);
-      } else {
-        map.addSource("violations", { type: "geojson", data: fc });
-        map.addLayer({
-          id: "violations-circle",
-          type: "circle",
-          source: "violations",
-          paint: {
-            "circle-radius": 8,
-            "circle-color": [
-              "match",
-              ["get", "severity"],
-              "high",
-              "#FF3B30",
-              "medium",
-              "#FF9500",
-              "#0A4ABF",
-            ],
-            "circle-stroke-width": 2,
-            "circle-stroke-color": "#fff",
-          },
-        });
-      }
-    };
-
-    if (map.loaded()) syncViolations();
-    else map.once("load", syncViolations);
-
-    const onViolationClick = (e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
-      const id = e.features?.[0]?.properties?.id as string | undefined;
-      if (!id || !onSelectViolation) return;
-      const v = violations.find((x) => x.id === id);
-      if (v) onSelectViolation(v);
-    };
-
-    map.on("click", "violations-circle", onViolationClick);
-    return () => {
-      map.off("click", "violations-circle", onViolationClick);
-    };
-  }, [violations, onSelectViolation]);
 
   return (
     <div className={`relative flex flex-1 flex-col ${className}`}>

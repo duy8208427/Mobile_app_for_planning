@@ -46,7 +46,7 @@ export function DashboardPage() {
         >
           <h2 className="text-lg font-semibold">Bản đồ quy hoạch</h2>
           <p className="mt-1 text-sm text-text-muted">
-            Overlay vùng quy hoạch và điểm nghi vấn vi phạm
+            Overlay vùng quy hoạch demo
           </p>
         </Link>
         <Link

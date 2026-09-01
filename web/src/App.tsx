@@ -6,7 +6,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MapPage } from "./pages/MapPage";
 import { ReportsPage } from "./pages/ReportsPage";
-import { ViolationsPage } from "./pages/ViolationsPage";
+import { UsersPage } from "./pages/UsersPage";
 
 export default function App() {
   return (
@@ -19,8 +19,8 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<DashboardPage />} />
               <Route path="/admin/map" element={<MapPage />} />
-              <Route path="/admin/violations" element={<ViolationsPage />} />
               <Route path="/admin/reports" element={<ReportsPage />} />
+              <Route path="/admin/users" element={<UsersPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/admin" replace />} />

@@ -5,7 +5,7 @@ type User = {
   id: string;
   email: string;
   full_name: string;
-  role: "citizen" | "admin";
+  role: "citizen" | "manager" | "admin";
   phone?: string;
   address?: {
     province?: string | null;
@@ -24,8 +24,7 @@ type AuthCtx = {
     email: string,
     password: string,
     full_name: string,
-    phone?: string,
-    role?: "citizen" | "admin"
+    phone?: string
   ) => Promise<User>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -79,12 +78,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string,
     password: string,
     full_name: string,
-    phone?: string,
-    role: "citizen" | "admin" = "citizen"
+    phone?: string
   ) => {
     const data = await api("/auth/register", {
       method: "POST",
-      body: { email, password, full_name, phone, role },
+      body: { email, password, full_name, phone },
       auth: false,
     });
     await saveAuth(data.access_token, data.user);

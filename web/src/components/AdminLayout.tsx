@@ -4,8 +4,8 @@ import { useAuth } from "../auth/AuthContext";
 const nav = [
   { to: "/admin", label: "Tổng quan", end: true },
   { to: "/admin/map", label: "Bản đồ quy hoạch" },
-  { to: "/admin/violations", label: "Nghi vấn vi phạm" },
   { to: "/admin/reports", label: "Báo cáo công dân" },
+  { to: "/admin/users", label: "Người dùng" },
 ];
 
 export function AdminLayout() {

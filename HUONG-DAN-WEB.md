@@ -9,8 +9,8 @@ Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, nghi vấn
 | | **Local (dev trên PC)** | **Production (link online)** |
 |--|-------------------------|------------------------------|
 | Khi nào dùng | Sửa code, test trên máy | Demo khách, iPhone 4G, không cần PC bật |
-| MongoDB | `mongod.exe` local **hoặc** Atlas | **MongoDB Railway** (service trong project) **hoặc** Atlas — qua `MONGO_URL` trên Railway |
-| Backend API | `http://localhost:8000` | `https://quyhoach-api-production.up.railway.app` |
+| MongoDB | `mongod.exe` local **hoặc** Atlas | **MongoDB Atlas** — `MONGO_URL` trên Render |
+| Backend API | `http://localhost:8000` | Render (ví dụ `https://quyhoach-api.onrender.com`) — Railway cũ đang 404 |
 | Web admin | `http://localhost:5173` | `https://quyhoach-web.vercel.app` |
 | App công dân | Expo / emulator | `https://quyhoach-citizen.vercel.app` |
 | Cần terminal bật? | **Có** | **Không** |
@@ -84,7 +84,7 @@ Mở trình duyệt: http://localhost:5173
 - `GET /api/admin/stats`
 - `GET /api/reports`, `PUT /api/reports/{id}`
 - `GET /api/planning/zones`, `GET /api/planning/buildings`
-- `GET /api/violations`, `PATCH /api/violations/{id}/review`
+- (API `GET /api/violations` còn trên backend; đã gỡ khỏi UI web admin)
 
 ---
 
@@ -136,7 +136,8 @@ git branch -M main
 git push -u origin main
 ```
 
-**Không** commit file `.env` — đã có trong `.gitignore`. Chỉ dùng `.env.example` làm mẫu.
+# Khong commit file .env. Chi dung .env.example / render.yaml.
+# Wizard: powershell -ExecutionPolicy Bypass -File .\scripts\self-deploy.ps1
 
 **Lưu ý:** `backend/requirements.txt` đã bỏ `emergentintegrations` (không có trên PyPI) — web admin deploy bình thường; tính năng AI compare trên mobile cần cài package riêng khi dev local.
 
@@ -274,16 +275,66 @@ Vercel (citizen)        → EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api-product
 
 ---
 
-### Phương án dự phòng — Render (API)
+### Bật lại web production — Render (API) + Atlas + Vercel
 
-Repo có [`render.yaml`](render.yaml) nếu muốn deploy backend trên [Render](https://render.com) thay Railway:
+Railway `quyhoach-api-production.up.railway.app` đang **404** (`x-railway-fallback`). Dùng Render thay thế.
+
+#### A. MongoDB Atlas
+
+1. [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) → Create → **M0 FREE**, region **Singapore (`ap-southeast-1`)**.
+2. **Database Access** → Add user (username + password) → lưu lại.
+3. **Network Access** → **Allow Access from Anywhere** (`0.0.0.0/0`).
+4. **Connect** → Drivers → connection string, thêm database `quyhoach`:
+
+```
+mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/quyhoach?retryWrites=true&w=majority
+```
+
+URL-encode ký tự đặc biệt trong password (`@` → `%40`, `#` → `%23`).
+
+#### B. GitHub
+
+Đẩy repo lên GitHub (Render đọc từ GitHub). Root phải chứa [`render.yaml`](render.yaml).
+
+#### C. Render Web Service
+
+1. [render.com](https://render.com) → **New** → **Blueprint** (file `render.yaml`) **hoặc** **Web Service** thủ công:
 
 | Mục | Giá trị |
 |-----|---------|
 | Root Directory | `backend` |
-| Start Command | `uvicorn server:app --host 0.0.0.0 --port $PORT` |
+| Runtime | Python |
+| Build | `pip install -r requirements.txt` |
+| Start | `uvicorn server:app --host 0.0.0.0 --port $PORT` |
+| Health Check | `/health` |
+| Region | Singapore |
 
-**Lưu ý:** Render free tier **ngủ sau ~15 phút** không có request; lần mở đầu có thể chậm 30–60 giây. Khi dùng Render, đổi `VITE_API_URL` và `EXPO_PUBLIC_BACKEND_URL` sang URL Render (ví dụ `https://quyhoach-api.onrender.com`).
+2. Environment:
+
+| Biến | Giá trị |
+|------|---------|
+| `MONGO_URL` | chuỗi Atlas ở bước A |
+| `DB_NAME` | `quyhoach` |
+| `JWT_SECRET` | chuỗi ngẫu nhiên 32+ ký tự |
+| `CORS_ORIGINS` | `https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app` |
+
+(`CORS_ORIGINS` và `DB_NAME` đã có trong [`render.yaml`](render.yaml); `MONGO_URL` phải dán tay.)
+
+3. Deploy xong, URL dạng `https://quyhoach-api.onrender.com`.
+4. Kiểm tra: `GET https://<host>/health` và `GET https://<host>/api/` → `{"app":"QuyHoạch AI","ok":true}`.
+
+**Lưu ý:** Free tier **ngủ ~15 phút**; lần mở đầu chậm 30–60 giây.
+
+#### D. Vercel — trỏ API mới rồi Redeploy
+
+| Project | Biến | Giá trị |
+|---------|------|---------|
+| `quyhoach-citizen` | `EXPO_PUBLIC_BACKEND_URL` | `https://<host-render>` (không có `/api`) |
+| `quyhoach-web` | `VITE_API_URL` | `https://<host-render>` |
+
+Settings → Environment Variables → Save → **Deployments → Redeploy** (bắt buộc: biến bake lúc build).
+
+Đăng nhập: `citizen@quyhoach.vn` / `Citizen@123` (citizen) và `admin@quyhoach.vn` / `Admin@123` (admin).
 
 ---
 
@@ -306,6 +357,6 @@ Web Vercel: `VITE_API_URL` và `EXPO_PUBLIC_BACKEND_URL` cùng URL API productio
 ## Dữ liệu demo GIS
 
 - File tĩnh: `web/public/data/planning_zones_demo.geojson`
-- Mongo (sau seed): collections `planning_zones`, `observed_buildings`, `violations`
+- Mongo (sau seed): collections `planning_zones`, `observed_buildings` (và `violations` nếu seed cũ — không còn UI)
 
 Restart backend một lần để `seed_planning_data()` chạy khi DB trống.

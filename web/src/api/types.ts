@@ -1,4 +1,4 @@
-export type UserRole = "citizen" | "admin";
+export type UserRole = "citizen" | "manager" | "admin";
 
 export interface User {
   id: string;
@@ -22,6 +22,22 @@ export interface AdminStats {
   rejected: number;
 }
 
+export interface AdminUserCreate {
+  email: string;
+  password: string;
+  full_name: string;
+  phone?: string | null;
+  role: UserRole;
+}
+
+export interface AdminUserUpdate {
+  email?: string;
+  password?: string;
+  full_name?: string;
+  phone?: string | null;
+  role?: UserRole;
+}
+
 export interface Report {
   id: string;
   user_id: string;
@@ -35,22 +51,6 @@ export interface Report {
   status: "received" | "processing" | "resolved" | "rejected";
   admin_response?: string | null;
   handled_by?: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Violation {
-  id: string;
-  latitude: number;
-  longitude: number;
-  severity: "low" | "medium" | "high";
-  rule_id: string;
-  reason: string;
-  confidence: number;
-  status: "pending_review" | "confirmed" | "rejected";
-  zone_code?: string | null;
-  reviewed_by?: string | null;
-  review_note?: string | null;
   created_at: string;
   updated_at: string;
 }

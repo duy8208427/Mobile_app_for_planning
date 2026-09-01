@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hướng dẫn người dùng — QuyHoạch AI v1.2</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --primary: #0A4ABF;
+      --text: #1a1a1a;
+      --muted: #555;
+      --border: #d0d7de;
+      --bg-soft: #f6f8fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      line-height: 1.55;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      background: #fff;
+      font-size: 11pt;
+    }
+    .cover {
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      border-bottom: 3px solid var(--primary);
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+    }
+    .cover .brand {
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .cover h1 {
+      font-size: 2rem;
+      margin: 0.4rem 0 0.6rem;
+      color: var(--primary);
+    }
+    .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
+    .cover-meta {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 480px;
+    }
+    .cover-meta th, .cover-meta td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .cover-meta th { background: var(--bg-soft); width: 38%; }
+    h2 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 0.25rem;
+      margin-top: 2rem;
+      page-break-after: avoid;
+    }
+    h3 { color: #0d3a8f; margin-top: 1.35rem; page-break-after: avoid; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.95em;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      vertical-align: top;
+    }
+    th { background: var(--bg-soft); text-align: left; }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88em;
+      background: var(--bg-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 0.25rem 0; }
+    a { color: var(--primary); }
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0 2rem;
+    }
+    .guide-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.15rem;
+      background: #fff;
+    }
+    .guide-card h3 {
+      margin: 0 0 0.4rem;
+      color: var(--primary);
+    }
+    .guide-card p { margin: 0.35rem 0; color: var(--muted); }
+    .guide-card a.btn {
+      display: inline-block;
+      margin-top: 0.65rem;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.95em;
+    }
+    .note {
+      background: #fff8e6;
+      border-left: 4px solid #e6a700;
+      padding: 0.55rem 0.85rem;
+      margin: 0.8rem 0;
+      font-size: 0.95em;
+    }
+    .mermaid {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 1rem 0;
+      overflow-x: auto;
+      page-break-inside: avoid;
+    }
+    footer.doc-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media print {
+      body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
+      a { color: inherit; }
+      .guide-card, .mermaid { break-inside: avoid; }
+    }
+    @page { size: A4; margin: 14mm 12mm; }
+  </style>
+</head>
+<body>
+
+  <section class="cover">
+    <div class="brand">QuyHoạch AI</div>
+    <h1>Hướng dẫn người dùng</h1>
+    <p class="subtitle">Mục lục theo vị trí — mỗi vị trí có quy trình và sơ đồ riêng</p>
+    <table class="cover-meta">
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch &amp; trật tự xây dựng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Mục lục hướng dẫn sử dụng</td></tr>
+      <tr><th>Phiên bản</th><td>1.2</td></tr>
+      <tr><th>Ngày</th><td>31/08/2026</td></tr>
+    </table>
+  </section>
+
+  <p>Có <strong>3 vai trò = 3 file hướng dẫn</strong>. File này chỉ là mục lục, không phải vai trò hay quy trình thứ 4. Mỗi quy trình có sơ đồ Mermaid rồi mới đến các bước trên giao diện.</p>
+
+  <h2>Ai dùng kênh nào</h2>
+
+  <div class="mermaid">
+flowchart LR
+  Dan["Người dân"] --> App["App công dân"]
+  ThucHien["Người thực hiện"] --> App
+  Admin["Admin"] --> Web["Web quản trị"]
+  App --> API["API"]
+  Web --> API
+  Dan -->|"Gửi báo cáo"| API
+  ThucHien -->|"Xử lý báo cáo trên app"| API
+  Admin -->|"Báo cáo trên web"| API
+  API -->|"Thông báo"| Dan
+  </div>
+
+  <div class="card-grid">
+    <article class="guide-card">
+      <h3>1. Người dân</h3>
+      <p>App điện thoại / trình duyệt. Gửi báo cáo vi phạm, theo dõi phản hồi, tra cứu và phân tích AI.</p>
+      <p><strong>Ba quy trình:</strong> Vào hệ thống · Báo cáo vi phạm · Tra cứu và phân tích AI</p>
+      <p>Demo: <code>citizen@quyhoach.vn</code> / <code>Citizen@123</code> · <code>https://quyhoach-citizen.vercel.app</code></p>
+      <a class="btn" href="HUONG-DAN-NGUOI-DAN.html">Mở hướng dẫn người dân</a>
+    </article>
+    <article class="guide-card">
+      <h3>2. Admin (web)</h3>
+      <p>Trình duyệt máy tính. Thống kê và xử lý báo cáo từ công dân.</p>
+      <p><strong>Ba quy trình:</strong> Đăng nhập và tổng quan · Báo cáo từ công dân trên web · Quản lý người dùng</p>
+      <p>Demo: <code>admin@quyhoach.vn</code> / <code>Admin@123</code> · <code>https://quyhoach-web.vercel.app</code></p>
+      <a class="btn" href="HUONG-DAN-ADMIN.html">Mở hướng dẫn Admin</a>
+    </article>
+    <article class="guide-card">
+      <h3>3. Người thực hiện (app)</h3>
+      <p>Cùng app với người dân. Xử lý báo cáo trên điện thoại (Trung tâm Quản trị). Vai trò kỹ thuật <code>manager</code> — tách biệt với Admin web.</p>
+      <p><strong>Ba quy trình:</strong> Vào app với tài khoản thực hiện · Trung tâm Quản trị · Xử lý từng báo cáo</p>
+      <p>Demo: <code>manager@quyhoach.vn</code> / <code>Manager@123</code> · <code>https://quyhoach-citizen.vercel.app</code></p>
+      <a class="btn" href="HUONG-DAN-NGUOI-THUC-HIEN.html">Mở hướng dẫn người thực hiện</a>
+    </article>
+  </div>
+
+  <h2>Tài khoản và địa chỉ</h2>
+  <table>
+    <thead><tr><th>Ứng dụng</th><th>Địa chỉ production</th></tr></thead>
+    <tbody>
+      <tr><td>App công dân (và người thực hiện)</td><td><code>https://quyhoach-citizen.vercel.app</code></td></tr>
+      <tr><td>Web quản trị (Admin)</td><td><code>https://quyhoach-web.vercel.app</code></td></tr>
+    </tbody>
+  </table>
+  <table>
+    <thead><tr><th>Vai trò</th><th>Mã</th><th>Email</th><th>Mật khẩu</th></tr></thead>
+    <tbody>
+      <tr><td>Người dân</td><td><code>citizen</code></td><td><code>citizen@quyhoach.vn</code></td><td><code>Citizen@123</code></td></tr>
+      <tr><td>Người thực hiện</td><td><code>manager</code></td><td><code>manager@quyhoach.vn</code></td><td><code>Manager@123</code></td></tr>
+      <tr><td>Admin (web)</td><td><code>admin</code></td><td><code>admin@quyhoach.vn</code></td><td><code>Admin@123</code></td></tr>
+    </tbody>
+  </table>
+  <div class="note">Ba vai trò kỹ thuật: <code>citizen</code>, <code>manager</code>, <code>admin</code>. Người thực hiện không đăng nhập web Admin; Admin không dùng Trung tâm Quản trị trên app. Quy trình kỹ thuật: <code>SO-TAY-QUAN-TRI.html</code>.</div>
+
+  <footer class="doc-footer">QuyHoạch AI v1.2 · Mở từng file hướng dẫn trong trình duyệt rồi In → PDF nếu cần nộp giấy.</footer>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", flowchart: { htmlLabels: false }, securityLevel: "loose" });
+  </script>
+</body>
+</html>

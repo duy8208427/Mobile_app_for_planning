@@ -21,7 +21,7 @@ export function LoginPage() {
     try {
       const u = await login(email.trim(), password);
       if (u.role !== "admin") {
-        setError("Tài khoản không có quyền quản trị web.");
+        setError("Tài khoản không có quyền quản trị web. Chỉ Admin mới đăng nhập được.");
         return;
       }
       navigate("/admin");

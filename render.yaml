@@ -2,10 +2,14 @@ services:
   - type: web
     name: quyhoach-api
     runtime: python
+    region: singapore
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
       - key: MONGO_URL
         sync: false
       - key: DB_NAME
@@ -13,4 +17,4 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ORIGINS
-        sync: false
+        value: https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app

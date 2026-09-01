@@ -10,7 +10,7 @@ export default function Admin() {
   const { mine } = useLocalSearchParams<{ mine?: string }>();
   const { user } = useAuth();
 
-  const isMine = mine === "1" || user?.role !== "admin";
+  const isMine = mine === "1" || user?.role !== "manager";
 
   return (
     <SafeAreaView style={styles.container} testID="admin-screen">
