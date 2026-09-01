@@ -93,6 +93,7 @@ android-sdk/-e
 # Environment and credential files
 .env
 .env.*
+scripts/.deploy-local.ps1
 !.env.example
 *.env
 !**/.env.example
