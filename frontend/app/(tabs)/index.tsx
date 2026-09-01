@@ -26,12 +26,19 @@ type ReportItem = {
 export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
+  const isManager = user?.role === "manager";
   const [recent, setRecent] = useState<ReportItem[]>([]);
   const [loadingHome, setLoadingHome] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
+    if (isManager) {
+      setLoadError("");
+      setRecent([]);
+      setLoadingHome(false);
+      return;
+    }
     setLoadError("");
     try {
       const r = await api("/reports/mine");
@@ -42,7 +49,7 @@ export default function Home() {
     } finally {
       setLoadingHome(false);
     }
-  }, []);
+  }, [isManager]);
 
   useEffect(() => {
     setLoadingHome(true);
@@ -158,11 +165,14 @@ export default function Home() {
           <View style={styles.headerHint}>
             <Ionicons name="information-circle-outline" size={14} color={colors.primary} />
             <Text style={styles.headerHintText}>
-              Theo dõi quy hoạch, báo cáo vi phạm và tra cứu thông tin tại một nơi
+              {isManager
+                ? "Xem thống kê và xử lý báo cáo người dân tại Trung tâm Quản trị"
+                : "Theo dõi quy hoạch, báo cáo vi phạm và tra cứu thông tin tại một nơi"}
             </Text>
           </View>
         </View>
 
+        {!isManager && (
         <TouchableOpacity
           testID="compare-feature-card"
           style={styles.heroCard}
@@ -185,7 +195,9 @@ export default function Home() {
             </View>
           </View>
         </TouchableOpacity>
+        )}
 
+        {!isManager && (
         <View style={styles.sectionWrap}>
           <Text style={styles.sectionTitle}>TIỆN ÍCH NHANH</Text>
           <View style={styles.quickGrid}>
@@ -206,7 +218,9 @@ export default function Home() {
             ))}
           </View>
         </View>
+        )}
 
+        {!isManager && (
         <View style={styles.sectionWrap}>
           <Text style={styles.sectionTitle}>TRA CỨU CHUYÊN SÂU</Text>
           {highlightFeatures.map((item) => (
@@ -228,8 +242,9 @@ export default function Home() {
             </TouchableOpacity>
           ))}
         </View>
+        )}
 
-        {user?.role === "manager" && (
+        {isManager && (
           <View style={styles.sectionWrap}>
             <Text style={styles.sectionTitle}>QUẢN TRỊ</Text>
             <TouchableOpacity
@@ -249,6 +264,7 @@ export default function Home() {
           </View>
         )}
 
+        {!isManager && (
         <View style={styles.sectionWrap}>
           <Text style={styles.sectionTitle}>BÁO CÁO CỦA TÔI</Text>
           {loadingHome ? (
@@ -297,6 +313,7 @@ export default function Home() {
             ))
           )}
         </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
