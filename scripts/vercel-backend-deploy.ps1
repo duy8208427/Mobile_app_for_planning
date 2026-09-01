@@ -54,12 +54,12 @@ if (-not $apiProject) { throw "Could not find or create project $apiProjectName"
 $apiPid = $apiProject.id
 Write-Host "API project id: $apiPid"
 
-function Set-ProjectEnv([string]$pid, [hashtable]$vars) {
-    $existing = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$pid/env" -Headers $vercelHeaders
+function Set-ProjectEnv([string]$projectId, [hashtable]$vars) {
+    $existing = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$projectId/env" -Headers $vercelHeaders
     foreach ($key in $vars.Keys) {
         foreach ($ev in $existing.envs) {
             if ($ev.key -eq $key) {
-                Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$pid/env/$($ev.id)" -Headers $vercelHeaders -Method DELETE | Out-Null
+                Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$projectId/env/$($ev.id)" -Headers $vercelHeaders -Method DELETE | Out-Null
             }
         }
         $payload = @(@{
@@ -68,8 +68,8 @@ function Set-ProjectEnv([string]$pid, [hashtable]$vars) {
             target = @("production", "preview", "development")
             type = "encrypted"
         }) | ConvertTo-Json -Depth 5
-        Invoke-RestMethod -Uri "https://api.vercel.com/v10/projects/$pid/env" -Headers $vercelHeaders -Method POST -Body $payload | Out-Null
-        Write-Host "Set env $key on $pid"
+        Invoke-RestMethod -Uri "https://api.vercel.com/v10/projects/$projectId/env" -Headers $vercelHeaders -Method POST -Body $payload | Out-Null
+        Write-Host "Set env $key on $projectId"
     }
 }
 
@@ -80,14 +80,18 @@ Set-ProjectEnv $apiPid @{
     CORS_ORIGINS = $cors
 }
 
-Write-Host "Deploying API..."
+$projectDetail = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$apiPid" -Headers $vercelHeaders
+$repoId = $projectDetail.link.repoId
+if (-not $repoId) { throw "Project has no git repoId" }
+
+Write-Host "Deploying API (repoId=$repoId)..."
 $depBody = @{
     name = $apiProjectName
     project = $apiProjectName
     target = "production"
     gitSource = @{
         type = "github"
-        repo = "duy8208427/Mobile_app_for_planning"
+        repoId = $repoId
         ref = "main"
     }
 } | ConvertTo-Json -Depth 5
@@ -142,11 +146,16 @@ foreach ($p in $projectsResp.projects) {
     if (-not $map.ContainsKey($p.name)) { continue }
     Set-ProjectEnv $p.id @{ $map[$p.name] = $apiHost }
     try {
+        $pd = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$($p.id)" -Headers $vercelHeaders
         $dep2Body = @{
             name = $p.name
             project = $p.name
             target = "production"
-            gitSource = @{ type = "github"; repo = $p.link.repo; ref = "main" }
+            gitSource = @{
+                type = "github"
+                repoId = $pd.link.repoId
+                ref = "main"
+            }
         } | ConvertTo-Json -Depth 5
         $dep2 = Invoke-RestMethod -Uri "https://api.vercel.com/v13/deployments" -Headers $vercelHeaders -Method POST -Body $dep2Body
         Write-Host "Redeploy $($p.name): $($dep2.url)"

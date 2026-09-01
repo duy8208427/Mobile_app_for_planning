@@ -21,13 +21,13 @@ foreach ($p in $projectsResp.projects) {
     $name = $p.name
     if (-not $map.ContainsKey($name)) { continue }
     $key = $map[$name]
-    $pid = $p.id
+    $projectId = $p.id
     Write-Host "Project $name -> $key"
 
-    $existing = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$pid/env" -Headers $vercelHeaders
+    $existing = Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$projectId/env" -Headers $vercelHeaders
     foreach ($ev in $existing.envs) {
         if ($ev.key -eq $key) {
-            Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$pid/env/$($ev.id)" -Headers $vercelHeaders -Method DELETE | Out-Null
+            Invoke-RestMethod -Uri "https://api.vercel.com/v9/projects/$projectId/env/$($ev.id)" -Headers $vercelHeaders -Method DELETE | Out-Null
         }
     }
 
@@ -37,7 +37,7 @@ foreach ($p in $projectsResp.projects) {
         target = @("production", "preview", "development")
         type = "encrypted"
     }) | ConvertTo-Json -Depth 5
-    Invoke-RestMethod -Uri "https://api.vercel.com/v10/projects/$pid/env" -Headers $vercelHeaders -Method POST -Body $envPayload | Out-Null
+    Invoke-RestMethod -Uri "https://api.vercel.com/v10/projects/$projectId/env" -Headers $vercelHeaders -Method POST -Body $envPayload | Out-Null
 
     try {
         $depBody = @{

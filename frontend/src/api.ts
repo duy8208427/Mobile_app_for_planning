@@ -1,11 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-/** Render Blueprint service name `quyhoach-api` → this host. Railway URL cũ đang 404. */
-export const RENDER_API_ORIGIN = "https://quyhoach-api.onrender.com";
+/** Production API (Vercel). Render/Railway URLs cũ đang 404. */
+export const PRODUCTION_API_ORIGIN = "https://quyhoach-api.vercel.app";
 
 function resolveBackendUrl(raw: string): string {
   const url = (raw || "").replace(/\/$/, "");
-  if (!url || url.includes("railway.app")) return RENDER_API_ORIGIN;
+  if (!url || url.includes("railway.app") || url.includes("onrender.com")) {
+    return PRODUCTION_API_ORIGIN;
+  }
   return url;
 }
 

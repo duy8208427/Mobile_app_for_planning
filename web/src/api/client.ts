@@ -1,10 +1,10 @@
-const RENDER_API_ORIGIN = "https://quyhoach-api.onrender.com";
+const PRODUCTION_API_ORIGIN = "https://quyhoach-api.vercel.app";
 
 function resolveApiHost(): string {
   const raw = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-  if (raw && !raw.includes("railway.app")) return raw;
+  if (raw && !raw.includes("railway.app") && !raw.includes("onrender.com")) return raw;
   if (import.meta.env.DEV) return raw || "http://localhost:8000";
-  return RENDER_API_ORIGIN;
+  return PRODUCTION_API_ORIGIN;
 }
 
 const API_BASE = `${resolveApiHost()}/api`;
