@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "name": "pilot_xa_cao_lanh",
+  "crs": { "type": "name", "properties": { "name": "EPSG:4326" } },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "p-odt-1",
+        "so_to": "12",
+        "so_thua": "15",
+        "loai_dat": "ODT",
+        "allow_build": true,
+        "xa": "Hòa Thuận"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[105.628, 10.452], [105.635, 10.452], [105.635, 10.458], [105.628, 10.458], [105.628, 10.452]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "p-ont-1",
+        "so_to": "12",
+        "so_thua": "16",
+        "loai_dat": "ONT",
+        "allow_build": true,
+        "xa": "Hòa Thuận"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[105.635, 10.452], [105.640, 10.452], [105.640, 10.458], [105.635, 10.458], [105.635, 10.452]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "p-lua-1",
+        "so_to": "12",
+        "so_thua": "21",
+        "loai_dat": "LUA",
+        "allow_build": false,
+        "xa": "Hòa Thuận"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[105.628, 10.458], [105.640, 10.458], [105.640, 10.464], [105.628, 10.464], [105.628, 10.458]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "p-dgt-1",
+        "so_to": "12",
+        "so_thua": "99",
+        "loai_dat": "DGT",
+        "allow_build": false,
+        "xa": "Hòa Thuận"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[105.640, 10.452], [105.645, 10.452], [105.645, 10.464], [105.640, 10.464], [105.640, 10.452]]]
+      }
+    }
+  ]
+}

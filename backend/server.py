@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 from typing import List, Optional, Literal
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -94,9 +94,19 @@ class ReportCreate(BaseModel):
     image_base64: Optional[str] = None  # data:image/jpeg;base64,....
     violation_type: Optional[str] = "construction"  # construction|encroachment|zoning|other
 
+ReportStatus = Literal[
+    "received",
+    "assigned",
+    "pending_approval",
+    "resolved",
+    "rejected",
+    "processing",  # legacy; treated as assigned
+]
+
 class ReportUpdate(BaseModel):
-    status: Literal["received", "processing", "resolved", "rejected"]
+    status: ReportStatus
     admin_response: Optional[str] = None
+    implementer_notes: Optional[str] = None
 
 class Report(BaseModel):
     id: str
@@ -109,8 +119,9 @@ class Report(BaseModel):
     longitude: Optional[float] = None
     image_base64: Optional[str] = None
     violation_type: str
-    status: str  # received|processing|resolved|rejected
+    status: str  # received|assigned|pending_approval|resolved|rejected
     admin_response: Optional[str] = None
+    implementer_notes: Optional[str] = None
     handled_by: Optional[str] = None
     created_at: datetime
     updated_at: datetime
@@ -165,12 +176,15 @@ class AdministrativeProcedure(BaseModel):
     legal_basis: List[str] = []
 
 class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str
     user_id: str
     title: str
     body: str
-    type: str  # report_status|zone_alert|general
+    type: str  # report_status|zone_alert|violation_alert|general
     related_report_id: Optional[str] = None
+    related_violation_id: Optional[str] = None
+    related_mission_id: Optional[str] = None
     read: bool
     created_at: datetime
 
@@ -224,6 +238,21 @@ async def require_staff(user=Depends(get_current_user)):
 
 def is_staff(user: dict) -> bool:
     return user.get("role") in ("admin", "manager")
+
+def normalize_report_status(status: Optional[str]) -> str:
+    """Map legacy processing → assigned for 2-step workflow."""
+    if status == "processing":
+        return "assigned"
+    return status or "received"
+
+def normalize_report_doc(doc: Optional[dict]) -> Optional[dict]:
+    if not doc:
+        return doc
+    out = dict(doc)
+    out["status"] = normalize_report_status(out.get("status"))
+    if "implementer_notes" not in out:
+        out["implementer_notes"] = None
+    return out
 
 def user_to_public(u: dict) -> dict:
     return {
@@ -329,6 +358,7 @@ async def create_report(payload: ReportCreate, user=Depends(get_current_user)):
         "violation_type": payload.violation_type or "construction",
         "status": "received",
         "admin_response": None,
+        "implementer_notes": None,
         "handled_by": None,
         "created_at": now_utc(),
         "updated_at": now_utc(),
@@ -339,27 +369,35 @@ async def create_report(payload: ReportCreate, user=Depends(get_current_user)):
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
         "title": "Đã tiếp nhận báo cáo",
-        "body": f"Báo cáo \"{payload.title}\" đã được hệ thống tiếp nhận và đang chờ xử lý.",
+        "body": f"Báo cáo \"{payload.title}\" đã được hệ thống tiếp nhận và đang chờ Admin xử lý.",
         "type": "report_status",
         "related_report_id": report_id,
         "read": False,
         "created_at": now_utc(),
     })
     doc.pop("_id", None)
-    return doc
+    return normalize_report_doc(doc)
 
 @api_router.get("/reports/mine", response_model=List[Report])
 async def list_my_reports(user=Depends(get_current_user)):
     cursor = db.reports.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1)
-    return await cursor.to_list(500)
+    rows = await cursor.to_list(500)
+    return [normalize_report_doc(r) for r in rows]
 
 @api_router.get("/reports", response_model=List[Report])
-async def list_all_reports(status: Optional[str] = None, _staff=Depends(require_staff)):
-    q = {}
-    if status:
-        q["status"] = status
+async def list_all_reports(status: Optional[str] = None, staff=Depends(require_staff)):
+    q: dict = {}
+    want = normalize_report_status(status) if status else None
+    if want == "assigned":
+        q["status"] = {"$in": ["assigned", "processing"]}
+    elif want:
+        q["status"] = want
+    elif staff.get("role") == "manager":
+        # Manager queue: assigned + pending_approval (xem đã gửi)
+        q["status"] = {"$in": ["assigned", "processing", "pending_approval"]}
     cursor = db.reports.find(q, {"_id": 0}).sort("created_at", -1)
-    return await cursor.to_list(1000)
+    rows = await cursor.to_list(1000)
+    return [normalize_report_doc(r) for r in rows]
 
 @api_router.get("/reports/{report_id}", response_model=Report)
 async def get_report(report_id: str, user=Depends(get_current_user)):
@@ -368,39 +406,85 @@ async def get_report(report_id: str, user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Không tìm thấy báo cáo")
     if not is_staff(user) and r["user_id"] != user["id"]:
         raise HTTPException(status_code=403, detail="Không có quyền")
-    return r
+    return normalize_report_doc(r)
 
 @api_router.put("/reports/{report_id}", response_model=Report)
 async def update_report(report_id: str, payload: ReportUpdate, staff=Depends(require_staff)):
     r = await db.reports.find_one({"id": report_id})
     if not r:
         raise HTTPException(status_code=404, detail="Không tìm thấy báo cáo")
+
+    current = normalize_report_status(r.get("status"))
+    new_status = normalize_report_status(payload.status)
+    role = staff.get("role")
+
+    if role == "manager":
+        if current != "assigned" or new_status != "pending_approval":
+            raise HTTPException(
+                status_code=403,
+                detail="Người thực hiện chỉ được gửi kết quả (Đã giao → Chờ duyệt).",
+            )
+        notes = (payload.implementer_notes or "").strip()
+        if not notes:
+            raise HTTPException(status_code=400, detail="Vui lòng nhập nội dung xử lý.")
+        update = {
+            "status": "pending_approval",
+            "implementer_notes": notes,
+            "handled_by": staff["full_name"],
+            "updated_at": now_utc(),
+        }
+        await db.reports.update_one({"id": report_id}, {"$set": update})
+        # Không thông báo người gửi — chờ Admin phê duyệt
+        updated = await db.reports.find_one({"id": report_id}, {"_id": 0})
+        return normalize_report_doc(updated)
+
+    # Admin transitions
+    if role != "admin":
+        raise HTTPException(status_code=403, detail="Không có quyền")
+
+    allowed = {
+        "received": {"assigned", "rejected"},
+        "assigned": {"rejected"},
+        "pending_approval": {"resolved", "rejected", "assigned"},
+    }
+    if new_status not in allowed.get(current, set()):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Không thể chuyển trạng thái từ '{current}' sang '{new_status}'.",
+        )
+
     update = {
-        "status": payload.status,
-        "admin_response": payload.admin_response,
+        "status": new_status,
         "handled_by": staff["full_name"],
         "updated_at": now_utc(),
     }
+    if payload.admin_response is not None:
+        update["admin_response"] = payload.admin_response
+
     await db.reports.update_one({"id": report_id}, {"$set": update})
-    # notify the citizen
-    status_label = {
-        "received": "đã được tiếp nhận",
-        "processing": "đang được xử lý",
-        "resolved": "đã được giải quyết",
-        "rejected": "đã bị từ chối",
-    }.get(payload.status, payload.status)
-    await db.notifications.insert_one({
-        "id": str(uuid.uuid4()),
-        "user_id": r["user_id"],
-        "title": f"Báo cáo {status_label}",
-        "body": (payload.admin_response or f"Báo cáo \"{r['title']}\" {status_label}."),
-        "type": "report_status",
-        "related_report_id": report_id,
-        "read": False,
-        "created_at": now_utc(),
-    })
+
+    # Notify citizen only on final outcomes or when assigned (đang xử lý)
+    notify_labels = {
+        "assigned": ("đang được xử lý", "Báo cáo đã được giao cho cán bộ thực hiện."),
+        "resolved": ("đã được giải quyết", None),
+        "rejected": ("đã bị từ chối", None),
+    }
+    if new_status in notify_labels:
+        label, default_body = notify_labels[new_status]
+        body = payload.admin_response or default_body or f"Báo cáo \"{r['title']}\" {label}."
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": r["user_id"],
+            "title": f"Báo cáo {label}",
+            "body": body,
+            "type": "report_status",
+            "related_report_id": report_id,
+            "read": False,
+            "created_at": now_utc(),
+        })
+
     updated = await db.reports.find_one({"id": report_id}, {"_id": 0})
-    return updated
+    return normalize_report_doc(updated)
 
 # ---------- AI Compare ----------
 def _parse_data_url(data: str):
@@ -601,13 +685,17 @@ async def mark_all_read(user=Depends(get_current_user)):
 async def admin_stats(_staff=Depends(require_staff)):
     total = await db.reports.count_documents({})
     pending = await db.reports.count_documents({"status": "received"})
-    processing = await db.reports.count_documents({"status": "processing"})
+    assigned = await db.reports.count_documents({"status": {"$in": ["assigned", "processing"]}})
+    pending_approval = await db.reports.count_documents({"status": "pending_approval"})
     resolved = await db.reports.count_documents({"status": "resolved"})
     rejected = await db.reports.count_documents({"status": "rejected"})
     return {
         "total": total,
         "pending": pending,
-        "processing": processing,
+        "assigned": assigned,
+        "pending_approval": pending_approval,
+        # backward-compat: "processing" = đang ở phía người thực hiện
+        "processing": assigned,
         "resolved": resolved,
         "rejected": rejected,
     }
@@ -953,12 +1041,15 @@ async def seed_data():
     )
 
 from routers.planning import create_planning_routers
+from routers.surveys import create_survey_router
 
 _planning_router, _violations_router, seed_planning_data = create_planning_routers(
-    db, get_current_user, require_admin, now_utc
+    db, get_current_user, require_admin, now_utc, require_staff=require_staff
 )
+_surveys_router = create_survey_router(db, get_current_user, require_staff, now_utc)
 api_router.include_router(_planning_router)
 api_router.include_router(_violations_router)
+api_router.include_router(_surveys_router)
 
 
 @app.on_event("startup")

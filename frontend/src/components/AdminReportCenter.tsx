@@ -17,6 +17,8 @@ type ReportItem = {
 type AdminStats = {
   total: number;
   pending: number;
+  assigned?: number;
+  pending_approval?: number;
   processing: number;
   resolved: number;
   rejected: number;
@@ -24,10 +26,8 @@ type AdminStats = {
 
 const FILTERS = [
   { id: "all", label: "Tất cả" },
-  { id: "received", label: "Tiếp nhận" },
-  { id: "processing", label: "Đang xử lý" },
-  { id: "resolved", label: "Đã duyệt" },
-  { id: "rejected", label: "Từ chối" },
+  { id: "assigned", label: "Đã giao" },
+  { id: "pending_approval", label: "Chờ duyệt" },
 ];
 
 type Props = {
@@ -129,17 +129,21 @@ export default function AdminReportCenter({
             <Text style={styles.statNum}>{stats.total}</Text>
             <Text style={styles.statLabel}>Tổng</Text>
           </View>
-          <View style={[styles.statCard, { borderLeftColor: "#F59E0B" }]}>
-            <Text style={[styles.statNum, { color: "#B45309" }]}>{stats.pending}</Text>
-            <Text style={styles.statLabel}>Chờ xử lý</Text>
-          </View>
           <View style={[styles.statCard, { borderLeftColor: colors.primary }]}>
-            <Text style={[styles.statNum, { color: colors.primary }]}>{stats.processing}</Text>
-            <Text style={styles.statLabel}>Đang xử lý</Text>
+            <Text style={[styles.statNum, { color: colors.primary }]}>
+              {stats.assigned ?? stats.processing}
+            </Text>
+            <Text style={styles.statLabel}>Đã giao</Text>
+          </View>
+          <View style={[styles.statCard, { borderLeftColor: "#F59E0B" }]}>
+            <Text style={[styles.statNum, { color: "#B45309" }]}>
+              {stats.pending_approval ?? 0}
+            </Text>
+            <Text style={styles.statLabel}>Chờ duyệt</Text>
           </View>
           <View style={[styles.statCard, { borderLeftColor: colors.success }]}>
             <Text style={[styles.statNum, { color: colors.success }]}>{stats.resolved}</Text>
-            <Text style={styles.statLabel}>Đã duyệt</Text>
+            <Text style={styles.statLabel}>Đã giải quyết</Text>
           </View>
         </View>
       )}

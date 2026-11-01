@@ -11,14 +11,14 @@ export default function AdminReport() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [report, setReport] = useState<any>(null);
-  const [response, setResponse] = useState("");
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
     try {
       const r = await api(`/reports/${id}`);
       setReport(r);
-      setResponse(r.admin_response || "");
+      setNotes(r.implementer_notes || "");
     } catch (e: any) {
       Alert.alert("Lỗi", e.message);
     }
@@ -26,11 +26,19 @@ export default function AdminReport() {
 
   useEffect(() => { if (id) load(); }, [id]);
 
-  const update = async (status: string) => {
+  const submitForApproval = async () => {
+    const trimmed = notes.trim();
+    if (!trimmed) {
+      Alert.alert("Thiếu nội dung", "Vui lòng nhập nội dung xử lý trước khi gửi Admin.");
+      return;
+    }
     setSaving(true);
     try {
-      await api(`/reports/${id}`, { method: "PUT", body: { status, admin_response: response } });
-      Alert.alert("Đã cập nhật", "Trạng thái báo cáo đã được cập nhật");
+      await api(`/reports/${id}`, {
+        method: "PUT",
+        body: { status: "pending_approval", implementer_notes: trimmed },
+      });
+      Alert.alert("Đã gửi", "Báo cáo đã được gửi Admin phê duyệt.");
       load();
     } catch (e: any) {
       Alert.alert("Lỗi", e.message);
@@ -40,6 +48,9 @@ export default function AdminReport() {
   };
 
   if (!report) return <SafeAreaView style={styles.container}><ActivityIndicator style={{ marginTop: 40 }} /></SafeAreaView>;
+
+  const status = report.status === "processing" ? "assigned" : report.status;
+  const canSubmit = status === "assigned";
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,28 +78,44 @@ export default function AdminReport() {
         <Text style={styles.section}>MÔ TẢ</Text>
         <Text style={styles.body}>{report.description}</Text>
 
-        <Text style={styles.section}>PHẢN HỒI CỦA QUẢN LÝ</Text>
-        <TextInput
-          testID="admin-response-input"
-          style={styles.input}
-          value={response}
-          onChangeText={setResponse}
-          placeholder="Nhập phản hồi gửi cho người dân..."
-          placeholderTextColor={colors.textMuted}
-          multiline
-        />
+        {report.admin_response ? (
+          <>
+            <Text style={styles.section}>PHẢN HỒI ADMIN</Text>
+            <Text style={styles.body}>{report.admin_response}</Text>
+          </>
+        ) : null}
 
-        <View style={styles.actions}>
-          <TouchableOpacity testID="action-processing" style={[styles.btn, { backgroundColor: colors.primary }]} onPress={() => update("processing")} disabled={saving}>
-            <Text style={styles.btnText}>Đang xử lý</Text>
-          </TouchableOpacity>
-          <TouchableOpacity testID="action-resolved" style={[styles.btn, { backgroundColor: colors.success }]} onPress={() => update("resolved")} disabled={saving}>
-            <Text style={styles.btnText}>Duyệt</Text>
-          </TouchableOpacity>
-          <TouchableOpacity testID="action-rejected" style={[styles.btn, { backgroundColor: colors.alert }]} onPress={() => update("rejected")} disabled={saving}>
-            <Text style={styles.btnText}>Từ chối</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.section}>NỘI DUNG XỬ LÝ</Text>
+        {canSubmit ? (
+          <TextInput
+            testID="implementer-notes-input"
+            style={styles.input}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Nhập kết quả kiểm tra / xử lý gửi Admin phê duyệt..."
+            placeholderTextColor={colors.textMuted}
+            multiline
+          />
+        ) : (
+          <Text style={styles.body}>{report.implementer_notes || "—"}</Text>
+        )}
+
+        {canSubmit && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              testID="action-pending-approval"
+              style={[styles.btn, { backgroundColor: colors.primary }]}
+              onPress={submitForApproval}
+              disabled={saving}
+            >
+              <Text style={styles.btnText}>{saving ? "Đang gửi…" : "Gửi Admin phê duyệt"}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {status === "pending_approval" && (
+          <Text style={styles.hint}>Đã gửi Admin — đang chờ phê duyệt.</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -106,7 +133,8 @@ const styles = StyleSheet.create({
   section: { fontSize: 11, fontWeight: "800", color: colors.textMuted, letterSpacing: 1, marginTop: spacing.lg, marginBottom: 6 },
   body: { color: colors.text, lineHeight: 20 },
   input: { borderWidth: 1, borderColor: colors.border, backgroundColor: "#fff", padding: 12, minHeight: 90, textAlignVertical: "top", color: colors.text },
-  actions: { flexDirection: "row", gap: 8, marginTop: spacing.lg },
-  btn: { flex: 1, paddingVertical: 14, alignItems: "center" },
-  btnText: { color: "#fff", fontWeight: "800", fontSize: 13 },
+  actions: { marginTop: spacing.lg },
+  btn: { paddingVertical: 14, alignItems: "center" },
+  btnText: { color: "#fff", fontWeight: "800", fontSize: 14 },
+  hint: { marginTop: spacing.md, color: colors.textMuted, fontSize: 13, fontStyle: "italic" },
 });

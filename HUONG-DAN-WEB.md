@@ -1,6 +1,9 @@
 # Hướng dẫn Web App quản trị (Vite)
 
-Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, nghi vấn vi phạm, duyệt báo cáo. Dùng chung API FastAPI và MongoDB với app mobile Expo.
+Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, duyệt báo cáo công dân, quản lý người dùng. Dùng chung API FastAPI và MongoDB với app mobile Expo.
+
+Chạy app mobile / demo: [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md).  
+Hướng dẫn sử dụng admin (HTML): [docs/HUONG-DAN-ADMIN.html](docs/HUONG-DAN-ADMIN.html).
 
 ---
 
@@ -9,13 +12,13 @@ Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, nghi vấn
 | | **Local (dev trên PC)** | **Production (link online)** |
 |--|-------------------------|------------------------------|
 | Khi nào dùng | Sửa code, test trên máy | Demo khách, iPhone 4G, không cần PC bật |
-| MongoDB | `mongod.exe` local **hoặc** Atlas | **MongoDB Atlas** — `MONGO_URL` trên Render |
-| Backend API | `http://localhost:8000` | Render (ví dụ `https://quyhoach-api.onrender.com`) — Railway cũ đang 404 |
+| MongoDB | `mongod` local **hoặc** Atlas | **MongoDB Atlas** — `MONGO_URL` trên Vercel |
+| Backend API | `http://localhost:8000` | `https://quyhoach-api.vercel.app` |
 | Web admin | `http://localhost:5173` | `https://quyhoach-web.vercel.app` |
-| App công dân | Expo / emulator | `https://quyhoach-citizen.vercel.app` |
+| App công dân | [Expo Go / Emulator](HUONG-DAN-CHAY-DU-AN.md) | `https://quyhoach-citizen.vercel.app` |
 | Cần terminal bật? | **Có** | **Không** |
 
-Mục **LOCAL** bên dưới **không** áp dụng cho link Vercel/Railway online. Xem [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md) cho mobile local vs demo remote.
+Mục **LOCAL** bên dưới **không** áp dụng cho link Vercel online.
 
 ---
 
@@ -24,34 +27,21 @@ Mục **LOCAL** bên dưới **không** áp dụng cho link Vercel/Railway onlin
 ```
 web/                 # Vite + React + MapLibre — web quản trị (admin)
 frontend/            # Expo — app công dân (web export trên Vercel)
-backend/             # FastAPI (port 8000)
+backend/             # FastAPI (port 8000 local; Vercel production)
 ```
 
 ---
 
-## LOCAL — Chạy trên máy dev (không dùng cho Vercel/Railway online)
+## LOCAL — Chạy trên máy dev
 
 > **Chỉ khi sửa code trên PC.** Link production (`quyhoach-*.vercel.app`) **không** cần bật MongoDB/backend local.
 
-**Terminal 1 — MongoDB** (chỉ dev local; production dùng MongoDB cloud trên Railway/Atlas):
+MongoDB + backend (uvicorn): làm theo [HUONG-DAN-CHAY-DU-AN.md §5](HUONG-DAN-CHAY-DU-AN.md#5-chạy-chung-api-local) — kiểm tra http://localhost:8000/health trước khi mở web.
+
+**Web admin:**
 
 ```powershell
-cd D:\mongodb-win32-x86_64-windows-8.3.2\bin
-.\mongod.exe --dbpath D:\mongodb-win32-x86_64-windows-8.3.2\bin\DB
-```
-
-**Terminal 2 — Backend API:**
-
-```powershell
-cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main\backend
-.\venv\Scripts\Activate.ps1
-uvicorn server:app --host 0.0.0.0 --port 8000 --reload
-```
-
-**Terminal 3 — Web:**
-
-```powershell
-cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main\web
+cd web
 copy .env.example .env
 npm install
 npm run dev
@@ -65,6 +55,8 @@ Mở trình duyệt: http://localhost:5173
 |-------|----------|
 | `admin@quyhoach.vn` | `Admin@123` |
 
+Backend tự seed và **luôn reset** mật khẩu/role tài khoản demo mỗi lần khởi động.
+
 ---
 
 ## Biến môi trường (local)
@@ -74,7 +66,9 @@ Mở trình duyệt: http://localhost:5173
 | `web/.env` | `VITE_API_URL` | URL backend, ví dụ `http://localhost:8000` |
 | `web/.env` | `VITE_GIS_ZONES_URL` | (Tùy chọn) URL GeoJSON; mặc định `/data/planning_zones_demo.geojson` |
 | `backend/.env` | `MONGO_URL`, `DB_NAME`, `JWT_SECRET` | Database và JWT |
-| `backend/.env` | `CORS_ORIGINS` | `http://localhost:5173` hoặc `*` khi dev |
+| `backend/.env` | `CORS_ORIGINS` | `http://localhost:5173,http://localhost:8081` |
+
+Mẫu: [web/.env.example](web/.env.example), [backend/.env.example](backend/.env.example).
 
 ---
 
@@ -88,7 +82,7 @@ Mở trình duyệt: http://localhost:5173
 
 ---
 
-## PRODUCTION — Deploy online (Vercel + Railway)
+## PRODUCTION — Deploy online (Vercel + Atlas)
 
 Khách/cán bộ truy cập web qua internet, **không cần cùng WiFi** với máy dev.
 
@@ -98,33 +92,34 @@ flowchart LR
   UserCitizen["Citizen browser"]
   VercelWeb["Vercel web/"]
   VercelFrontend["Vercel frontend/"]
-  Railway["Railway API"]
-  MongoCloud["MongoDB Railway hoac Atlas"]
+  VercelApi["Vercel backend/"]
+  MongoAtlas["MongoDB Atlas"]
 
   UserAdmin --> VercelWeb
   UserCitizen --> VercelFrontend
-  VercelWeb --> Railway
-  VercelFrontend --> Railway
-  Railway --> MongoCloud
+  VercelWeb --> VercelApi
+  VercelFrontend --> VercelApi
+  VercelApi --> MongoAtlas
 ```
 
 | Thành phần | Host | URL production |
 |------------|------|----------------|
-| MongoDB | MongoDB Railway (trong project) **hoặc** [MongoDB Atlas M0](https://www.mongodb.com/cloud/atlas/register) | `MONGO_URL` trên service `quyhoach-api` |
-| API | [Railway](https://railway.com) — [`backend/Dockerfile`](backend/Dockerfile), Root Directory `backend` | `https://quyhoach-api-production.up.railway.app` |
-| Web quản trị | [Vercel](https://vercel.com) — thư mục `web/` | `https://quyhoach-web.vercel.app` |
-| App công dân (web) | [Vercel](https://vercel.com) — thư mục `frontend/` | `https://quyhoach-citizen.vercel.app` |
+| MongoDB | [MongoDB Atlas M0](https://www.mongodb.com/cloud/atlas/register) | `MONGO_URL` trên project `quyhoach-api` |
+| API | [Vercel](https://vercel.com) — thư mục `backend/` | `https://quyhoach-api.vercel.app` |
+| Web quản trị | Vercel — thư mục `web/` | `https://quyhoach-web.vercel.app` |
+| App công dân (web) | Vercel — thư mục `frontend/` | `https://quyhoach-citizen.vercel.app` |
 
-Demo công dân trên iPhone: xem [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md) (mục demo remote).
+Client frontend/web **bỏ qua** URL `railway.app` / `onrender.com` và fallback về `https://quyhoach-api.vercel.app`.
+
+Demo công dân trên iPhone: [HUONG-DAN-CHAY-DU-AN.md#2-demo-online-không-cài-gì](HUONG-DAN-CHAY-DU-AN.md#2-demo-online-không-cài-gì) hoặc [Expo Go](HUONG-DAN-CHAY-DU-AN.md#6-expo-go-điện-thoại-thật).
 
 ---
 
 ### Bước 0 — Đẩy code lên GitHub
 
-Repo đã có git local. Tạo repo mới trên https://github.com/new rồi chạy:
+Tạo repo mới trên https://github.com/new rồi chạy (từ thư mục gốc repo):
 
 ```powershell
-cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main
 .\scripts\push-github.ps1 -GitHubUser "<user>" -RepoName "Mobile_app_for_planning"
 ```
 
@@ -136,73 +131,68 @@ git branch -M main
 git push -u origin main
 ```
 
-# Khong commit file .env. Chi dung .env.example / render.yaml.
-# Wizard: powershell -ExecutionPolicy Bypass -File .\scripts\self-deploy.ps1
+Không commit file `.env`. Chỉ dùng `.env.example`.
 
 **Lưu ý:** `backend/requirements.txt` đã bỏ `emergentintegrations` (không có trên PyPI) — web admin deploy bình thường; tính năng AI compare trên mobile cần cài package riêng khi dev local.
 
 ---
 
-### Bước 1 — MongoDB (Railway hoặc Atlas)
-
-**Khuyên dùng:** thêm service **MongoDB** trong cùng Railway project → biến `MONGO_URL` = `${{MongoDB.MONGO_URL}}` (reference).
-
-**Hoặc MongoDB Atlas:**
+### Bước 1 — MongoDB Atlas
 
 1. Đăng ký [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register).
 2. **Create deployment** → chọn **M0 FREE**, region **Singapore (`ap-southeast-1`)**.
 3. **Database Access** → Add user (username + password mạnh) → lưu lại.
 4. **Network Access** → **Add IP Address** → **Allow Access from Anywhere** (`0.0.0.0/0`).
-5. **Database** → **Connect** → **Drivers** → copy connection string:
-   ```
-   mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
-   ```
-6. Thay `<password>` bằng mật khẩu thật (URL-encode ký tự đặc biệt nếu có).
-7. Tên database: **`quyhoach`** (khớp `DB_NAME`).
+5. **Database** → **Connect** → **Drivers** → copy connection string, thêm database `quyhoach`:
 
-Backend tự **seed** user admin và dữ liệu demo khi DB trống. Đăng nhập: `admin@quyhoach.vn` / `Admin@123`.
+```
+mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/quyhoach?retryWrites=true&w=majority
+```
+
+URL-encode ký tự đặc biệt trong password (`@` → `%40`, `#` → `%23`).
 
 ---
 
-### Bước 2 — Deploy Backend (Railway)
+### Bước 2 — Deploy Backend API (Vercel)
 
-1. [railway.com](https://railway.com) → **New Project** → **Deploy from GitHub repo** → chọn repo.
-2. Service **quyhoach-api** — cấu hình Source (**bắt buộc** — tránh lỗi `railpack process exited`):
+**Project:** `quyhoach-api` — root [`backend/`](backend/), cấu hình trong [`backend/vercel.json`](backend/vercel.json).
+
+1. [vercel.com](https://vercel.com) → **Add New Project** → import GitHub repo.
+2. Cấu hình:
 
 | Mục | Giá trị |
 |-----|---------|
-| Root Directory | **`backend`** (không để trống / repo root) |
-| Builder | **Dockerfile** |
-| Dockerfile | [`backend/Dockerfile`](backend/Dockerfile) |
+| Project name | `quyhoach-api` |
+| Root Directory | `backend` |
+| Framework | Other |
 
-Repo có [`backend/railway.toml`](backend/railway.toml) cố định builder Dockerfile (chỉ có hiệu lực khi Root Directory = `backend`).
-
-**Lỗi thường gặp:** Root Directory = `.` → Railpack build cả monorepo → fail. Service vẫn **Online** vì bản deploy cũ chưa bị thay.
-
-**Lưu ý:** [`Dockerfile`](Dockerfile) ở thư mục gốc dùng cho Fly.io / build từ repo root — **không** dùng cho Railway service `quyhoach-api`.
-
-3. **Environment Variables** (service `quyhoach-api`):
+3. **Environment Variables:**
 
 | Biến | Giá trị |
 |------|---------|
-| `MONGO_URL` | Connection string MongoDB Railway hoặc Atlas (bước 1) |
+| `MONGO_URL` | Connection string Atlas (bước 1) |
 | `DB_NAME` | `quyhoach` |
 | `JWT_SECRET` | Chuỗi ngẫu nhiên 32+ ký tự (khác `dev-secret-change-me`) |
 | `CORS_ORIGINS` | `https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app` |
 
-4. Deploy → lấy URL public, ví dụ `https://quyhoach-api-production.up.railway.app`.
-5. Kiểm tra: mở `https://<url>/api/` → `{"app":"QuyHoạch AI","ok":true}`.
+4. Deploy → URL `https://quyhoach-api.vercel.app`.
+5. Kiểm tra: `GET https://quyhoach-api.vercel.app/health` → `{"app":"QuyHoạch AI","ok":true}`.
 
-Thêm domain Vercel mới → cập nhật `CORS_ORIGINS` trên Railway rồi redeploy API.
+Deploy tự động bằng script (cần `VERCEL_TOKEN`):
+
+```powershell
+.\scripts\vercel-backend-deploy.ps1 -MongoUrl "<atlas-connection-string>" -VercelToken "<token>"
+```
+
+Script tạo/cập nhật env project `quyhoach-api`, deploy API, rồi trỏ env `quyhoach-web` và `quyhoach-citizen` về URL API.
+
+> **Lưu ý:** [scripts/vercel-backend-deploy.ps1](scripts/vercel-backend-deploy.ps1) hardcode repo GitHub `duy8208427/Mobile_app_for_planning` — sửa trường `repo` trong file nếu dùng repo khác.
 
 ---
 
 ### Bước 3 — Deploy Web quản trị (Vercel)
 
 **Project:** `quyhoach-web` — root [`web/`](web/), cấu hình trong [`web/vercel.json`](web/vercel.json).
-
-1. [vercel.com](https://vercel.com) → **Add New Project** → import GitHub repo (hoặc deploy CLI).
-2. Cấu hình:
 
 | Mục | Giá trị |
 |-----|---------|
@@ -211,24 +201,24 @@ Thêm domain Vercel mới → cập nhật `CORS_ORIGINS` trên Railway rồi re
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
 
-3. **Environment Variable:**
+**Environment Variable:**
 
 | Biến | Giá trị |
 |------|---------|
-| `VITE_API_URL` | `https://quyhoach-api-production.up.railway.app` (URL Railway, **không** có `/api`) |
+| `VITE_API_URL` | `https://quyhoach-api.vercel.app` (**không** có `/api`) |
 
-4. Deploy → URL `https://quyhoach-web.vercel.app`.
+Deploy → URL `https://quyhoach-web.vercel.app`.
 
 Deploy lại thủ công:
 
 ```powershell
-cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main\web
+cd web
 vercel deploy --prod
 ```
 
 ---
 
-### Bước 3b — Deploy App công dân web (Vercel)
+### Bước 4 — Deploy App công dân web (Vercel)
 
 **Project:** `quyhoach-citizen` — root [`frontend/`](frontend/), cấu hình trong [`frontend/vercel.json`](frontend/vercel.json).
 
@@ -242,115 +232,49 @@ vercel deploy --prod
 
 | Biến | Giá trị |
 |------|---------|
-| `EXPO_PUBLIC_BACKEND_URL` | `https://quyhoach-api-production.up.railway.app` |
+| `EXPO_PUBLIC_BACKEND_URL` | `https://quyhoach-api.vercel.app` |
 
-Deploy → URL `https://quyhoach-citizen.vercel.app`. Chi tiết demo iPhone: [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md).
+Deploy → URL `https://quyhoach-citizen.vercel.app`.
 
 ```powershell
-cd c:\Users\kimli\Downloads\Mobile_app_for_planning-main\frontend
+cd frontend
 vercel deploy --prod
 ```
 
 ---
 
-### Bước 4 — Kiểm tra truy cập từ xa
+### Bước 5 — Kiểm tra truy cập từ xa
+
+```powershell
+.\scripts\verify-production.ps1
+```
+
+Hoặc thủ công:
 
 1. Mở URL Vercel trên điện thoại **4G/5G** (tắt WiFi):
    - Admin: `https://quyhoach-web.vercel.app`
    - Công dân: `https://quyhoach-citizen.vercel.app`
-2. Hoặc nhờ người khác (mạng khác) mở cùng URL.
-3. Đăng nhập admin: `admin@quyhoach.vn` / `Admin@123`; công dân: `citizen@quyhoach.vn` / `Citizen@123`.
-4. Nếu lỗi CORS → kiểm tra `CORS_ORIGINS` trên Railway có đủ cả hai domain Vercel.
+2. Đăng nhập admin: `admin@quyhoach.vn` / `Admin@123`; công dân: `citizen@quyhoach.vn` / `Citizen@123`.
+3. Nếu lỗi CORS → kiểm tra `CORS_ORIGINS` trên Vercel project `quyhoach-api` có đủ cả hai domain Vercel.
+
+### Cập nhật URL API trên frontend/web (sau khi đổi host)
+
+```powershell
+.\scripts\vercel-only.ps1 -ApiHost "https://quyhoach-api.vercel.app" -VercelToken "<token>"
+```
+
+Biến env Vercel được bake lúc build — **Redeploy bắt buộc** sau khi đổi.
 
 ---
 
 ### Biến môi trường production (tóm tắt)
 
 ```
-MongoDB (Railway/Atlas) → MONGO_URL, DB_NAME=quyhoach
-Railway (backend)       → MONGO_URL, DB_NAME, JWT_SECRET, CORS_ORIGINS
-Vercel (web admin)      → VITE_API_URL=https://quyhoach-api-production.up.railway.app
-Vercel (citizen)        → EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api-production.up.railway.app
+MongoDB Atlas           → MONGO_URL (db quyhoach)
+Vercel quyhoach-api     → MONGO_URL, DB_NAME, JWT_SECRET, CORS_ORIGINS
+Vercel quyhoach-web     → VITE_API_URL=https://quyhoach-api.vercel.app
+Vercel quyhoach-citizen → EXPO_PUBLIC_BACKEND_URL=https://quyhoach-api.vercel.app
 ```
-
----
-
-### Bật lại web production — Render (API) + Atlas + Vercel
-
-Railway `quyhoach-api-production.up.railway.app` đang **404** (`x-railway-fallback`). Dùng Render thay thế.
-
-#### A. MongoDB Atlas
-
-1. [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) → Create → **M0 FREE**, region **Singapore (`ap-southeast-1`)**.
-2. **Database Access** → Add user (username + password) → lưu lại.
-3. **Network Access** → **Allow Access from Anywhere** (`0.0.0.0/0`).
-4. **Connect** → Drivers → connection string, thêm database `quyhoach`:
-
-```
-mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/quyhoach?retryWrites=true&w=majority
-```
-
-URL-encode ký tự đặc biệt trong password (`@` → `%40`, `#` → `%23`).
-
-#### B. GitHub
-
-Đẩy repo lên GitHub (Render đọc từ GitHub). Root phải chứa [`render.yaml`](render.yaml).
-
-#### C. Render Web Service
-
-1. [render.com](https://render.com) → **New** → **Blueprint** (file `render.yaml`) **hoặc** **Web Service** thủ công:
-
-| Mục | Giá trị |
-|-----|---------|
-| Root Directory | `backend` |
-| Runtime | Python |
-| Build | `pip install -r requirements.txt` |
-| Start | `uvicorn server:app --host 0.0.0.0 --port $PORT` |
-| Health Check | `/health` |
-| Region | Singapore |
-
-2. Environment:
-
-| Biến | Giá trị |
-|------|---------|
-| `MONGO_URL` | chuỗi Atlas ở bước A |
-| `DB_NAME` | `quyhoach` |
-| `JWT_SECRET` | chuỗi ngẫu nhiên 32+ ký tự |
-| `CORS_ORIGINS` | `https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app` |
-
-(`CORS_ORIGINS` và `DB_NAME` đã có trong [`render.yaml`](render.yaml); `MONGO_URL` phải dán tay.)
-
-3. Deploy xong, URL dạng `https://quyhoach-api.onrender.com`.
-4. Kiểm tra: `GET https://<host>/health` và `GET https://<host>/api/` → `{"app":"QuyHoạch AI","ok":true}`.
-
-**Lưu ý:** Free tier **ngủ ~15 phút**; lần mở đầu chậm 30–60 giây.
-
-#### D. Vercel — trỏ API mới rồi Redeploy
-
-| Project | Biến | Giá trị |
-|---------|------|---------|
-| `quyhoach-citizen` | `EXPO_PUBLIC_BACKEND_URL` | `https://<host-render>` (không có `/api`) |
-| `quyhoach-web` | `VITE_API_URL` | `https://<host-render>` |
-
-Settings → Environment Variables → Save → **Deployments → Redeploy** (bắt buộc: biến bake lúc build).
-
-Đăng nhập: `citizen@quyhoach.vn` / `Citizen@123` (citizen) và `admin@quyhoach.vn` / `Admin@123` (admin).
-
----
-
-### Nâng cấp — Fly.io (API luôn online)
-
-Nếu có thẻ tín dụng và cần host API khác Railway:
-
-| Thành phần | Host |
-|------------|------|
-| MongoDB | MongoDB Atlas |
-| API | Fly.io — deploy `backend/` (dùng [`Dockerfile`](Dockerfile)) |
-| Web | Vercel |
-
-Set secrets Fly: `MONGO_URL`, `DB_NAME`, `JWT_SECRET`, `CORS_ORIGINS=https://quyhoach-web.vercel.app,https://quyhoach-citizen.vercel.app`
-
-Web Vercel: `VITE_API_URL` và `EXPO_PUBLIC_BACKEND_URL` cùng URL API production.
 
 ---
 
@@ -360,3 +284,16 @@ Web Vercel: `VITE_API_URL` và `EXPO_PUBLIC_BACKEND_URL` cùng URL API productio
 - Mongo (sau seed): collections `planning_zones`, `observed_buildings` (và `violations` nếu seed cũ — không còn UI)
 
 Restart backend một lần để `seed_planning_data()` chạy khi DB trống.
+
+---
+
+## Scripts deploy (thư mục `scripts/`)
+
+| Script | Mục đích |
+|--------|----------|
+| `vercel-backend-deploy.ps1` | Deploy API lên Vercel + cập nhật env 3 project |
+| `vercel-only.ps1` | Chỉ cập nhật `VITE_API_URL` / `EXPO_PUBLIC_BACKEND_URL` và redeploy |
+| `push-github.ps1` | Đẩy repo lên GitHub |
+| `verify-production.ps1` | Kiểm tra `/health` API production |
+
+Tùy chọn: [`backend/Dockerfile`](backend/Dockerfile) để chạy API trong container thủ công (không bắt buộc khi dùng Vercel).

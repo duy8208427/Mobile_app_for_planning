@@ -1,10 +1,10 @@
-# Verify production API (Render) then optional login.
+# Verify production API health and print Vercel env hints.
 # Usage:
 #   .\scripts\verify-production.ps1
-#   .\scripts\verify-production.ps1 -ApiBase "https://your-service.onrender.com"
+#   .\scripts\verify-production.ps1 -ApiBase "https://quyhoach-api.vercel.app"
 
 param(
-    [string]$ApiBase = "https://quyhoach-api.onrender.com"
+    [string]$ApiBase = "https://quyhoach-api.vercel.app"
 )
 
 $ErrorActionPreference = "Continue"
@@ -30,12 +30,12 @@ $okRoot = Probe "$ApiBase/api/"
 
 if (-not ($okHealth -or $okRoot)) {
     Write-Host ""
-    Write-Host "API chua song. Tren Render: dán MONGO_URL Atlas, Network Access 0.0.0.0/0, doi deploy xong (lan dau co the 30-60s)."
+    Write-Host "API chua song. Kiem tra MONGO_URL tren Vercel project quyhoach-api, doi deploy xong."
     exit 1
 }
 
 Write-Host ""
-Write-Host "Health OK. Tiep theo tren Vercel Redeploy:"
+Write-Host "Health OK. Neu doi URL API, cap nhat tren Vercel roi Redeploy:"
 Write-Host "  quyhoach-citizen  EXPO_PUBLIC_BACKEND_URL=$ApiBase"
 Write-Host "  quyhoach-web      VITE_API_URL=$ApiBase"
 exit 0

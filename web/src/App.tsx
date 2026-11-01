@@ -6,7 +6,9 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MapPage } from "./pages/MapPage";
 import { ReportsPage } from "./pages/ReportsPage";
+import { SurveysPage } from "./pages/SurveysPage";
 import { UsersPage } from "./pages/UsersPage";
+import { ViolationsPage } from "./pages/ViolationsPage";
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<DashboardPage />} />
               <Route path="/admin/map" element={<MapPage />} />
+              <Route path="/admin/surveys" element={<SurveysPage />} />
+              <Route path="/admin/violations" element={<ViolationsPage />} />
               <Route path="/admin/reports" element={<ReportsPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
             </Route>

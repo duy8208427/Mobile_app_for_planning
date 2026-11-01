@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../src/auth";
 import { api } from "../../src/api";
@@ -31,12 +31,22 @@ export default function Home() {
   const [loadingHome, setLoadingHome] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [pendingViolations, setPendingViolations] = useState(0);
+  const [latestFlight, setLatestFlight] = useState("");
 
   const load = useCallback(async () => {
     if (isManager) {
       setLoadError("");
       setRecent([]);
-      setLoadingHome(false);
+      try {
+        const vs = await api("/violations/stats");
+        setPendingViolations(vs.pending_review || 0);
+        setLatestFlight(vs.latest_mission?.flight_date || "");
+      } catch {
+        setPendingViolations(0);
+      } finally {
+        setLoadingHome(false);
+      }
       return;
     }
     setLoadError("");
@@ -72,6 +82,16 @@ export default function Home() {
       title: "Báo cáo",
       desc: "Vi phạm xây dựng",
       onPress: () => router.push("/report"),
+    },
+    {
+      id: "confirmed-violations",
+      testID: "confirmed-violations-card",
+      icon: "map-outline" as const,
+      iconColor: "#B45309",
+      iconBg: "#FFEDD5",
+      title: "Nhà đã xác nhận",
+      desc: "Flycam vs địa chính",
+      onPress: () => router.push("/violations-map" as Href),
     },
     {
       id: "social-housing",
@@ -248,6 +268,24 @@ export default function Home() {
           <View style={styles.sectionWrap}>
             <Text style={styles.sectionTitle}>QUẢN TRỊ</Text>
             <TouchableOpacity
+              testID="open-latest-survey-violations"
+              style={styles.adminShortcut}
+              onPress={() => router.push("/violations-map" as Href)}
+            >
+              <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#FEE2E2" }]}>
+                <Ionicons name="airplane-outline" size={21} color={colors.alert} />
+              </View>
+              <View style={styles.featureTextWrap}>
+                <Text style={styles.featureTitle}>Nghi vấn đợt bay mới nhất</Text>
+                <Text style={styles.featureDesc}>
+                  {latestFlight
+                    ? `${latestFlight} · ${pendingViolations} chờ duyệt`
+                    : "Chưa có đợt bay"}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+            <TouchableOpacity
               testID="open-admin-dashboard"
               style={styles.adminShortcut}
               onPress={() => router.push("/(tabs)/admin")}
@@ -322,8 +360,10 @@ export default function Home() {
 export function StatusBadge({ status }: { status: string }) {
   const map: any = {
     received: { c: "#FFF3E0", t: colors.warning, label: "Tiếp nhận" },
-    processing: { c: "#E0F2FE", t: colors.primary, label: "Đang xử lý" },
-    resolved: { c: "#DCFCE7", t: colors.success, label: "Đã duyệt" },
+    assigned: { c: "#E0F2FE", t: colors.primary, label: "Đã giao" },
+    processing: { c: "#E0F2FE", t: colors.primary, label: "Đã giao" },
+    pending_approval: { c: "#FEF3C7", t: "#B45309", label: "Chờ duyệt" },
+    resolved: { c: "#DCFCE7", t: colors.success, label: "Đã giải quyết" },
     rejected: { c: "#FEE2E2", t: colors.alert, label: "Từ chối" },
   };
   const s = map[status] || map.received;

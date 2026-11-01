@@ -27,6 +27,8 @@ export default function RootLayout() {
             <Stack.Screen name="admin" options={{ presentation: "card" }} />
             <Stack.Screen name="admin-report" options={{ presentation: "card" }} />
             <Stack.Screen name="report-detail" options={{ presentation: "card" }} />
+            <Stack.Screen name="violations-map" options={{ presentation: "card" }} />
+            <Stack.Screen name="violation-detail" options={{ presentation: "card" }} />
             <Stack.Screen name="change-password" options={{ presentation: "card" }} />
           </Stack>
         </AuthProvider>

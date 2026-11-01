@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hướng dẫn người dùng — QuyHoạch AI v1.2</title>
+  <title>Hướng dẫn tổng quan — QuyHoạch AI v1.2</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <style>
     :root {
@@ -151,17 +151,72 @@
 
   <section class="cover">
     <div class="brand">QuyHoạch AI</div>
-    <h1>Hướng dẫn người dùng</h1>
+    <h1>Hướng dẫn tổng quan</h1>
     <p class="subtitle">Mục lục theo vị trí — mỗi vị trí có quy trình và sơ đồ riêng</p>
     <table class="cover-meta">
       <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch &amp; trật tự xây dựng</td></tr>
-      <tr><th>Loại tài liệu</th><td>Mục lục hướng dẫn sử dụng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Hướng dẫn tổng quan (mục lục)</td></tr>
       <tr><th>Phiên bản</th><td>1.2</td></tr>
       <tr><th>Ngày</th><td>31/08/2026</td></tr>
     </table>
   </section>
 
-  <p>Có <strong>3 vai trò = 3 file hướng dẫn</strong>. File này chỉ là mục lục, không phải vai trò hay quy trình thứ 4. Mỗi quy trình có sơ đồ Mermaid rồi mới đến các bước trên giao diện.</p>
+  <p>Có <strong>3 vai trò = 3 file hướng dẫn</strong>. File này là mục lục tổng quan. Luồng báo cáo vi phạm đã triển khai: <strong>gửi → Admin tiếp nhận/giao → Người thực hiện xử lý → Admin phê duyệt → thông báo người gửi</strong>.</p>
+
+  <h2>Luồng tổng quan — Báo cáo vi phạm</h2>
+
+  <p>Sơ đồ dưới đây mô tả <strong>luồng đã triển khai trên phần mềm</strong> (gửi báo cáo cho Admin trên web, Admin giao vào hàng đợi Người thực hiện, rồi Admin phê duyệt kết quả trước khi thông báo hoàn tất cho người gửi).</p>
+
+  <div class="mermaid">
+sequenceDiagram
+  participant NguoiGui as Người gửi
+  participant App as App công dân
+  participant WebAdmin as Admin Web
+  participant Manager as Người thực hiện
+  participant API as API
+
+  Note over NguoiGui: Người dân hoặc Người thực hiện khi gửi báo cáo
+  NguoiGui->>App: Tạo và gửi báo cáo vi phạm
+  App->>API: Lưu báo cáo chờ Admin
+  API-->>WebAdmin: Báo cáo vào hàng đợi Admin
+
+  WebAdmin->>WebAdmin: Xem xét / tiếp nhận
+  WebAdmin->>Manager: Giao báo cáo để xử lý trực tiếp
+  Note over Manager: Kiểm tra hiện trường, nhập nội dung xử lý
+
+  Manager->>WebAdmin: Gửi kết quả xử lý để Admin phê duyệt
+  WebAdmin->>WebAdmin: Phê duyệt kết quả
+
+  alt Phê duyệt đạt
+    WebAdmin->>API: Xác nhận đã xử lý xong
+    API-->>NguoiGui: Thông báo báo cáo đã được xử lý xong
+  else Không đạt / từ chối
+    WebAdmin->>API: Từ chối hoặc yêu cầu xử lý lại
+    API-->>NguoiGui: Thông báo kết quả tương ứng
+  end
+
+  Note over NguoiGui: Xem tab Thông báo / chi tiết báo cáo trên app
+  </div>
+
+  <table>
+    <thead><tr><th>Bước</th><th>Ai</th><th>Kênh</th><th>Kết quả</th></tr></thead>
+    <tbody>
+      <tr><td>1. Gửi báo cáo</td><td>Người dân (hoặc Người thực hiện khi gửi phản ánh)</td><td>App công dân</td><td>Báo cáo vào hàng đợi Admin</td></tr>
+      <tr><td>2. Tiếp nhận / giao việc</td><td>Admin</td><td>Web quản trị</td><td>Giao cho Người thực hiện xử lý trực tiếp</td></tr>
+      <tr><td>3. Xử lý thực địa</td><td>Người thực hiện</td><td>App — Trung tâm Quản trị</td><td>Kiểm tra, nhập nội dung, gửi lại Admin phê duyệt</td></tr>
+      <tr><td>4. Phê duyệt kết quả</td><td>Admin</td><td>Web quản trị</td><td>Duyệt đạt hoặc từ chối / yêu cầu xử lý lại</td></tr>
+      <tr><td>5. Thông báo hoàn tất</td><td>Hệ thống → người gửi</td><td>App — Thông báo / chi tiết báo cáo</td><td>Người gửi biết báo cáo đã được xử lý xong</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Đã khớp phần mềm:</strong> Admin giao việc (<code>assigned</code> — hàng đợi chung mọi Người thực hiện), Người thực hiện nhập nội dung và gửi chờ duyệt (<code>pending_approval</code>), Admin phê duyệt (<code>resolved</code>) / từ chối / trả lại xử lý. Người gửi được thông báo khi tiếp nhận và khi có kết quả cuối.
+    <ul>
+      <li>Admin tạo tài khoản Người thực hiện trên web (mục Người dùng); Người thực hiện <strong>không</strong> đăng nhập web Admin.</li>
+      <li>Người thực hiện vẫn gửi được báo cáo giống người dân trên app, ngoài vai trò xử lý tại Trung tâm Quản trị.</li>
+      <li>MVP chưa chọn từng người khi giao — mọi tài khoản <code>manager</code> thấy cùng hàng đợi <code>assigned</code>.</li>
+    </ul>
+  </div>
 
   <h2>Ai dùng kênh nào</h2>
 
@@ -172,10 +227,6 @@ flowchart LR
   Admin["Admin"] --> Web["Web quản trị"]
   App --> API["API"]
   Web --> API
-  Dan -->|"Gửi báo cáo"| API
-  ThucHien -->|"Xử lý báo cáo trên app"| API
-  Admin -->|"Báo cáo trên web"| API
-  API -->|"Thông báo"| Dan
   </div>
 
   <div class="card-grid">
@@ -208,6 +259,7 @@ flowchart LR
     <tbody>
       <tr><td>App công dân (và người thực hiện)</td><td><code>https://quyhoach-citizen.vercel.app</code></td></tr>
       <tr><td>Web quản trị (Admin)</td><td><code>https://quyhoach-web.vercel.app</code></td></tr>
+      <tr><td>API</td><td><code>https://quyhoach-api.vercel.app</code></td></tr>
     </tbody>
   </table>
   <table>
@@ -218,9 +270,9 @@ flowchart LR
       <tr><td>Admin (web)</td><td><code>admin</code></td><td><code>admin@quyhoach.vn</code></td><td><code>Admin@123</code></td></tr>
     </tbody>
   </table>
-  <div class="note">Ba vai trò kỹ thuật: <code>citizen</code>, <code>manager</code>, <code>admin</code>. Người thực hiện không đăng nhập web Admin; Admin không dùng Trung tâm Quản trị trên app. Quy trình kỹ thuật: <code>SO-TAY-QUAN-TRI.html</code>.</div>
+  <div class="note">Ba vai trò kỹ thuật: <code>citizen</code>, <code>manager</code>, <code>admin</code>. Người thực hiện không đăng nhập web Admin; Admin không dùng Trung tâm Quản trị trên app. Hướng dẫn kỹ thuật / deploy: <a href="../HUONG-DAN-WEB.md">HUONG-DAN-WEB.md</a>.</div>
 
-  <footer class="doc-footer">QuyHoạch AI v1.2 · Mở từng file hướng dẫn trong trình duyệt rồi In → PDF nếu cần nộp giấy.</footer>
+  <footer class="doc-footer">Hướng dẫn tổng quan — QuyHoạch AI v1.2 · Mở từng file hướng dẫn trong trình duyệt rồi In → PDF nếu cần nộp giấy.</footer>
 
   <script>
     mermaid.initialize({ startOnLoad: true, theme: "neutral", flowchart: { htmlLabels: false }, securityLevel: "loose" });

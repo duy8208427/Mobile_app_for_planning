@@ -267,9 +267,10 @@ flowchart TD
       <thead><tr><th>Thẻ số liệu</th><th>Ý nghĩa</th></tr></thead>
       <tbody>
         <tr><td>Tổng báo cáo</td><td>Tất cả báo cáo công dân</td></tr>
-        <tr><td>Chờ xử lý</td><td>Trạng thái Tiếp nhận</td></tr>
-        <tr><td>Đang xử lý</td><td>Đã được cán bộ tiếp nhận</td></tr>
-        <tr><td>Đã giải quyết</td><td>Hoàn tất (app người dân hiện Đã duyệt)</td></tr>
+        <tr><td>Tiếp nhận</td><td>Mới gửi, chờ Admin</td></tr>
+        <tr><td>Đã giao</td><td>Đã giao hàng đợi Người thực hiện</td></tr>
+        <tr><td>Chờ duyệt</td><td>Người thực hiện đã gửi kết quả, chờ Admin</td></tr>
+        <tr><td>Đã giải quyết</td><td>Admin đã phê duyệt</td></tr>
         <tr><td>Từ chối</td><td>Không chấp nhận</td></tr>
       </tbody>
     </table>
@@ -283,30 +284,34 @@ flowchart TD
     <p>Lọc, đọc và cập nhật trạng thái + phản hồi. Người dân nhận thông báo trên app.</p>
   </div>
 
-  <p><span class="label">Mục đích</span> Xử lý phản ánh gửi từ mobile. Cùng API với Trung tâm Quản trị trên app.</p>
+  <p><span class="label">Mục đích</span> Tiếp nhận, giao việc và phê duyệt kết quả từ Người thực hiện. Người dân nhận thông báo khi tiếp nhận và khi có kết quả cuối.</p>
 
   <div class="mermaid">
 flowchart TD
-  Menu["Sidebar: Báo cáo công dân"] --> Loc["Lọc Tất cả / Tiếp nhận / Đang xử lý / Đã giải quyết / Từ chối"]
+  Menu["Sidebar: Báo cáo công dân"] --> Loc["Lọc Tất cả / Tiếp nhận / Đã giao / Chờ duyệt / Đã giải quyết / Từ chối"]
   Loc --> DanhSach["Danh sách báo cáo"]
   DanhSach --> ChuaChon{"Đã chọn báo cáo?"}
   ChuaChon -->|Không| Hint["Chọn một báo cáo để xử lý"]
-  ChuaChon -->|Có| Doc["Đọc mô tả, địa chỉ, ảnh"]
-  Doc --> Status["Chọn trạng thái"]
-  Status --> PhanHoi["Nhập Phản hồi cán bộ"]
-  PhanHoi --> CapNhat["Cập nhật"]
-  CapNhat --> Notif["Thông báo tới người dân"]
+  ChuaChon -->|Có| Doc["Đọc mô tả, địa chỉ, nội dung người thực hiện"]
+  Doc --> HanhDong{"Theo trạng thái"}
+  HanhDong -->|Tiếp nhận| Giao["Giao việc / Từ chối"]
+  HanhDong -->|Chờ duyệt| Duyet["Phê duyệt / Từ chối / Trả lại xử lý"]
+  Giao --> API["Cập nhật API"]
+  Duyet --> API
+  API --> Notif["Thông báo người gửi khi kết quả cuối"]
   </div>
 
-  <p>Vòng đời báo cáo từ công dân (nhãn web):</p>
+  <p>Vòng đời báo cáo (2 vòng phê duyệt):</p>
   <div class="mermaid">
 stateDiagram-v2
   [*] --> received: Cong_dan_gui
-  received --> processing: Dang_xu_ly
-  processing --> resolved: Da_giai_quyet
-  processing --> rejected: Tu_choi
-  received --> resolved: Giai_quyet_truc_tiep
-  received --> rejected: Tu_choi_truc_tiep
+  received --> assigned: Admin_giao_viec
+  received --> rejected: Admin_tu_choi
+  assigned --> pending_approval: Nguoi_thuc_hien_gui_ket_qua
+  assigned --> rejected: Admin_tu_choi
+  pending_approval --> resolved: Admin_phe_duyet
+  pending_approval --> rejected: Admin_tu_choi
+  pending_approval --> assigned: Tra_lai_xu_ly
   </div>
 
   <div class="feature">
@@ -317,23 +322,29 @@ stateDiagram-v2
     </figure>
     <ol>
       <li>Mở <strong>Báo cáo công dân</strong> (hoặc Hàng đợi báo cáo từ Tổng quan).</li>
-      <li>Lọc theo trạng thái: Tất cả · Tiếp nhận · Đang xử lý · Đã giải quyết · Từ chối.</li>
-      <li>Chọn báo cáo trong danh sách (tiêu đề, tên người gửi, trạng thái).</li>
-      <li>Đọc mô tả, địa chỉ, ảnh (nếu có).</li>
-      <li>Chọn trạng thái trên form, nhập <strong>Phản hồi cán bộ</strong>.</li>
-      <li>Nhấn <strong>Cập nhật</strong>.</li>
+      <li>Lọc: Tất cả · Tiếp nhận · Đã giao · Chờ duyệt · Đã giải quyết · Từ chối.</li>
+      <li>Chọn báo cáo trong danh sách.</li>
+      <li>Đọc mô tả, địa chỉ; với trạng thái Chờ duyệt xem thêm <strong>Nội dung người thực hiện</strong>.</li>
+      <li>Theo trạng thái:
+        <ul>
+          <li><strong>Tiếp nhận</strong> — <em>Giao việc</em> (hàng đợi chung Người thực hiện) hoặc <em>Từ chối</em>.</li>
+          <li><strong>Chờ duyệt</strong> — <em>Phê duyệt</em>, <em>Từ chối</em>, hoặc <em>Trả lại xử lý</em>.</li>
+        </ul>
+      </li>
+      <li>Có thể nhập phản hồi Admin gửi người dân khi phê duyệt / từ chối.</li>
     </ol>
     <p class="empty">Chưa chọn: Chọn một báo cáo để xử lý.</p>
     <table>
-      <thead><tr><th>Mã</th><th>Nhãn web</th><th>Nhãn app người dân</th></tr></thead>
+      <thead><tr><th>Mã</th><th>Nhãn web / app</th><th>Ý nghĩa</th></tr></thead>
       <tbody>
-        <tr><td>received</td><td>Tiếp nhận</td><td>Tiếp nhận</td></tr>
-        <tr><td>processing</td><td>Đang xử lý</td><td>Đang xử lý</td></tr>
-        <tr><td>resolved</td><td><strong>Đã giải quyết</strong></td><td><strong>Đã duyệt</strong></td></tr>
-        <tr><td>rejected</td><td>Từ chối</td><td>Từ chối</td></tr>
+        <tr><td>received</td><td>Tiếp nhận</td><td>Mới gửi, chờ Admin</td></tr>
+        <tr><td>assigned</td><td>Đã giao</td><td>Chờ Người thực hiện</td></tr>
+        <tr><td>pending_approval</td><td>Chờ duyệt</td><td>Chờ Admin phê duyệt kết quả</td></tr>
+        <tr><td>resolved</td><td>Đã giải quyết</td><td>Admin đã phê duyệt</td></tr>
+        <tr><td>rejected</td><td>Từ chối</td><td>Không chấp nhận</td></tr>
       </tbody>
     </table>
-    <div class="note">Sau khi cập nhật, người dân nhận thông báo và thấy mục PHẢN HỒI TỪ QUẢN LÝ trên chi tiết báo cáo. Người thực hiện (<code>manager</code>) cũng có thể cập nhật cùng báo cáo trên app — hai kênh ghi đè cùng một bản ghi.</div>
+    <div class="note">Admin không giải quyết thẳng từ Tiếp nhận (bỏ qua Người thực hiện); chỉ từ chối sớm nếu cần. Người thực hiện chỉ gửi kết quả chờ duyệt trên app — không duyệt/từ chối cuối.</div>
   </div>
 
   <!-- ========== QT3 ========== -->
@@ -381,7 +392,7 @@ flowchart TD
     <div class="note">Không thể xóa, đổi email hay hạ quyền tài khoản đang đăng nhập — tránh tự khóa khỏi hệ thống.</div>
   </div>
 
-  <footer class="doc-footer">Hết hướng dẫn Admin — QuyHoạch AI v1.2 · Mở file này trong trình duyệt rồi In → PDF nếu cần nộp giấy. Xem thêm: <a href="HUONG-DAN-NGUOI-DUNG.html">Mục lục hướng dẫn</a>.</footer>
+  <footer class="doc-footer">Hết hướng dẫn Admin — QuyHoạch AI v1.2 · Mở file này trong trình duyệt rồi In → PDF nếu cần nộp giấy. Xem thêm: <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>.</footer>
 
   <script>
     mermaid.initialize({ startOnLoad: true, theme: "neutral", flowchart: { htmlLabels: false }, securityLevel: "loose" });

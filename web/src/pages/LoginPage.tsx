@@ -2,11 +2,18 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
+const ACCOUNTS = [
+  {
+    email: "admin@quyhoach.vn",
+    password: "Admin@123",
+    label: "Trần Văn Quản — Quản trị",
+  },
+] as const;
+
 export function LoginPage() {
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@quyhoach.vn");
-  const [password, setPassword] = useState("Admin@123");
+  const [email, setEmail] = useState(ACCOUNTS[0].email);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -14,12 +21,14 @@ export function LoginPage() {
     return <Navigate to="/admin" replace />;
   }
 
+  const selected = ACCOUNTS.find((a) => a.email === email) ?? ACCOUNTS[0];
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     try {
-      const u = await login(email.trim(), password);
+      const u = await login(selected.email, selected.password);
       if (u.role !== "admin") {
         setError("Tài khoản không có quyền quản trị web. Chỉ Admin mới đăng nhập được.");
         return;
@@ -51,27 +60,21 @@ export function LoginPage() {
           </p>
         )}
         <label className="mt-6 block text-sm font-medium">
-          Email
-          <input
-            type="email"
+          Tài khoản
+          <select
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full border border-border-subtle px-3 py-2"
-            required
+            className="mt-1 w-full border border-border-subtle bg-white px-3 py-2"
             data-testid="login-email"
-          />
+          >
+            {ACCOUNTS.map((acc) => (
+              <option key={acc.email} value={acc.email}>
+                {acc.label}
+              </option>
+            ))}
+          </select>
         </label>
-        <label className="mt-4 block text-sm font-medium">
-          Mật khẩu
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full border border-border-subtle px-3 py-2"
-            required
-            data-testid="login-password"
-          />
-        </label>
+        <p className="mt-2 text-xs text-text-muted">{selected.email}</p>
         <button
           type="submit"
           disabled={submitting}

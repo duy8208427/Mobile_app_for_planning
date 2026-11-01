@@ -3,7 +3,9 @@ import { useAuth } from "../auth/AuthContext";
 
 const nav = [
   { to: "/admin", label: "Tổng quan", end: true },
-  { to: "/admin/map", label: "Bản đồ quy hoạch" },
+  { to: "/admin/map", label: "Bản đồ" },
+  { to: "/admin/surveys", label: "Đợt bay" },
+  { to: "/admin/violations", label: "Nghi vấn" },
   { to: "/admin/reports", label: "Báo cáo công dân" },
   { to: "/admin/users", label: "Người dùng" },
 ];

@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { api } from "../../src/api";
 import { colors, spacing } from "../../src/theme";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 
 export default function Notifications() {
   const router = useRouter();
@@ -50,6 +50,10 @@ export default function Notifications() {
     }
     if (item.related_report_id) {
       router.push({ pathname: "/report-detail", params: { id: item.related_report_id } });
+    } else if (item.related_violation_id) {
+      router.push({ pathname: "/violation-detail", params: { id: item.related_violation_id } } as unknown as Href);
+    } else if (item.type === "violation_alert") {
+      router.push("/violations-map" as Href);
     } else {
       load();
     }

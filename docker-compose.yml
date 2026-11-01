@@ -1,0 +1,46 @@
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: quyhoach-postgis
+    environment:
+      POSTGRES_USER: quyhoach
+      POSTGRES_PASSWORD: quyhoach
+      POSTGRES_DB: quyhoach_gis
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./docker/postgis/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quyhoach -d quyhoach_gis"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  detection-worker:
+    build:
+      context: ./services/detection
+      dockerfile: Dockerfile
+    container_name: quyhoach-detection
+    depends_on:
+      postgis:
+        condition: service_healthy
+    environment:
+      POSTGIS_DSN: postgresql://quyhoach:quyhoach@postgis:5432/quyhoach_gis
+      MONGO_URL: ${MONGO_URL:-mongodb://host.docker.internal:27017}
+      DB_NAME: ${DB_NAME:-quyhoach}
+      MODEL_PATH: /app/models/yolo11-seg-buildings.onnx
+      COG_DIR: /data/cog
+      AREA_CRS: EPSG:3405
+      MIN_VIOLATION_M2: "5"
+      NEGATIVE_BUFFER_M: "0.4"
+      POLL_SECONDS: "10"
+    volumes:
+      - ./data/cog:/data/cog
+      - ./services/detection/models:/app/models
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["python", "-m", "detection", "worker"]
+
+volumes:
+  postgis_data:

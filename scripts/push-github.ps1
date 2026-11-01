@@ -35,4 +35,4 @@ git push -u origin main
 
 Write-Host ""
 Write-Host "Done. Repo: https://github.com/$GitHubUser/$RepoName"
-Write-Host "Tiếp theo: Render (backend) + Vercel (web) — xem HUONG-DAN-WEB.md"
+Write-Host "Tiếp theo: deploy Vercel — xem HUONG-DAN-WEB.md"

@@ -93,3 +93,22 @@ export async function api<T>(
   }
   return data as T;
 }
+
+export async function uploadFile<T>(path: string, file: File): Promise<T> {
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch(`${API_BASE}${path}`, { method: "POST", headers, body });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!res.ok) {
+    const detail =
+      typeof data === "object" && data && "detail" in data
+        ? String((data as { detail: unknown }).detail)
+        : `Lỗi ${res.status}`;
+    throw new Error(detail);
+  }
+  return data as T;
+}
