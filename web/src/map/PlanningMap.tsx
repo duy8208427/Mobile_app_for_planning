@@ -142,14 +142,6 @@ function formatValue(key: string, val: unknown): string {
   return String(val);
 }
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 function qgisRows(props: Record<string, unknown>): { label: string; value: string }[] {
   const rows: { label: string; value: string }[] = [];
   for (const [key, label] of QGIS_FIELDS) {
@@ -157,40 +149,6 @@ function qgisRows(props: Record<string, unknown>): { label: string; value: strin
     if (formatted) rows.push({ label, value: formatted });
   }
   return rows;
-}
-
-function popupHtml(props: Record<string, unknown>, kind: "parcel" | "violation"): string {
-  const rows = qgisRows(props);
-  const parts: string[] = [];
-  if (kind === "violation") {
-    const rule = String(props.rule_id || "");
-    parts.push(
-      `<p class="font-semibold">${escapeHtml(RULE_LABEL[rule] || rule || "Nghi vấn")}</p>`,
-    );
-    if (props.reason) parts.push(`<p>${escapeHtml(String(props.reason))}</p>`);
-    if (props.area_m2 != null) {
-      parts.push(`<p>Diện tích lệch: ${escapeHtml(String(props.area_m2))} m²</p>`);
-    }
-    if (props.confidence != null) {
-      parts.push(`<p>Độ tin cậy: ${Math.round(Number(props.confidence) * 100)}%</p>`);
-    }
-    if (props.status) {
-      const st = String(props.status);
-      parts.push(`<p>Trạng thái: ${escapeHtml(STATUS_LABEL[st] || st)}</p>`);
-    }
-  } else {
-    const title =
-      formatValue("KyHieuLoaiDat", pickProp(props, "KyHieuLoaiDat")) ||
-      formatValue("DiaChi", pickProp(props, "DiaChi")) ||
-      "Thửa đất";
-    parts.push(`<p class="font-semibold">${escapeHtml(title)}</p>`);
-  }
-  for (const row of rows) {
-    parts.push(
-      `<p><span style="color:#64748b">${escapeHtml(row.label)}:</span> ${escapeHtml(row.value)}</p>`,
-    );
-  }
-  return `<div style="font-size:12px;line-height:1.45;max-width:260px">${parts.join("")}</div>`;
 }
 
 function ringCentroid(ring: number[][]): [number, number] | null {
@@ -257,8 +215,8 @@ function addViolationPoints(map: maplibregl.Map, data: GeoJSONFeatureCollection)
         "#eab308",
         "#ef4444",
       ],
-      "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 6, 14, 8, 17, 11],
-      "circle-stroke-width": 2,
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 3.5, 14, 5, 17, 7, 19, 9],
+      "circle-stroke-width": 1.5,
       "circle-stroke-color": "#ffffff",
     },
   });
@@ -302,6 +260,9 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
               "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
             ],
             tileSize: 256,
+            // Esri's level 19 is a "Map data not yet available" tile in the city,
+            // and level 20 is that tile everywhere. Scale the last real imagery.
+            maxzoom: 18,
             attribution: "Esri, Maxar, Earthstar Geographics",
           },
         },
@@ -312,19 +273,13 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
       },
       center: FALLBACK_CENTER,
       zoom: INITIAL_ZOOM,
+      maxZoom: 20,
     });
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     mapRef.current = map;
     let ready = false;
     let debounce: number | undefined;
-    const hoverPopup = new maplibregl.Popup({
-      closeButton: false,
-      closeOnClick: false,
-      offset: 12,
-      maxWidth: "280px",
-    });
-
     const reloadParcels = async () => {
       if (!showCadastreRef.current) {
         setLayerVisible(map, ["parcels-fill", "parcels-line"], false);
@@ -350,28 +305,11 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
     };
     reloadRef.current = reloadParcels;
 
-    const bindHover = (layer: string, kind: "parcel" | "violation") => {
-      map.on("mousemove", layer, (e) => {
-        const feat = e.features?.[0];
-        if (!feat?.properties) return;
-        map.getCanvas().style.cursor = "pointer";
-        hoverPopup
-          .setLngLat(e.lngLat)
-          .setHTML(popupHtml(feat.properties as Record<string, unknown>, kind))
-          .addTo(map);
-      });
-      map.on("mouseleave", layer, () => {
-        map.getCanvas().style.cursor = "";
-        hoverPopup.remove();
-      });
-    };
-
-    const bindClick = (layer: string, kind: string) => {
-      map.on("click", layer, (e) => {
-        if (!e.features?.[0]?.properties) return;
-        setSelectedKind(kind);
-        setSelectedProps(e.features[0].properties as Record<string, unknown>);
-      });
+    const pickLayers = ["violation-points", "violations-fill", "buildings-fill", "parcels-fill"];
+    const kindForLayer = (layerId: string) => {
+      if (layerId.startsWith("parcels")) return "Thửa đất";
+      if (layerId.startsWith("buildings")) return "Mái nhà (YOLO)";
+      return "Nghi vấn";
     };
 
     const loadLayers = async () => {
@@ -425,13 +363,27 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
       setPointerCount(violationPoints(violations || EMPTY).features.length);
       setLayerVisible(map, ["buildings-fill", "buildings-line"], showBuildingsRef.current);
 
-      bindClick("parcels-fill", "Thửa đất");
-      bindClick("buildings-fill", "Mái nhà (YOLO)");
-      bindClick("violations-fill", "Nghi vấn");
-      bindClick("violation-points", "Nghi vấn");
-      bindHover("parcels-fill", "parcel");
-      bindHover("violation-points", "violation");
-      bindHover("violations-fill", "violation");
+      for (const layer of pickLayers) {
+        map.on("mouseenter", layer, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", layer, () => {
+          map.getCanvas().style.cursor = "";
+        });
+      }
+
+      map.on("click", (e) => {
+        const layers = pickLayers.filter((id) => map.getLayer(id));
+        const hits = layers.length ? map.queryRenderedFeatures(e.point, { layers }) : [];
+        const feat = hits.find((hit) => hit.properties);
+        if (!feat?.properties) {
+          setSelectedProps(null);
+          setSelectedKind("");
+          return;
+        }
+        setSelectedKind(kindForLayer(feat.layer?.id || ""));
+        setSelectedProps({ ...(feat.properties as Record<string, unknown>) });
+      });
 
       ready = true;
       await reloadParcels();
@@ -450,7 +402,6 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
 
     return () => {
       window.clearTimeout(debounce);
-      hoverPopup.remove();
       map.remove();
       mapRef.current = null;
     };

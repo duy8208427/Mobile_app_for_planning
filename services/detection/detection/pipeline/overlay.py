@@ -6,6 +6,7 @@ from typing import Any
 
 from shapely.geometry import mapping, shape
 from shapely.ops import transform, unary_union
+from shapely.strtree import STRtree
 
 from detection.config import (
     AREA_CRS,
@@ -133,6 +134,7 @@ def overlay_shapely(
         if rec["allow_build"]:
             legal.append(g)
 
+    parcel_tree = STRtree([p["geom"] for p in parcel_geoms]) if parcel_geoms else None
     legal_union = unary_union(legal) if legal else None
     cad_union = None
     if cadastral_buildings:
@@ -147,7 +149,7 @@ def overlay_shapely(
         conf = float(props.get("confidence") or 0.7)
         extra_base = {"confidence": conf, "building_tag": props.get("tag")}
 
-        host = _host_parcel(geom, parcel_geoms)
+        host = _host_parcel(geom, parcel_geoms, parcel_tree)
         if host is None:
             continue
         inside = geom.intersection(host["geom"]).buffer(0)
@@ -181,10 +183,13 @@ def overlay_shapely(
     return violations
 
 
-def _host_parcel(geom, parcels: list[dict]) -> dict | None:
+def _host_parcel(geom, parcels: list[dict], tree: STRtree | None) -> dict | None:
+    if tree is None:
+        return None
     best = None
     best_area = 0.0
-    for p in parcels:
+    for idx in tree.query(geom):
+        p = parcels[int(idx)]
         inter = geom.intersection(p["geom"])
         if inter.is_empty:
             continue

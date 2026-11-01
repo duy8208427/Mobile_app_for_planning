@@ -411,11 +411,17 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
             q["status"] = status
         if mission_id:
             q["mission_id"] = mission_id
-        docs = await db.violations.find(q, {"_id": 0}).to_list(2000)
-        on_parcel = []
-        for doc in docs:
-            if await _point_on_parcel(_violation_point(doc)):
-                on_parcel.append(doc)
+        docs = await db.violations.find(q, {"_id": 0}).to_list(8000)
+        gate = asyncio.Semaphore(24)
+
+        async def _keep(doc: dict):
+            async with gate:
+                if await _point_on_parcel(_violation_point(doc)):
+                    return doc
+            return None
+
+        checked = await asyncio.gather(*(_keep(doc) for doc in docs))
+        on_parcel = [doc for doc in checked if doc is not None]
         return _feature_collection(on_parcel)
 
     @violations_router.get("/{violation_id}")

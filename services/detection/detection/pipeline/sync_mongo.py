@@ -64,7 +64,7 @@ def write_violations(mission: dict, violations: list[dict], buildings: list[dict
                 "id": str(uuid.uuid4()),
                 "mission_id": mission_id,
                 "confidence": float(props.get("confidence") or 0.7),
-                "source": "yolo11-seg",
+                "source": props.get("source") or "yolo11-seg",
                 "geometry": geom,
                 "updated_at": now_utc(),
             }
