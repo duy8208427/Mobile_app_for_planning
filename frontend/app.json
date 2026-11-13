@@ -1,17 +1,22 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "QuyHoạch AI",
+    "slug": "quyhoach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "quyhoach",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.quyhoach.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "vn.quyhoach.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000"
@@ -28,10 +33,24 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#000"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "QuyHoạch AI dùng vị trí của bạn để xác định thửa đất và gắn toạ độ cho báo cáo."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "QuyHoạch AI cần truy cập thư viện ảnh để bạn đính kèm ảnh vào báo cáo.",
+          "cameraPermission": "QuyHoạch AI cần dùng camera để bạn chụp ảnh hiện trạng khi gửi báo cáo.",
+          "microphonePermission": false
         }
       ]
     ],
