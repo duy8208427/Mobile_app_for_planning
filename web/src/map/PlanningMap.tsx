@@ -389,7 +389,10 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
       await reloadParcels();
     };
 
-    map.on("load", () => {
+    // "load" waits for every basemap tile; if one tile host is slow or blocked
+    // (e.g. OSM unreachable on some networks) the data layers never appear.
+    // "style.load" only needs the style, which is all addSource/addLayer need.
+    map.once("style.load", () => {
       void loadLayers();
     });
     map.on("moveend", () => {

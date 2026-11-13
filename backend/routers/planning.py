@@ -130,6 +130,21 @@ def _is_staff(user: dict) -> bool:
     return user.get("role") in ("admin", "manager")
 
 
+STAFF_ONLY_PARCEL_FIELDS = ("TenChuSoHuu",)
+
+
+def _strip_owner(fc: dict, user: dict) -> dict:
+    """Owner names are personal data: only admin/manager accounts may see them."""
+    if _is_staff(user):
+        return fc
+    for feat in fc.get("features") or []:
+        props = feat.get("properties")
+        if props:
+            for key in STAFF_ONLY_PARCEL_FIELDS:
+                props.pop(key, None)
+    return fc
+
+
 def create_planning_routers(db, get_current_user, require_admin, now_utc, require_staff=None):
     planning_router = APIRouter(prefix="/planning", tags=["planning"])
     violations_router = APIRouter(prefix="/violations", tags=["violations"])
@@ -291,7 +306,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
             try:
                 fc = parcels_geojson(parsed, limit=limit)
                 if fc.get("features"):
-                    return fc
+                    return _strip_owner(fc, user)
             except Exception:
                 pass
 
@@ -313,7 +328,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
                 "returned": len(acc),
                 "matched": total,
             }
-            return fc
+            return _strip_owner(fc, user)
 
         q = _xy_query(minx, miny, maxx, maxy) if has_xy else {
             "geometry": {
@@ -335,7 +350,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
         docs = await cursor.to_list(limit)
         fc = _feature_collection(docs, simplify=True)
         fc["properties"] = {"truncated": len(docs) >= limit, "returned": len(docs)}
-        return fc
+        return _strip_owner(fc, user)
 
     @planning_router.get("/buildings")
     async def list_observed_buildings(
