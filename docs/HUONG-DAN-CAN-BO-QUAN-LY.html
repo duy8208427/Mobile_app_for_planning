@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hướng dẫn Cán bộ Quản lý — QuyHoạch AI v2.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <style>
+    :root { --primary: #0A4ABF; --text: #1a1a1a; --muted: #555; --border: #d0d7de; --bg-soft: #f6f8fa; }
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--text); line-height: 1.55; max-width: 210mm; margin: 0 auto; padding: 24px 28px 48px; background: #fff; font-size: 11pt; }
+    .cover { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; border-bottom: 3px solid var(--primary); margin-bottom: 2rem; padding-bottom: 2rem; page-break-after: always; }
+    .cover .brand { font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+    .cover h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; color: var(--primary); }
+    .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
+    .cover-meta { border-collapse: collapse; width: 100%; max-width: 520px; }
+    .cover-meta th, .cover-meta td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    .cover-meta th { background: var(--bg-soft); width: 38%; }
+    h2 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.25rem; margin-top: 2rem; page-break-after: avoid; }
+    h3 { color: #0d3a8f; margin-top: 1.35rem; page-break-after: avoid; }
+    table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1rem; font-size: 0.95em; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; vertical-align: top; }
+    th { background: var(--bg-soft); text-align: left; }
+    td.num { white-space: nowrap; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: var(--bg-soft); padding: 0.1em 0.35em; border-radius: 3px; }
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 0.25rem 0; }
+    a { color: var(--primary); }
+    .toc { background: var(--bg-soft); border: 1px solid var(--border); padding: 1rem 1.25rem; margin: 1rem 0 2rem; }
+    .toc ol { margin: 0.4rem 0 0; }
+    .toc a { text-decoration: none; }
+    .feature { border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; margin: 0.9rem 0 1.2rem; background: #fff; }
+    .note { background: #fff8e6; border-left: 4px solid #e6a700; padding: 0.55rem 0.85rem; margin: 0.6rem 0; font-size: 0.95em; }
+    .shot { margin: 0.85rem 0 1.1rem; text-align: center; page-break-inside: avoid; }
+    .shot img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); background: #fff; }
+    .shot.tall img { max-width: 70%; }
+    .shot figcaption { margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+    .part-banner { background: var(--primary); color: #fff; padding: 0.75rem 1rem; border-radius: 6px; margin: 2rem 0 1rem; page-break-before: always; }
+    .part-banner h2 { color: #fff; border: none; margin: 0; padding: 0; font-size: 1.25rem; }
+    .part-banner p { margin: 0.35rem 0 0; opacity: 0.9; font-size: 0.95rem; }
+    .mermaid { background: #fafbfc; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 1rem 0; overflow-x: auto; page-break-inside: avoid; }
+    footer.doc-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+    @media print {
+      body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
+      .cover { min-height: auto; }
+      a { color: inherit; text-decoration: none; }
+      .feature, .part-banner, .shot, .mermaid { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+    }
+    @page { size: A4; margin: 14mm 12mm; }
+  </style>
+</head>
+<body>
+
+  <section class="cover">
+    <div class="brand">QuyHoạch AI</div>
+    <h1>Hướng dẫn Cán bộ Quản lý</h1>
+    <p class="subtitle">Tiền kiểm, giao việc, ra quyết định, hậu kiểm, đóng hồ sơ; nghi vấn AI, đợt bay, danh mục, người dùng</p>
+    <table class="cover-meta">
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch và trật tự xây dựng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Hướng dẫn sử dụng — vai trò Cán bộ Quản lý</td></tr>
+      <tr><th>Phiên bản</th><td>2.0 — giai đoạn demo</td></tr>
+      <tr><th>Ngày</th><td>14/11/2026</td></tr>
+      <tr><th>Web quản trị</th><td><a href="https://quyhoach-web.vercel.app">https://quyhoach-web.vercel.app</a></td></tr>
+      <tr><th>App (khi đi công tác)</th><td><a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a></td></tr>
+      <tr><th>Tài khoản demo</th><td>Trần Văn Quản — Cán bộ Quản lý</td></tr>
+    </table>
+  </section>
+
+  <nav class="toc">
+    <strong>Mục lục</strong>
+    <ol>
+      <li><a href="#p1">Đăng nhập và Tổng quan</a></li>
+      <li><a href="#p2">Danh sách Hồ sơ vụ việc</a></li>
+      <li><a href="#p3">Bước 3–5 — Tiền kiểm, đóng hoặc giao việc</a></li>
+      <li><a href="#p4">Bước 9–10 — Rà soát và ban hành quyết định</a></li>
+      <li><a href="#p5">Sau quyết định — Điều 85, Case 5, nhập thay</a></li>
+      <li><a href="#p6">Bước 13 và 16 — Yêu cầu hậu kiểm, đóng hồ sơ</a></li>
+      <li><a href="#p7">Nghi vấn AI</a></li>
+      <li><a href="#p8">Đợt bay flycam</a></li>
+      <li><a href="#p9">Bản đồ</a></li>
+      <li><a href="#p10">Danh mục vi phạm</a></li>
+      <li><a href="#p11">Người dùng</a></li>
+      <li><a href="#p12">Làm việc trên app</a></li>
+    </ol>
+  </nav>
+
+  <p>Cán bộ Quản lý điều phối toàn bộ hồ sơ. Bạn làm các bước <strong>3, 4, 5, 9, 10, 13, 16</strong> của quy trình 16 bước. Bạn cũng mở hồ sơ từ cảnh báo AI (bước 2).</p>
+  <p>Toàn bộ quy trình và bảng khung phạt: xem <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>.</p>
+
+  <div class="mermaid">
+flowchart TD
+  IN["Phản ánh mới / Nghi vấn AI"] --> TK["3. Tiền kiểm online"]
+  TK -->|Không vi phạm| B4["4. Đóng hồ sơ"]
+  TK -->|Có dấu hiệu| GV["5. Lập phiếu giao việc"]
+  GV --> XL["Cán bộ Xử lý lập biên bản"]
+  XL --> RS["9. Rà soát"]
+  RS -->|Thiếu| TL["Trả lại bổ sung"]
+  TL --> XL
+  RS --> QD["10. Ban hành quyết định"]
+  QD --> KP["Người vi phạm khắc phục, báo cáo"]
+  QD -->|Điều 85| CP["Chờ cấp/điều chỉnh giấy phép"]
+  CP -->|Hết hạn| PD["Buộc phá dỡ"]
+  PD --> KP
+  KP --> YC["13. Yêu cầu hậu kiểm"]
+  YC --> HK["Cán bộ Xử lý hậu kiểm"]
+  HK -->|Không đạt| KP
+  HK -->|Đạt| DONG["16. Đóng hồ sơ lưu trữ"]
+  </div>
+
+  <!-- ========== 1 ========== -->
+  <div class="part-banner" id="p1">
+    <h2>1. Đăng nhập và Tổng quan</h2>
+    <p>Vào web quản trị, đọc nhanh tình hình.</p>
+  </div>
+
+  <div class="feature">
+    <h3>1.1. Đăng nhập</h3>
+    <figure class="shot">
+      <img src="images/web-login.png" alt="Đăng nhập web quản trị" />
+      <figcaption>Hình 1 — Đăng nhập web quản trị (tài khoản demo chọn sẵn)</figcaption>
+    </figure>
+    <ol>
+      <li>Mở <a href="https://quyhoach-web.vercel.app">https://quyhoach-web.vercel.app</a> trên máy tính.</li>
+      <li>Ô <strong>Tài khoản</strong> đã chọn <strong>Trần Văn Quản — Cán bộ Quản lý</strong>.</li>
+      <li>Bấm nút <strong>Đăng nhập</strong> (tài khoản demo đã chọn sẵn).</li>
+    </ol>
+    <p>Menu bên trái: <strong>Tổng quan · Bản đồ · Đợt bay · Hồ sơ vụ việc · Nghi vấn AI · Danh mục vi phạm · Người dùng</strong>. Nút <strong>Đăng xuất</strong> ở góc dưới.</p>
+  </div>
+
+  <div class="feature">
+    <h3>1.2. Tổng quan</h3>
+    <figure class="shot">
+      <img src="images/web-tong-quan.png" alt="Trang Tổng quan" />
+      <figcaption>Hình 2 — Tổng quan: hồ sơ theo giai đoạn, theo hành vi, báo cáo công dân, nghi vấn AI</figcaption>
+    </figure>
+    <table>
+      <thead><tr><th>Khối</th><th>Nội dung</th></tr></thead>
+      <tbody>
+        <tr><td>Hồ sơ vụ việc</td><td>Số hồ sơ đang mở, quá hạn, số hồ sơ ở từng giai đoạn 1–4</td></tr>
+        <tr><td>5 hành vi</td><td>Số hồ sơ theo từng trường hợp vi phạm</td></tr>
+        <tr><td>Báo cáo công dân</td><td>Tổng phản ánh, tiếp nhận, đã giao, chờ duyệt, đã giải quyết, từ chối</td></tr>
+        <tr><td>Nghi vấn</td><td>Nghi vấn AI chờ duyệt, đã xác nhận, không vi phạm; đợt bay mới nhất</td></tr>
+        <tr><td>Lối tắt</td><td>Bản đồ, Đợt bay flycam, Nghi vấn AI, Hồ sơ vụ việc</td></tr>
+      </tbody>
+    </table>
+    <p>Mỗi ngày nên xem: <strong>Quá hạn</strong>, <strong>Nghi vấn chờ duyệt</strong>, và hồ sơ ở giai đoạn 1 và 3 (đang chờ bạn).</p>
+  </div>
+
+  <!-- ========== 2 ========== -->
+  <div class="part-banner" id="p2">
+    <h2>2. Danh sách Hồ sơ vụ việc</h2>
+    <p>Tìm hồ sơ theo giai đoạn, trạng thái, hành vi, quá hạn.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot">
+      <img src="images/web-ho-so-danh-sach.png" alt="Danh sách hồ sơ vụ việc" />
+      <figcaption>Hình 3 — Hồ sơ vụ việc: bộ lọc và bảng hồ sơ</figcaption>
+    </figure>
+    <ol>
+      <li>Bấm <strong>Hồ sơ vụ việc</strong> ở menu trái.</li>
+      <li>Lọc theo <strong>Giai đoạn</strong> (1–4), <strong>Trạng thái</strong>, <strong>Hành vi</strong>. Tích <strong>Quá hạn</strong> để xem hồ sơ trễ hạn.</li>
+      <li>Bảng ghi: mã hồ sơ, tiêu đề, nguồn (Người dân hoặc AI), trạng thái kèm bước, hành vi, cán bộ xử lý, hạn, giờ cập nhật.</li>
+      <li>Bấm mã hồ sơ để mở chi tiết. Bấm <strong>Làm mới</strong> để tải lại.</li>
+    </ol>
+    <p>Trang chi tiết có: thanh 4 giai đoạn, dòng "Bước x/16", các khối thông tin (tiếp nhận, tiền kiểm, phiếu giao việc, biên bản, quyết định, khắc phục, hậu kiểm), khung <strong>Thao tác của Cán bộ Quản lý</strong> và <strong>Dòng thời gian</strong>.</p>
+    <div class="note">Khung thao tác chỉ hiện việc bạn được làm ở bước hiện tại. Khi hồ sơ đang ở tay Cán bộ Xử lý, khung ghi "Hồ sơ đang chờ Cán bộ Xử lý thực hiện trên ứng dụng di động".</div>
+  </div>
+
+  <!-- ========== 3 ========== -->
+  <div class="part-banner" id="p3">
+    <h2>3. Bước 3–5 — Tiền kiểm, đóng hoặc giao việc</h2>
+    <p>Đối chiếu dữ liệu trên máy trước khi cử người ra hiện trường.</p>
+  </div>
+
+  <div class="feature">
+    <h3>3.1. Bước 3 — Tiền kiểm online</h3>
+    <figure class="shot">
+      <img src="images/web-tien-kiem.png" alt="Khối tiền kiểm online" />
+      <figcaption>Hình 4 — Tiền kiểm online: thửa đất, quy hoạch tại vị trí, giấy phép xây dựng</figcaption>
+    </figure>
+    <ol>
+      <li>Mở hồ sơ ở trạng thái <strong>Tiếp nhận</strong>. Khung thao tác mở sẵn <strong>Tiền kiểm online</strong>.</li>
+      <li>Đọc <strong>Thửa đất</strong> tại tọa độ hồ sơ: tờ/thửa, loại đất, diện tích, được phép xây hay không.</li>
+      <li>Đọc <strong>Quy hoạch</strong>: loại đất quy hoạch tại vị trí, năm quy hoạch (2030), hiện trạng thửa, có cho phép xây nhà ở không. Nếu vị trí không thuộc đất ở, phần mềm ghi rõ dấu hiệu "không đúng quy hoạch".</li>
+      <li>Đọc <strong>Giấy phép xây dựng</strong> của thửa. Giấy phép mẫu có nhãn "Dữ liệu mẫu để demo".</li>
+      <li>Nếu thửa đã có hồ sơ khác đang mở, phần mềm liệt kê để bạn tránh mở trùng.</li>
+      <li>Đọc <strong>Gợi ý hành vi</strong> và lý do gợi ý.</li>
+      <li>Chọn kết quả: <strong>Có dấu hiệu vi phạm</strong> hoặc <strong>Không vi phạm (đóng hồ sơ)</strong>.</li>
+      <li>Nếu có dấu hiệu: chọn <strong>Hành vi nghi vi phạm</strong> (Cán bộ Xử lý có thể sửa khi lập biên bản), ghi chú, bấm <strong>Xác nhận nghi vấn vi phạm</strong>. Hồ sơ chuyển sang <strong>Đã tiền kiểm</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Dữ liệu đối chiếu</th><th>Nguồn hiện có</th></tr></thead>
+      <tbody>
+        <tr><td>Thửa đất</td><td>331.604 thửa: GDB nền địa chính 269.822 thửa và TP. Cao Lãnh nội thị 61.782 thửa</td></tr>
+        <tr><td>Quy hoạch</td><td>Quy hoạch sử dụng đất TP. Cao Lãnh đến năm 2030, 11.293 vùng</td></tr>
+        <tr><td>Giấy phép</td><td>30 giấy phép <strong>mẫu</strong> (dữ liệu demo), chờ thay bằng dữ liệu thật</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Vì giấy phép hiện là dữ liệu mẫu, kết quả "Không tìm thấy giấy phép cho thửa đất này" chưa đủ để kết luận xây không phép. Hãy kiểm tra hồ sơ giấy phép giấy trước khi kết luận.</div>
+  </div>
+
+  <div class="feature">
+    <h3>3.2. Bước 4 — Không vi phạm: đóng hồ sơ</h3>
+    <ol>
+      <li>Trong khung Tiền kiểm online, chọn <strong>Không vi phạm (đóng hồ sơ)</strong>.</li>
+      <li>Ghi lý do vào ô <strong>Ghi chú</strong>.</li>
+      <li>Bấm <strong>Đóng: không vi phạm</strong>. Hồ sơ chuyển sang <strong>Không vi phạm - đã đóng</strong>.</li>
+      <li>Người phản ánh nhận thông báo "không phát hiện vi phạm, hồ sơ đã đóng".</li>
+    </ol>
+  </div>
+
+  <div class="feature">
+    <h3>3.3. Bước 5 — Lập phiếu giao việc</h3>
+    <figure class="shot">
+      <img src="images/web-giao-viec.png" alt="Form lập phiếu giao việc" />
+      <figcaption>Hình 5 — Lập phiếu giao việc: chọn Cán bộ Xử lý, hạn kiểm tra, chỉ đạo</figcaption>
+    </figure>
+    <ol>
+      <li>Mở hồ sơ ở trạng thái <strong>Đã tiền kiểm</strong>. Khung thao tác hiện <strong>Lập phiếu giao việc</strong>.</li>
+      <li>Chọn <strong>Cán bộ Xử lý</strong> trong danh sách (tên kèm số điện thoại).</li>
+      <li>Chọn <strong>Hạn kiểm tra thực địa</strong>.</li>
+      <li>Ghi <strong>Chỉ đạo / yêu cầu</strong>, ví dụ "Kiểm tra giấy phép, đo phần lấn chiếm".</li>
+      <li>Bấm <strong>Lập phiếu giao việc</strong>. Hồ sơ chuyển sang <strong>Đã giao việc</strong>. Cán bộ được chọn nhận thông báo trên app.</li>
+    </ol>
+  </div>
+
+  <!-- ========== 4 ========== -->
+  <div class="part-banner" id="p4">
+    <h2>4. Bước 9–10 — Rà soát và ban hành quyết định</h2>
+    <p>Sau khi Cán bộ Xử lý gửi biên bản, hồ sơ ở trạng thái Chờ ra quyết định.</p>
+  </div>
+
+  <div class="feature">
+    <h3>4.1. Bước 9 — Rà soát biên bản</h3>
+    <ol>
+      <li>Mở hồ sơ ở trạng thái <strong>Chờ ra quyết định</strong>. Bạn nhận thông báo khi biên bản đến.</li>
+      <li>Đọc khối <strong>Biên bản hiện trường</strong>: số biên bản, nội dung, diện tích, hành vi, loại công trình, tình trạng, yêu cầu dừng thi công, người vi phạm, ảnh bằng chứng.</li>
+      <li>Nếu biên bản thiếu hoặc sai: mở <strong>Trả lại bổ sung biên bản</strong>, ghi rõ nội dung cần bổ sung (bắt buộc), bấm <strong>Trả lại biên bản</strong>. Hồ sơ quay về Cán bộ Xử lý.</li>
+      <li>Nếu đủ: chuyển sang bước 10.</li>
+    </ol>
+  </div>
+
+  <div class="feature">
+    <h3>4.2. Bước 10 — Ban hành quyết định xử phạt</h3>
+    <figure class="shot">
+      <img src="images/web-quyet-dinh.png" alt="Form ban hành quyết định xử phạt" />
+      <figcaption>Hình 6 — Form quyết định: khung phạt tự hiện theo hành vi, loại công trình, đối tượng</figcaption>
+    </figure>
+    <ol>
+      <li>Mở <strong>Ban hành quyết định xử phạt</strong> trong khung thao tác.</li>
+      <li>Kiểm tra <strong>Hành vi vi phạm</strong>. Dưới ô có dòng căn cứ (khoản, Điều 25).</li>
+      <li>Chọn <strong>Loại công trình</strong> (a–d) và <strong>Đối tượng vi phạm</strong> (Cá nhân hoặc Tổ chức).</li>
+      <li>Chọn <strong>Tình trạng công trình</strong>: Đang thi công hoặc Đã thi công xong.</li>
+      <li>Đọc <strong>Khung phạt</strong> phần mềm tự tính. Cá nhân bằng 1/2 tổ chức.</li>
+      <li>Nhập <strong>Mức phạt</strong> (đồng). Mức phải nằm trong khung; ngoài khung thì ô đỏ và không ban hành được.</li>
+      <li>Kiểm tra <strong>Biện pháp khắc phục hậu quả</strong> (điền sẵn theo hành vi, sửa được).</li>
+      <li>Chọn <strong>Hạn khắc phục</strong>. Với nhánh Điều 85, không cần nhập hạn này.</li>
+      <li>Ghi <strong>Hình thức xử phạt bổ sung</strong> nếu có.</li>
+      <li>Nhập <strong>Số quyết định</strong>, ví dụ <code>123/QĐ-XPHC</code>.</li>
+      <li>Bấm <strong>Ban hành quyết định xử phạt</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Trường hợp</th><th>Phần mềm làm gì</th></tr></thead>
+      <tbody>
+        <tr><td>Mức phạt vượt thẩm quyền Chủ tịch UBND cấp xã (500 triệu tổ chức, 250 triệu cá nhân)</td><td>Hiện cảnh báo: cần chuyển cấp có thẩm quyền ban hành quyết định</td></tr>
+        <tr><td>Case 1 hoặc 2, công trình <strong>Đang thi công</strong></td><td>Hiện khung "Áp dụng Điều 85 — theo dõi cấp phép": 35 ngày (nhà ở riêng lẻ) hoặc 120 ngày (công trình c, d). Hồ sơ chuyển sang <strong>Chờ cấp/điều chỉnh giấy phép</strong></td></tr>
+        <tr><td>Các trường hợp khác</td><td>Hồ sơ chuyển sang <strong>Chờ khắc phục</strong></td></tr>
+        <tr><td>Case 5 (tiếp tục sau biên bản)</td><td>Khung phạt khoản 11; gợi ý hình thức bổ sung: tước giấy phép 3–12 tháng, tịch thu tang vật</td></tr>
+        <tr><td>Tái phạm sau quyết định (khoản 12)</td><td>Dùng khung khoản 12, cao hơn khoản 11</td></tr>
+      </tbody>
+    </table>
+    <p>Sau khi ban hành: người vi phạm nhận thông báo trên app (nếu số điện thoại trùng tài khoản). Người phản ánh nhận thông báo "đã ban hành quyết định xử lý", không thấy mức phạt.</p>
+    <div class="note"><strong>Lưu ý pháp lý:</strong> Khung phạt là gợi ý theo Nghị định 339/2026/NĐ-CP. Người có thẩm quyền quyết định mức cụ thể sau khi đối chiếu văn bản gốc và tình tiết vụ việc.</div>
+  </div>
+
+  <!-- ========== 5 ========== -->
+  <div class="part-banner" id="p5">
+    <h2>5. Sau quyết định — Điều 85, Case 5, nhập thay</h2>
+    <p>Các thao tác phụ khi hồ sơ ở Chờ cấp/điều chỉnh giấy phép hoặc Chờ khắc phục.</p>
+  </div>
+
+  <div class="feature">
+    <h3>5.1. Nhánh Điều 85</h3>
+    <ul>
+      <li>Người vi phạm nộp số giấy phép trên app. Nếu họ nộp giấy trực tiếp, bạn mở <strong>Nộp giấy phép được cấp/điều chỉnh</strong>, nhập số giấy phép, bấm <strong>Ghi nhận giấy phép</strong>.</li>
+      <li>Sau khi có giấy phép, hồ sơ tự chuyển sang <strong>Chờ hậu kiểm</strong> loại "kiểm tra sau cấp phép", hạn 5 ngày. Cán bộ Xử lý kiểm tra.</li>
+      <li>Hết hạn hoặc không được cấp: mở <strong>Hết hạn/không được cấp phép: buộc phá dỡ</strong>, tích "Tôi xác nhận chuyển sang buộc phá dỡ", bấm <strong>Buộc phá dỡ</strong>. Hồ sơ chuyển sang Chờ khắc phục, hạn 15 ngày.</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <h3>5.2. Vẫn tiếp tục thi công (Case 5)</h3>
+    <ol>
+      <li>Mở <strong>Ghi nhận vẫn tiếp tục thi công</strong> (có ở Chờ ra quyết định, Chờ cấp/điều chỉnh giấy phép, Chờ khắc phục).</li>
+      <li>Nhập <strong>Mô tả hiện trạng</strong>. Thêm ảnh nếu có.</li>
+      <li>Bấm <strong>Ghi nhận tiếp tục thi công</strong>.</li>
+    </ol>
+    <p>Trước quyết định: hồ sơ đổi sang hành vi 5 (khoản 11). Sau quyết định: ghi nhận khoản 12 để xử lý tiếp.</p>
+  </div>
+
+  <div class="feature">
+    <h3>5.3. Nhập thay báo cáo khắc phục</h3>
+    <p>Dùng khi người vi phạm không có tài khoản hoặc nộp giấy tờ trực tiếp.</p>
+    <ol>
+      <li>Mở <strong>Báo cáo kết quả khắc phục</strong> khi hồ sơ ở Chờ khắc phục.</li>
+      <li>Tích <strong>Đã nộp tiền phạt</strong> nếu đã nộp. Gắn ảnh biên lai nếu có.</li>
+      <li>Gắn <strong>ảnh hiện trạng sau khắc phục</strong> (1–6 ảnh, bắt buộc). Ghi chú.</li>
+      <li>Bấm <strong>Báo cáo kết quả khắc phục</strong>. Hồ sơ chuyển sang <strong>Đã báo cáo khắc phục</strong>.</li>
+    </ol>
+  </div>
+
+  <!-- ========== 6 ========== -->
+  <div class="part-banner" id="p6">
+    <h2>6. Bước 13 và 16 — Yêu cầu hậu kiểm, đóng hồ sơ</h2>
+    <p>Xác minh hiện trạng sau khắc phục rồi lưu trữ hồ sơ.</p>
+  </div>
+
+  <div class="feature">
+    <h3>6.1. Bước 13 — Yêu cầu hậu kiểm</h3>
+    <ol>
+      <li>Mở hồ sơ ở trạng thái <strong>Đã báo cáo khắc phục</strong>. Xem ảnh báo cáo khắc phục.</li>
+      <li>Mở <strong>Yêu cầu hậu kiểm</strong>. Chọn <strong>Hạn hậu kiểm</strong> (mặc định 3 ngày).</li>
+      <li>Ô <strong>Cán bộ Xử lý hậu kiểm</strong>: để "Giữ nguyên" hoặc chọn cán bộ khác.</li>
+      <li>Ghi chú nếu cần. Bấm <strong>Yêu cầu hậu kiểm</strong>. Hồ sơ chuyển sang <strong>Chờ hậu kiểm</strong>; cán bộ nhận thông báo.</li>
+    </ol>
+    <p>Cán bộ Xử lý trả kết quả (bước 14–15). <strong>Không đạt</strong>: hồ sơ quay về Chờ khắc phục, người vi phạm khắc phục và báo cáo lại, bạn yêu cầu hậu kiểm lần nữa.</p>
+  </div>
+
+  <div class="feature">
+    <h3>6.2. Bước 16 — Đóng hồ sơ lưu trữ</h3>
+    <figure class="shot tall">
+      <img src="images/web-ho-so-da-dong.png" alt="Hồ sơ đi đủ 4 giai đoạn, đang đóng hồ sơ" />
+      <figcaption>Hình 7 — Hồ sơ đã qua đủ 4 giai đoạn: các khối thông tin bên trái, Đóng hồ sơ lưu trữ và Dòng thời gian bên phải</figcaption>
+    </figure>
+    <ol>
+      <li>Mở hồ sơ ở trạng thái <strong>Hậu kiểm đạt</strong>.</li>
+      <li>Rà lại các khối: tiền kiểm, phiếu giao việc, biên bản, quyết định, khắc phục, hậu kiểm.</li>
+      <li>Mở <strong>Đóng hồ sơ lưu trữ</strong>. Ghi chú (mặc định "Đã khắc phục, đóng hồ sơ lưu trữ").</li>
+      <li>Bấm <strong>Đóng hồ sơ lưu trữ</strong>. Hồ sơ chuyển sang <strong>Đã đóng hồ sơ</strong>.</li>
+      <li>Người phản ánh nhận thông báo "vụ việc đã xử lý xong".</li>
+    </ol>
+  </div>
+
+  <!-- ========== 7 ========== -->
+  <div class="part-banner" id="p7">
+    <h2>7. Nghi vấn AI</h2>
+    <p>Bước 2: biến cảnh báo của AI thành hồ sơ tiền kiểm.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot">
+      <img src="images/web-nghi-van.png" alt="Trang Nghi vấn AI" />
+      <figcaption>Hình 8 — Nghi vấn nhà xây trái phép. Hiện chưa có bản ghi vì chưa có đợt bay</figcaption>
+    </figure>
+    <ol>
+      <li>Bấm <strong>Nghi vấn AI</strong> ở menu trái. Mặc định lọc <strong>Chờ duyệt</strong>; có thêm Đã xác nhận, Không vi phạm, Tất cả.</li>
+      <li>Mỗi dòng ghi: thửa, loại đất, quy tắc AI kèm <strong>Gợi ý</strong> hành vi, diện tích, lý do, mức độ, trạng thái.</li>
+      <li>Bấm <strong>Mở hồ sơ tiền kiểm</strong> để tạo hồ sơ vụ việc. Sau đó làm bước 3 như phần 3.</li>
+      <li>Nếu chắc chắn không vi phạm, bấm <strong>Không vi phạm</strong>.</li>
+      <li>Dòng đã có hồ sơ hiện liên kết <strong>Xem hồ sơ</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>AI phát hiện</th><th>Gợi ý hành vi</th></tr></thead>
+      <tbody>
+        <tr><td>Sai mục đích sử dụng đất</td><td>3. Không đúng quy hoạch</td></tr>
+        <tr><td>Lấn ranh thửa</td><td>4. Cơi nới, lấn chiếm</td></tr>
+        <tr><td>Nhà mới xuất hiện</td><td>1. Không phép; 2. Sai phép nếu thửa đã có giấy phép</td></tr>
+      </tbody>
+    </table>
+    <div class="note">AI chỉ gợi ý. Nghi vấn không tự thành vi phạm. Bạn quyết định mở hồ sơ hay không.</div>
+  </div>
+
+  <!-- ========== 8 ========== -->
+  <div class="part-banner" id="p8">
+    <h2>8. Đợt bay flycam</h2>
+    <p>Đăng ký đợt bay; ảnh được bổ sung sau trên máy trạm AI.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot">
+      <img src="images/web-dot-bay.png" alt="Trang Đợt bay flycam" />
+      <figcaption>Hình 9 — Đợt bay flycam: form đăng ký và bảng đợt bay (chưa có đợt bay nào)</figcaption>
+    </figure>
+    <p><strong>Hiện trạng:</strong> chưa bay đợt nào. Trang online <strong>không nhận được ảnh GeoTIFF</strong> vì file nặng nhiều GB, vượt giới hạn tải lên của máy chủ online.</p>
+    <h3>8.1. Đăng ký đợt bay (trên web online)</h3>
+    <ol>
+      <li>Bấm <strong>Đợt bay</strong> ở menu trái.</li>
+      <li>Trong khối <strong>Đăng ký đợt bay (bổ sung ảnh sau)</strong>: chọn <strong>Ngày bay (dự kiến)</strong>, nhập <strong>Khu vực</strong> (phường/xã thí điểm), ghi chú đơn vị bay, độ phân giải, phạm vi.</li>
+      <li>Bấm <strong>Đăng ký đợt bay</strong>. Đợt bay hiện trong bảng với trạng thái <strong>Chờ ảnh</strong>.</li>
+    </ol>
+    <h3>8.2. Bổ sung ảnh (trên máy trạm AI)</h3>
+    <ol>
+      <li>Chép file ảnh trực giao (GeoTIFF) vào máy trạm AI.</li>
+      <li>Trên máy trạm, mở web quản trị chạy kèm API cục bộ (bộ phận kỹ thuật cài sẵn, xem Sổ tay quản trị).</li>
+      <li>Ở dòng đợt bay, bấm <strong>Bổ sung ảnh</strong>, chọn file. Đợt bay chuyển sang <strong>Chờ AI xử lý</strong>, rồi <strong>Đang chạy AI</strong>, rồi <strong>Xong</strong>.</li>
+      <li>Cột Mái nhà và Nghi vấn hiện số đếm. Bấm liên kết để xem nghi vấn hoặc xem trên bản đồ.</li>
+      <li>Vào <strong>Nghi vấn AI</strong> để xử lý từng nghi vấn (phần 7).</li>
+    </ol>
+    <div class="note">Trên web online, bấm <strong>Bổ sung ảnh</strong> chỉ hiện hướng dẫn chép ảnh sang máy trạm AI, không tải file lên.</div>
+  </div>
+
+  <!-- ========== 9 ========== -->
+  <div class="part-banner" id="p9">
+    <h2>9. Bản đồ</h2>
+    <p>Thửa địa chính, mái nhà AI và điểm nghi vấn trên ảnh vệ tinh.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot">
+      <img src="images/web-ban-do.png" alt="Bản đồ địa chính và hiện trạng" />
+      <figcaption>Hình 10 — Bản đồ địa chính và hiện trạng: thửa đất (đỏ) trên ảnh vệ tinh, bảng lớp bên phải</figcaption>
+    </figure>
+    <ol>
+      <li>Bấm <strong>Bản đồ</strong>. Bản đồ mở ở vùng nhiều thửa đất.</li>
+      <li>Bảng <strong>Lớp bản đồ</strong> bên phải: bật/tắt Ảnh vệ tinh, Thửa địa chính (đỏ), Mái nhà YOLO. Dòng trên cùng ghi tổng số thửa và số thửa trong khung nhìn.</li>
+      <li>Bấm <strong>Xem toàn ranh GDB</strong> để thu về toàn vùng có dữ liệu.</li>
+      <li>Phóng to và bấm vào thửa để xem thông tin.</li>
+      <li>Nút <strong>Đợt bay / bổ sung ảnh</strong> ở góc trên mở trang Đợt bay.</li>
+    </ol>
+    <p>Màu điểm nghi vấn: đỏ sai mục đích sử dụng đất, cam lấn ranh, vàng nhà mới.</p>
+  </div>
+
+  <!-- ========== 10 ========== -->
+  <div class="part-banner" id="p10">
+    <h2>10. Danh mục vi phạm</h2>
+    <p>Bảng tra cứu 5 hành vi theo Điều 25 Nghị định 339/2026/NĐ-CP.</p>
+  </div>
+
+  <div class="feature">
+    <ol>
+      <li>Bấm <strong>Danh mục vi phạm</strong> ở menu trái.</li>
+      <li>Đọc khung lưu ý pháp lý ở đầu trang.</li>
+      <li>Khối <strong>Loại công trình</strong>: định nghĩa a, b, c, d.</li>
+      <li>Khối <strong>Quy định chung</strong>: cá nhân bằng 1/2 tổ chức; thẩm quyền cấp xã; thời hạn Điều 85.</li>
+      <li>Bảng chính: mỗi hành vi có căn cứ, khung phạt tổ chức và cá nhân cho a–d, biện pháp khắc phục, hình thức bổ sung. Hành vi có nhãn <strong>Điều 85</strong> là hành vi được xin cấp/điều chỉnh giấy phép.</li>
+    </ol>
+    <figure class="shot">
+      <img src="images/web-danh-muc.png" alt="Trang Danh mục vi phạm" />
+      <figcaption>Trang Danh mục vi phạm: 5 hành vi, khung phạt tổ chức và cá nhân theo loại công trình</figcaption>
+    </figure>
+    <p>Trang này chỉ để xem. Số liệu khung phạt đầy đủ có trong <a href="HUONG-DAN-TONG-QUAN.html#vi-pham">Hướng dẫn tổng quan, mục 4</a>.</p>
+  </div>
+
+  <!-- ========== 11 ========== -->
+  <div class="part-banner" id="p11">
+    <h2>11. Người dùng</h2>
+    <p>Tạo và quản lý tài khoản cán bộ, người dân.</p>
+  </div>
+
+  <div class="feature">
+    <ol>
+      <li>Bấm <strong>Người dùng</strong> ở menu trái.</li>
+      <li>Lọc theo vai trò: Người dân, Cán bộ Xử lý, Cán bộ Quản lý.</li>
+      <li>Bấm <strong>Thêm người dùng</strong>. Nhập họ tên, email, số điện thoại, chọn vai trò, đặt mật khẩu (tối thiểu 6 ký tự). Bấm <strong>Tạo</strong>.</li>
+      <li>Bấm một người trong danh sách để sửa. Để trống mật khẩu nếu giữ nguyên. Bấm <strong>Cập nhật</strong>.</li>
+      <li>Bấm <strong>Xóa</strong> để xóa tài khoản.</li>
+    </ol>
+    <div class="note">
+      Nên nhập <strong>số điện thoại</strong> cho Cán bộ Xử lý: danh sách giao việc hiện tên kèm số. Với Người dân, số điện thoại dùng để khớp người vi phạm trong biên bản.<br />
+      Tài khoản đang đăng nhập không tự xóa, đổi email hay hạ quyền được.
+    </div>
+  </div>
+
+  <!-- ========== 12 ========== -->
+  <div class="part-banner" id="p12">
+    <h2>12. Làm việc trên app</h2>
+    <p>Khi không có máy tính, Cán bộ Quản lý dùng app với cùng tài khoản.</p>
+  </div>
+
+  <div class="feature">
+    <ol>
+      <li>Mở <a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a>, chọn <strong>Trần Văn Quản — Cán bộ Quản lý</strong>, bấm <strong>Đăng nhập</strong>.</li>
+      <li>Trang chủ hiện số hồ sơ đang mở, quá hạn, tổng số và số hồ sơ theo 4 giai đoạn. Bấm một ô để mở danh sách đã lọc.</li>
+      <li>Bấm <strong>Hồ sơ vụ việc</strong> để làm các bước tiền kiểm, giao việc, ra quyết định, hậu kiểm, đóng hồ sơ. Các form giống trên web.</li>
+      <li>Bấm <strong>Nghi vấn flycam</strong> để xem cảnh báo AI và mở hồ sơ tiền kiểm.</li>
+    </ol>
+    <div class="note">Đợt bay, Danh mục vi phạm, Người dùng và Bản đồ đầy đủ chỉ có trên web quản trị.</div>
+  </div>
+
+  <footer class="doc-footer">Hết hướng dẫn Cán bộ Quản lý — QuyHoạch AI v2.0 · Mở file trong trình duyệt rồi chọn In → Lưu PDF nếu cần bản giấy. Xem thêm: <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>, <a href="HUONG-DAN-CAN-BO-XU-LY.html">Hướng dẫn Cán bộ Xử lý</a>, <a href="SO-TAY-QUAN-TRI.html">Sổ tay quản trị</a>.</footer>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+  </script>
+</body>
+</html>

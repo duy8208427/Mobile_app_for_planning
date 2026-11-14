@@ -3,146 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hướng dẫn tổng quan — QuyHoạch AI v1.2</title>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <title>Hướng dẫn tổng quan — QuyHoạch AI v2.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <style>
-    :root {
-      --primary: #0A4ABF;
-      --text: #1a1a1a;
-      --muted: #555;
-      --border: #d0d7de;
-      --bg-soft: #f6f8fa;
-    }
+    :root { --primary: #0A4ABF; --text: #1a1a1a; --muted: #555; --border: #d0d7de; --bg-soft: #f6f8fa; }
     * { box-sizing: border-box; }
-    body {
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      line-height: 1.55;
-      max-width: 210mm;
-      margin: 0 auto;
-      padding: 24px 28px 48px;
-      background: #fff;
-      font-size: 11pt;
-    }
-    .cover {
-      min-height: 50vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      border-bottom: 3px solid var(--primary);
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-    }
-    .cover .brand {
-      font-size: 0.9rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--primary);
-      font-weight: 700;
-    }
-    .cover h1 {
-      font-size: 2rem;
-      margin: 0.4rem 0 0.6rem;
-      color: var(--primary);
-    }
+    body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--text); line-height: 1.55; max-width: 210mm; margin: 0 auto; padding: 24px 28px 48px; background: #fff; font-size: 11pt; }
+    .cover { min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; border-bottom: 3px solid var(--primary); margin-bottom: 2rem; padding-bottom: 2rem; }
+    .cover .brand { font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+    .cover h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; color: var(--primary); }
     .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
-    .cover-meta {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 480px;
-    }
-    .cover-meta th, .cover-meta td {
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      text-align: left;
-    }
+    .cover-meta { border-collapse: collapse; width: 100%; max-width: 520px; }
+    .cover-meta th, .cover-meta td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
     .cover-meta th { background: var(--bg-soft); width: 38%; }
-    h2 {
-      color: var(--primary);
-      border-bottom: 2px solid var(--primary);
-      padding-bottom: 0.25rem;
-      margin-top: 2rem;
-      page-break-after: avoid;
-    }
+    h2 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.25rem; margin-top: 2rem; page-break-after: avoid; }
     h3 { color: #0d3a8f; margin-top: 1.35rem; page-break-after: avoid; }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 0.75rem 0 1rem;
-      font-size: 0.95em;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      vertical-align: top;
-    }
+    table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1rem; font-size: 0.95em; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; vertical-align: top; }
     th { background: var(--bg-soft); text-align: left; }
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.88em;
-      background: var(--bg-soft);
-      padding: 0.1em 0.35em;
-      border-radius: 3px;
-    }
+    td.num { white-space: nowrap; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: var(--bg-soft); padding: 0.1em 0.35em; border-radius: 3px; }
     ul, ol { padding-left: 1.35rem; }
     li { margin: 0.25rem 0; }
     a { color: var(--primary); }
-    .card-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      margin: 1.25rem 0 2rem;
-    }
-    .guide-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.15rem;
-      background: #fff;
-    }
-    .guide-card h3 {
-      margin: 0 0 0.4rem;
-      color: var(--primary);
-    }
+    .toc { background: var(--bg-soft); border: 1px solid var(--border); padding: 1rem 1.25rem; margin: 1rem 0 2rem; }
+    .toc ol { margin: 0.4rem 0 0; }
+    .toc a { text-decoration: none; }
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1.25rem 0 2rem; }
+    .guide-card { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.15rem; background: #fff; }
+    .guide-card h3 { margin: 0 0 0.4rem; color: var(--primary); }
     .guide-card p { margin: 0.35rem 0; color: var(--muted); }
-    .guide-card a.btn {
-      display: inline-block;
-      margin-top: 0.65rem;
-      background: var(--primary);
-      color: #fff;
-      text-decoration: none;
-      padding: 0.45rem 0.9rem;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 0.95em;
-    }
-    .note {
-      background: #fff8e6;
-      border-left: 4px solid #e6a700;
-      padding: 0.55rem 0.85rem;
-      margin: 0.8rem 0;
-      font-size: 0.95em;
-    }
-    .mermaid {
-      background: #fafbfc;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      margin: 1rem 0;
-      overflow-x: auto;
-      page-break-inside: avoid;
-    }
-    footer.doc-footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
+    .guide-card a.btn { display: inline-block; margin-top: 0.65rem; background: var(--primary); color: #fff; text-decoration: none; padding: 0.45rem 0.9rem; border-radius: 4px; font-weight: 700; font-size: 0.95em; }
+    .note { background: #fff8e6; border-left: 4px solid #e6a700; padding: 0.55rem 0.85rem; margin: 0.8rem 0; font-size: 0.95em; }
+    .mermaid { background: #fafbfc; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 1rem 0; overflow-x: auto; page-break-inside: avoid; }
+    footer.doc-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
     @media print {
       body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
+      .cover { min-height: auto; }
       a { color: inherit; }
-      .guide-card, .mermaid { break-inside: avoid; }
+      .guide-card, .mermaid, table { break-inside: avoid; }
     }
     @page { size: A4; margin: 14mm 12mm; }
   </style>
@@ -152,130 +51,232 @@
   <section class="cover">
     <div class="brand">QuyHoạch AI</div>
     <h1>Hướng dẫn tổng quan</h1>
-    <p class="subtitle">Mục lục theo vị trí — mỗi vị trí có quy trình và sơ đồ riêng</p>
+    <p class="subtitle">Xử lý vi phạm trật tự xây dựng: 4 vai trò, 16 bước, 4 giai đoạn</p>
     <table class="cover-meta">
-      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch &amp; trật tự xây dựng</td></tr>
-      <tr><th>Loại tài liệu</th><td>Hướng dẫn tổng quan (mục lục)</td></tr>
-      <tr><th>Phiên bản</th><td>1.2</td></tr>
-      <tr><th>Ngày</th><td>31/08/2026</td></tr>
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch và trật tự xây dựng, TP. Cao Lãnh, Đồng Tháp</td></tr>
+      <tr><th>Loại tài liệu</th><td>Hướng dẫn tổng quan (đọc trước)</td></tr>
+      <tr><th>Phiên bản</th><td>2.0 — giai đoạn demo</td></tr>
+      <tr><th>Ngày</th><td>14/11/2026</td></tr>
     </table>
   </section>
 
-  <p>Có <strong>3 vai trò = 3 file hướng dẫn</strong>. File này là mục lục tổng quan. Luồng báo cáo vi phạm đã triển khai: <strong>gửi → Admin tiếp nhận/giao → Người thực hiện xử lý → Admin phê duyệt → thông báo người gửi</strong>.</p>
+  <nav class="toc">
+    <strong>Mục lục</strong>
+    <ol>
+      <li><a href="#he-thong">Hệ thống là gì</a></li>
+      <li><a href="#vai-tro">4 vai trò</a></li>
+      <li><a href="#luong">Luồng 16 bước</a></li>
+      <li><a href="#vi-pham">5 trường hợp vi phạm và khung phạt</a></li>
+      <li><a href="#dia-chi">Địa chỉ truy cập và tài khoản demo</a></li>
+      <li><a href="#doc-gi">Mỗi vai trò đọc tài liệu nào</a></li>
+    </ol>
+  </nav>
 
-  <h2>Luồng tổng quan — Báo cáo vi phạm</h2>
+  <h2 id="he-thong">1. Hệ thống là gì</h2>
+  <p>QuyHoạch AI giúp phát hiện và xử lý vi phạm trật tự xây dựng. Có hai nguồn phát hiện:</p>
+  <ul>
+    <li><strong>Người dân</strong> gửi phản ánh trên app, kèm ảnh và vị trí GPS.</li>
+    <li><strong>Hệ thống AI</strong> đọc ảnh flycam, so mái nhà với thửa đất và quy hoạch, rồi báo điểm nghi ngờ.</li>
+  </ul>
+  <p>Mỗi phản ánh hoặc cảnh báo được mở thành một <strong>Hồ sơ vụ việc</strong>, mã dạng <code>HS-2026-0001</code>. Hồ sơ đi qua 16 bước, chia 4 giai đoạn. Mọi bước được ghi vào <strong>Dòng thời gian</strong> của hồ sơ, không ghi đè.</p>
+  <p>Ở mỗi bước, hệ thống gửi thông báo cho người làm bước tiếp theo. Người phản ánh nhận thông báo tiến độ.</p>
 
-  <p>Sơ đồ dưới đây mô tả <strong>luồng đã triển khai trên phần mềm</strong> (gửi báo cáo cho Admin trên web, Admin giao vào hàng đợi Người thực hiện, rồi Admin phê duyệt kết quả trước khi thông báo hoàn tất cho người gửi).</p>
+  <h2 id="vai-tro">2. Bốn vai trò</h2>
+  <table>
+    <thead><tr><th>Vai trò</th><th>Làm ở đâu</th><th>Việc chính</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Người dân</strong></td><td>App</td><td>Gửi phản ánh (tối đa 5 ảnh, GPS), xem tiến độ. Nếu là người vi phạm: xem quyết định, báo cáo khắc phục, nộp giấy phép.</td></tr>
+      <tr><td><strong>Hệ thống AI</strong></td><td>Tự động, trên máy trạm AI</td><td>Tách mái nhà từ ảnh flycam, đối chiếu thửa đất, sinh nghi vấn.</td></tr>
+      <tr><td><strong>Cán bộ Quản lý</strong></td><td>Web quản trị và app</td><td>Tiền kiểm, giao việc, ra quyết định, yêu cầu hậu kiểm, đóng hồ sơ. Quản lý nghi vấn AI, đợt bay, danh mục vi phạm, người dùng.</td></tr>
+      <tr><td><strong>Cán bộ Xử lý</strong></td><td>App, tại hiện trường</td><td>Nhận việc, chụp ảnh, lập biên bản, ghi nhận "Vẫn tiếp tục thi công", hậu kiểm, kiểm tra sau cấp phép.</td></tr>
+    </tbody>
+  </table>
+  <div class="note">Người phản ánh <strong>không</strong> thấy tên người vi phạm và mức phạt. Người vi phạm chỉ thấy quyết định trên app khi số điện thoại trong biên bản trùng số điện thoại tài khoản của họ. Nếu không trùng, cán bộ nhập thay.</div>
 
+  <h2 id="luong">3. Luồng 16 bước</h2>
   <div class="mermaid">
-sequenceDiagram
-  participant NguoiGui as Người gửi
-  participant App as App công dân
-  participant WebAdmin as Admin Web
-  participant Manager as Người thực hiện
-  participant API as API
-
-  Note over NguoiGui: Người dân hoặc Người thực hiện khi gửi báo cáo
-  NguoiGui->>App: Tạo và gửi báo cáo vi phạm
-  App->>API: Lưu báo cáo chờ Admin
-  API-->>WebAdmin: Báo cáo vào hàng đợi Admin
-
-  WebAdmin->>WebAdmin: Xem xét / tiếp nhận
-  WebAdmin->>Manager: Giao báo cáo để xử lý trực tiếp
-  Note over Manager: Kiểm tra hiện trường, nhập nội dung xử lý
-
-  Manager->>WebAdmin: Gửi kết quả xử lý để Admin phê duyệt
-  WebAdmin->>WebAdmin: Phê duyệt kết quả
-
-  alt Phê duyệt đạt
-    WebAdmin->>API: Xác nhận đã xử lý xong
-    API-->>NguoiGui: Thông báo báo cáo đã được xử lý xong
-  else Không đạt / từ chối
-    WebAdmin->>API: Từ chối hoặc yêu cầu xử lý lại
-    API-->>NguoiGui: Thông báo kết quả tương ứng
+flowchart TD
+  subgraph G1["Giai đoạn 1 — Phát hiện và Tiền kiểm"]
+    B1["1. Người dân gửi phản ánh"]
+    B2["2. AI gửi cảnh báo nghi ngờ"]
+    B3["3. Tiền kiểm online<br/>Cán bộ Quản lý"]
+    B4["4. Không vi phạm: đóng hồ sơ"]
+    B5["5. Lập phiếu giao việc"]
   end
-
-  Note over NguoiGui: Xem tab Thông báo / chi tiết báo cáo trên app
+  subgraph G2["Giai đoạn 2 — Kiểm tra thực địa và Lập biên bản"]
+    B6["6. Nhận việc, đến hiện trường<br/>Cán bộ Xử lý"]
+    B7["7. Chụp ảnh bằng chứng"]
+    B8["8. Lập biên bản, yêu cầu<br/>chấm dứt vi phạm, gửi hồ sơ"]
+  end
+  subgraph G3["Giai đoạn 3 — Ban hành quyết định và Xử lý"]
+    B9["9. Rà soát, áp mức phạt"]
+    B10["10. Ban hành quyết định"]
+    D85{"Điều 85: xin cấp/điều chỉnh<br/>giấy phép 35 hoặc 120 ngày"}
+    KT["Kiểm tra hiện trạng<br/>trong 5 ngày"]
+    PD["Buộc phá dỡ<br/>trong 15 ngày"]
+    B11["11. Nộp phạt, khắc phục<br/>Người vi phạm"]
+    B12["12. Báo cáo kết quả khắc phục"]
+  end
+  subgraph G4["Giai đoạn 4 — Hậu kiểm và Đóng hồ sơ"]
+    B13["13. Yêu cầu hậu kiểm"]
+    B14["14. Hậu kiểm thực địa"]
+    B15["15. Trả kết quả"]
+    B16["16. Đóng hồ sơ lưu trữ"]
+  end
+  B1 --> B3
+  B2 --> B3
+  B3 -->|Không vi phạm| B4
+  B3 -->|Có dấu hiệu| B5
+  B5 --> B6 --> B7 --> B8 --> B9
+  B9 -->|Trả lại bổ sung| B7
+  B9 --> B10
+  B10 -->|Case 1, 2 đang thi công| D85
+  B10 -->|Các trường hợp khác| B11
+  D85 -->|Có giấy phép| KT
+  D85 -->|Hết hạn / không được cấp| PD
+  KT -->|Phù hợp| B16
+  KT -->|Không phù hợp| PD
+  PD --> B11
+  B11 --> B12 --> B13 --> B14 --> B15
+  B15 -->|Không đạt| B11
+  B15 -->|Đạt| B16
+  B8 -.->|Vẫn tiếp tục thi công| C5["Case 5: khoản 11<br/>hoặc khoản 12 sau quyết định"]
   </div>
 
   <table>
-    <thead><tr><th>Bước</th><th>Ai</th><th>Kênh</th><th>Kết quả</th></tr></thead>
+    <thead><tr><th>Giai đoạn</th><th>Bước</th><th>Ai làm</th><th>Trạng thái hồ sơ sau bước</th></tr></thead>
     <tbody>
-      <tr><td>1. Gửi báo cáo</td><td>Người dân (hoặc Người thực hiện khi gửi phản ánh)</td><td>App công dân</td><td>Báo cáo vào hàng đợi Admin</td></tr>
-      <tr><td>2. Tiếp nhận / giao việc</td><td>Admin</td><td>Web quản trị</td><td>Giao cho Người thực hiện xử lý trực tiếp</td></tr>
-      <tr><td>3. Xử lý thực địa</td><td>Người thực hiện</td><td>App — Trung tâm Quản trị</td><td>Kiểm tra, nhập nội dung, gửi lại Admin phê duyệt</td></tr>
-      <tr><td>4. Phê duyệt kết quả</td><td>Admin</td><td>Web quản trị</td><td>Duyệt đạt hoặc từ chối / yêu cầu xử lý lại</td></tr>
-      <tr><td>5. Thông báo hoàn tất</td><td>Hệ thống → người gửi</td><td>App — Thông báo / chi tiết báo cáo</td><td>Người gửi biết báo cáo đã được xử lý xong</td></tr>
+      <tr><td rowspan="5">1. Phát hiện và Tiền kiểm</td><td>1. Gửi phản ánh vi phạm</td><td>Người dân</td><td>Tiếp nhận</td></tr>
+      <tr><td>2. Gửi cảnh báo điểm nghi ngờ (nút "Mở hồ sơ tiền kiểm" ở trang Nghi vấn AI)</td><td>AI, Cán bộ Quản lý mở hồ sơ</td><td>Tiếp nhận</td></tr>
+      <tr><td>3. Tiền kiểm online: thửa đất, quy hoạch, giấy phép, hồ sơ trùng thửa</td><td>Cán bộ Quản lý</td><td>Đã tiền kiểm</td></tr>
+      <tr><td>4. Không vi phạm: đóng hồ sơ</td><td>Cán bộ Quản lý</td><td>Không vi phạm - đã đóng</td></tr>
+      <tr><td>5. Lập phiếu giao việc (chọn cán bộ, hạn)</td><td>Cán bộ Quản lý</td><td>Đã giao việc</td></tr>
+      <tr><td rowspan="3">2. Kiểm tra thực địa và Lập biên bản</td><td>6. Nhận việc, đến hiện trường</td><td>Cán bộ Xử lý</td><td>Đang kiểm tra thực địa</td></tr>
+      <tr><td>7. Thu thập bằng chứng (ảnh)</td><td>Cán bộ Xử lý</td><td>Đang kiểm tra thực địa</td></tr>
+      <tr><td>8. Lập biên bản, yêu cầu chấm dứt hành vi, gửi hồ sơ</td><td>Cán bộ Xử lý</td><td>Chờ ra quyết định</td></tr>
+      <tr><td rowspan="4">3. Ban hành quyết định và Xử lý</td><td>9. Rà soát, áp mức phạt (hoặc trả lại bổ sung)</td><td>Cán bộ Quản lý</td><td>Chờ ra quyết định, hoặc quay lại Đang kiểm tra thực địa</td></tr>
+      <tr><td>10. Ban hành quyết định xử phạt, yêu cầu khắc phục</td><td>Cán bộ Quản lý</td><td>Chờ khắc phục, hoặc Chờ cấp/điều chỉnh giấy phép</td></tr>
+      <tr><td>11. Nộp phạt, thực hiện khắc phục</td><td>Người vi phạm</td><td>—</td></tr>
+      <tr><td>12. Báo cáo kết quả khắc phục</td><td>Người vi phạm (hoặc cán bộ nhập thay)</td><td>Đã báo cáo khắc phục</td></tr>
+      <tr><td rowspan="3">4. Hậu kiểm và Đóng hồ sơ</td><td>13. Yêu cầu xác minh hiện trạng</td><td>Cán bộ Quản lý</td><td>Chờ hậu kiểm</td></tr>
+      <tr><td>14–15. Hậu kiểm thực địa, trả kết quả</td><td>Cán bộ Xử lý</td><td>Hậu kiểm đạt, hoặc Chờ khắc phục nếu không đạt</td></tr>
+      <tr><td>16. Đóng hồ sơ lưu trữ</td><td>Cán bộ Quản lý</td><td>Đã đóng hồ sơ</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Nhánh Điều 85 (cấp hoặc điều chỉnh giấy phép)</h3>
+  <p>Áp dụng cho Case 1 (không phép) và Case 2 (sai phép) khi công trình <strong>còn đang thi công</strong>. Sau quyết định, hồ sơ chuyển sang "Chờ cấp/điều chỉnh giấy phép".</p>
+  <ul>
+    <li>Người vi phạm có <strong>35 ngày</strong> (nhà ở riêng lẻ) hoặc <strong>120 ngày</strong> (công trình phải lập Báo cáo KT-KT hoặc Báo cáo NCKT) để được cấp hoặc điều chỉnh giấy phép.</li>
+    <li>Có giấy phép: Cán bộ Xử lý kiểm tra hiện trạng trong <strong>5 ngày</strong>. Phù hợp thì đạt. Không phù hợp thì buộc phá dỡ trong <strong>15 ngày</strong>.</li>
+    <li>Hết hạn hoặc không được cấp: buộc tự phá dỡ trong <strong>15 ngày</strong>.</li>
+  </ul>
+
+  <h3>Case 5 (vẫn tiếp tục thi công)</h3>
+  <p>Cán bộ bấm <strong>"Vẫn tiếp tục thi công"</strong> sau khi đã lập biên bản.</p>
+  <ul>
+    <li>Trước khi có quyết định: hồ sơ chuyển sang hành vi "Tiếp tục xây dựng sau khi đã bị lập biên bản" (khoản 11).</li>
+    <li>Sau khi đã có quyết định: ghi nhận theo khoản 12 (khung phạt cao hơn).</li>
+  </ul>
+
+  <h3>Vòng "Không đạt"</h3>
+  <p>Ở bước 15, nếu hậu kiểm <strong>không đạt</strong>, hồ sơ quay về "Chờ khắc phục". Người vi phạm khắc phục tiếp và báo cáo lại (bước 11–12). Vòng này lặp đến khi đạt.</p>
+
+  <h2 id="vi-pham">4. Năm trường hợp vi phạm và khung phạt</h2>
+  <p>Theo Điều 25 Nghị định 339/2026/NĐ-CP. Đơn vị: <strong>triệu đồng</strong>. Cá nhân bị phạt bằng <strong>một nửa</strong> tổ chức (Điều 4 khoản 4).</p>
+  <p>Loại công trình: <strong>a</strong> nhà ở riêng lẻ; <strong>b</strong> nhà ở riêng lẻ trong khu vực bảo vệ di tích, di sản hoặc công trình khác; <strong>c</strong> công trình phải lập Báo cáo kinh tế - kỹ thuật; <strong>d</strong> công trình phải lập Báo cáo nghiên cứu khả thi.</p>
+
+  <h3>Tổ chức</h3>
+  <table>
+    <thead><tr><th>#</th><th>Hành vi</th><th>a</th><th>b</th><th>c</th><th>d</th><th>Khắc phục</th><th>Căn cứ</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Xây dựng không có giấy phép</td><td class="num">60–80</td><td class="num">80–100</td><td class="num">120–140</td><td class="num">140–160</td><td>Xin cấp phép (Điều 85) hoặc phá dỡ</td><td>k7, k14</td></tr>
+      <tr><td>2</td><td>Sai nội dung giấy phép</td><td class="num">30–40</td><td class="num">50–70</td><td class="num">100–120</td><td class="num">120–140</td><td>Xin điều chỉnh phép (Điều 85) hoặc phá dỡ phần sai</td><td>k6, k14</td></tr>
+      <tr><td>3</td><td>Không đúng quy hoạch</td><td class="num">80–100</td><td class="num">100–120</td><td class="num">160–180</td><td class="num">180–200</td><td>Buộc phá dỡ</td><td>k9, k14</td></tr>
+      <tr><td>4</td><td>Cơi nới, lấn chiếm</td><td class="num">80–100</td><td class="num">100–120</td><td class="num">180–200</td><td class="num">200–220</td><td>Buộc phá dỡ phần vi phạm</td><td>k10, k14</td></tr>
+      <tr><td>5</td><td>Tiếp tục sau khi đã lập biên bản</td><td class="num">60–80</td><td class="num">80–100</td><td class="num">400–500</td><td class="num">500–600</td><td>Theo hành vi gốc. Bổ sung: tước giấy phép 3–12 tháng, tịch thu tang vật</td><td>k11, k13, k14</td></tr>
+      <tr><td>—</td><td>Tái phạm sau quyết định (khoản 12)</td><td class="num">80–100</td><td class="num">100–120</td><td class="num">400–800</td><td class="num">800–1.000</td><td>Theo hành vi gốc</td><td>k12</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cá nhân (bằng 1/2 tổ chức)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Hành vi</th><th>a</th><th>b</th><th>c</th><th>d</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Xây dựng không có giấy phép</td><td class="num">30–40</td><td class="num">40–50</td><td class="num">60–70</td><td class="num">70–80</td></tr>
+      <tr><td>2</td><td>Sai nội dung giấy phép</td><td class="num">15–20</td><td class="num">25–35</td><td class="num">50–60</td><td class="num">60–70</td></tr>
+      <tr><td>3</td><td>Không đúng quy hoạch</td><td class="num">40–50</td><td class="num">50–60</td><td class="num">80–90</td><td class="num">90–100</td></tr>
+      <tr><td>4</td><td>Cơi nới, lấn chiếm</td><td class="num">40–50</td><td class="num">50–60</td><td class="num">90–100</td><td class="num">100–110</td></tr>
+      <tr><td>5</td><td>Tiếp tục sau khi đã lập biên bản</td><td class="num">30–40</td><td class="num">40–50</td><td class="num">200–250</td><td class="num">250–300</td></tr>
+      <tr><td>—</td><td>Tái phạm sau quyết định (khoản 12)</td><td class="num">40–50</td><td class="num">50–60</td><td class="num">200–400</td><td class="num">400–500</td></tr>
     </tbody>
   </table>
 
   <div class="note">
-    <strong>Đã khớp phần mềm:</strong> Admin giao việc (<code>assigned</code> — hàng đợi chung mọi Người thực hiện), Người thực hiện nhập nội dung và gửi chờ duyệt (<code>pending_approval</code>), Admin phê duyệt (<code>resolved</code>) / từ chối / trả lại xử lý. Người gửi được thông báo khi tiếp nhận và khi có kết quả cuối.
-    <ul>
-      <li>Admin tạo tài khoản Người thực hiện trên web (mục Người dùng); Người thực hiện <strong>không</strong> đăng nhập web Admin.</li>
-      <li>Người thực hiện vẫn gửi được báo cáo giống người dân trên app, ngoài vai trò xử lý tại Trung tâm Quản trị.</li>
-      <li>MVP chưa chọn từng người khi giao — mọi tài khoản <code>manager</code> thấy cùng hàng đợi <code>assigned</code>.</li>
-    </ul>
+    <strong>Thẩm quyền:</strong> Chủ tịch UBND cấp xã được phạt tới 500 triệu đồng với tổ chức, 250 triệu đồng với cá nhân (Điều 79). Phần mềm cảnh báo khi mức phạt vượt ngưỡng này.<br />
+    <strong>Lưu ý pháp lý:</strong> Khung phạt là gợi ý theo Nghị định 339/2026/NĐ-CP. Người có thẩm quyền quyết định mức cụ thể sau khi đối chiếu văn bản gốc và tình tiết vụ việc.
   </div>
 
-  <h2>Ai dùng kênh nào</h2>
+  <h3>Gợi ý từ cảnh báo AI</h3>
+  <table>
+    <thead><tr><th>AI phát hiện</th><th>Trường hợp gợi ý</th></tr></thead>
+    <tbody>
+      <tr><td>Sai mục đích sử dụng đất</td><td>3. Không đúng quy hoạch</td></tr>
+      <tr><td>Lấn ranh thửa</td><td>4. Cơi nới, lấn chiếm</td></tr>
+      <tr><td>Nhà mới xuất hiện</td><td>1. Không phép; thành 2. Sai phép nếu thửa đã có giấy phép</td></tr>
+    </tbody>
+  </table>
+  <p>Cán bộ Quản lý xác nhận gợi ý ở bước tiền kiểm. Cán bộ Xử lý có thể điều chỉnh khi lập biên bản.</p>
 
-  <div class="mermaid">
-flowchart LR
-  Dan["Người dân"] --> App["App công dân"]
-  ThucHien["Người thực hiện"] --> App
-  Admin["Admin"] --> Web["Web quản trị"]
-  App --> API["API"]
-  Web --> API
-  </div>
+  <h2 id="dia-chi">5. Địa chỉ truy cập và tài khoản demo</h2>
+  <table>
+    <thead><tr><th>Thành phần</th><th>Địa chỉ</th><th>Ai dùng</th></tr></thead>
+    <tbody>
+      <tr><td>Web quản trị</td><td><a href="https://quyhoach-web.vercel.app">https://quyhoach-web.vercel.app</a></td><td>Cán bộ Quản lý</td></tr>
+      <tr><td>App (bản chạy trên trình duyệt)</td><td><a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a></td><td>Người dân, Cán bộ Xử lý, Cán bộ Quản lý</td></tr>
+      <tr><td>Kiểm tra API</td><td><a href="https://quyhoach-api.vercel.app/health">https://quyhoach-api.vercel.app/health</a></td><td>Kỹ thuật</td></tr>
+    </tbody>
+  </table>
+  <div class="note">Bản cài đặt cho điện thoại (APK Android, TestFlight iOS) <strong>chưa phát hành</strong>. Trong giai đoạn demo, mở app bằng trình duyệt trên điện thoại hoặc máy tính.</div>
 
+  <p>Giai đoạn demo có nút đăng nhập một chạm. Trên màn đăng nhập, chọn tài khoản trong danh sách rồi bấm nút <strong>Đăng nhập</strong> (tài khoản demo đã chọn sẵn). Không cần gõ mật khẩu.</p>
+  <table>
+    <thead><tr><th>Tên hiển thị</th><th>Vai trò</th><th>Email</th></tr></thead>
+    <tbody>
+      <tr><td>Nguyễn Văn An</td><td>Người dân</td><td><code>citizen@quyhoach.vn</code></td></tr>
+      <tr><td>Phạm Văn Thực</td><td>Cán bộ Xử lý</td><td><code>manager@quyhoach.vn</code></td></tr>
+      <tr><td>Trần Văn Quản</td><td>Cán bộ Quản lý</td><td><code>admin@quyhoach.vn</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="doc-gi">6. Mỗi vai trò đọc tài liệu nào</h2>
   <div class="card-grid">
     <article class="guide-card">
-      <h3>1. Người dân</h3>
-      <p>App điện thoại / trình duyệt. Gửi báo cáo vi phạm, theo dõi phản hồi, tra cứu và phân tích AI.</p>
-      <p><strong>Ba quy trình:</strong> Vào hệ thống · Báo cáo vi phạm · Tra cứu và phân tích AI</p>
-      <p>Demo: <code>citizen@quyhoach.vn</code> / <code>Citizen@123</code> · <code>https://quyhoach-citizen.vercel.app</code></p>
-      <a class="btn" href="HUONG-DAN-NGUOI-DAN.html">Mở hướng dẫn người dân</a>
+      <h3>Người dân</h3>
+      <p>Gửi phản ánh, xem tiến độ. Nếu bị lập biên bản: xem quyết định, báo cáo khắc phục, nộp giấy phép mới.</p>
+      <a class="btn" href="HUONG-DAN-NGUOI-DAN.html">Hướng dẫn Người dân</a>
     </article>
     <article class="guide-card">
-      <h3>2. Admin (web)</h3>
-      <p>Trình duyệt máy tính. Thống kê và xử lý báo cáo từ công dân.</p>
-      <p><strong>Ba quy trình:</strong> Đăng nhập và tổng quan · Báo cáo từ công dân trên web · Quản lý người dùng</p>
-      <p>Demo: <code>admin@quyhoach.vn</code> / <code>Admin@123</code> · <code>https://quyhoach-web.vercel.app</code></p>
-      <a class="btn" href="HUONG-DAN-ADMIN.html">Mở hướng dẫn Admin</a>
+      <h3>Cán bộ Xử lý</h3>
+      <p>Làm trên app tại hiện trường: nhận việc, lập biên bản, hậu kiểm, kiểm tra sau cấp phép.</p>
+      <a class="btn" href="HUONG-DAN-CAN-BO-XU-LY.html">Hướng dẫn Cán bộ Xử lý</a>
     </article>
     <article class="guide-card">
-      <h3>3. Người thực hiện (app)</h3>
-      <p>Cùng app với người dân. Xử lý báo cáo trên điện thoại (Trung tâm Quản trị). Vai trò kỹ thuật <code>manager</code> — tách biệt với Admin web.</p>
-      <p><strong>Ba quy trình:</strong> Vào app với tài khoản thực hiện · Trung tâm Quản trị · Xử lý từng báo cáo</p>
-      <p>Demo: <code>manager@quyhoach.vn</code> / <code>Manager@123</code> · <code>https://quyhoach-citizen.vercel.app</code></p>
-      <a class="btn" href="HUONG-DAN-NGUOI-THUC-HIEN.html">Mở hướng dẫn người thực hiện</a>
+      <h3>Cán bộ Quản lý</h3>
+      <p>Làm trên web quản trị (hoặc app): tiền kiểm, giao việc, ra quyết định, hậu kiểm, đóng hồ sơ; nghi vấn AI, đợt bay, danh mục, người dùng.</p>
+      <a class="btn" href="HUONG-DAN-CAN-BO-QUAN-LY.html">Hướng dẫn Cán bộ Quản lý</a>
+    </article>
+    <article class="guide-card">
+      <h3>Kỹ thuật, vận hành</h3>
+      <p>Nạp dữ liệu, đợt bay trên máy trạm AI, triển khai Vercel, biến môi trường, danh sách việc trước khi chạy thật.</p>
+      <a class="btn" href="SO-TAY-QUAN-TRI.html">Sổ tay quản trị</a>
     </article>
   </div>
 
-  <h2>Tài khoản và địa chỉ</h2>
-  <table>
-    <thead><tr><th>Ứng dụng</th><th>Địa chỉ production</th></tr></thead>
-    <tbody>
-      <tr><td>App công dân (và người thực hiện)</td><td><code>https://quyhoach-citizen.vercel.app</code></td></tr>
-      <tr><td>Web quản trị (Admin)</td><td><code>https://quyhoach-web.vercel.app</code></td></tr>
-      <tr><td>API</td><td><code>https://quyhoach-api.vercel.app</code></td></tr>
-    </tbody>
-  </table>
-  <table>
-    <thead><tr><th>Vai trò</th><th>Mã</th><th>Email</th><th>Mật khẩu</th></tr></thead>
-    <tbody>
-      <tr><td>Người dân</td><td><code>citizen</code></td><td><code>citizen@quyhoach.vn</code></td><td><code>Citizen@123</code></td></tr>
-      <tr><td>Người thực hiện</td><td><code>manager</code></td><td><code>manager@quyhoach.vn</code></td><td><code>Manager@123</code></td></tr>
-      <tr><td>Admin (web)</td><td><code>admin</code></td><td><code>admin@quyhoach.vn</code></td><td><code>Admin@123</code></td></tr>
-    </tbody>
-  </table>
-  <div class="note">Ba vai trò kỹ thuật: <code>citizen</code>, <code>manager</code>, <code>admin</code>. Người thực hiện không đăng nhập web Admin; Admin không dùng Trung tâm Quản trị trên app. Hướng dẫn kỹ thuật / deploy: <a href="../HUONG-DAN-WEB.md">HUONG-DAN-WEB.md</a>.</div>
-
-  <footer class="doc-footer">Hướng dẫn tổng quan — QuyHoạch AI v1.2 · Mở từng file hướng dẫn trong trình duyệt rồi In → PDF nếu cần nộp giấy.</footer>
+  <footer class="doc-footer">Hướng dẫn tổng quan — QuyHoạch AI v2.0 · Mở file trong trình duyệt rồi chọn In → Lưu PDF nếu cần bản giấy.</footer>
 
   <script>
-    mermaid.initialize({ startOnLoad: true, theme: "neutral", flowchart: { htmlLabels: false }, securityLevel: "loose" });
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose", flowchart: { useMaxWidth: true } });
   </script>
 </body>
 </html>

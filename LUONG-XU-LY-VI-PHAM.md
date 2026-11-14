@@ -76,8 +76,31 @@ Hành vi tái phạm sau khi đã bị xử phạt (khoản 12) có khung riêng
 
 > Khung phạt là gợi ý theo Nghị định 339/2026/NĐ-CP. Người có thẩm quyền quyết định mức cụ thể sau khi đối chiếu văn bản gốc và tình tiết vụ việc.
 
-## Dữ liệu giấy phép
-API `GET /api/permits?so_to=&so_thua=` đọc collection `permits`. Collection này hiện chưa có dữ liệu. Khi có file giấy phép thật, viết script nạp với các trường `permit_no`, `so_to`, `so_thua`, `owner_name`, `address`, `issued_date`, `area_m2`, `floors`.
+## Dữ liệu dùng cho tiền kiểm
+
+| Dữ liệu | Nguồn | Số lượng | Script nạp |
+| --- | --- | --- | --- |
+| Thửa đất nền địa chính | `Sở TNMT\BD_NenDiaChinh\GeoDatabase\20250808_BanDoNenDiaChinh.gdb` lớp `ThuaDat` | 269.822 | `scripts/import_cadastre_mongo.py <gdb> ThuaDat` |
+| Thửa đất nội thị TP. Cao Lãnh | `Sở TNMT\QHSDD_tpCaoLanh\GeoDatabase\TPCaoLanh.gdb` lớp `ThuaDat_TNMT_DC` | 61.782 (chỉ các phường chưa có) | `scripts/import_cadastre_mongo.py <gdb> ThuaDat_TNMT_DC --append` |
+| Quy hoạch sử dụng đất (năm 2030) | cùng file, lớp `SuDungDat_TNMT_QH` | 11.293 vùng | `scripts/import_planning_zones.py <gdb>` |
+| Giấy phép xây dựng | **dữ liệu mẫu** (`is_demo: true`) gắn trên thửa thật | 30 | `scripts/seed_demo_permits.py` |
+
+Ba script đọc GDB cần GDAL, nên chạy bằng Python của QGIS: `"C:\Program Files\QGIS 4.0.3in\python-qgis.bat" scripts\...`. Script giấy phép chạy bằng `backendenv\Scripts\python`. Tất cả đọc `MONGO_URL` trong `backend/.env`.
+
+Tiền kiểm so sánh **mục đích sử dụng theo quy hoạch** tại vị trí với loại đất hiện trạng của thửa, rồi gợi ý hành vi:
+- vị trí không thuộc quy hoạch đất ở (ODT/ONT): Case 3;
+- thuộc đất ở và thửa đã có giấy phép: Case 2;
+- thuộc đất ở, chưa có giấy phép: Case 1.
+
+Khi có dữ liệu giấy phép thật: xoá giấy phép mẫu bằng `db.permits.deleteMany({is_demo: true})`, rồi nạp dữ liệu thật với các trường `permit_no`, `so_to`, `so_thua`, `owner_name`, `address`, `issued_date`, `area_m2`, `floors`.
+
+## Đợt bay flycam
+Chưa có đợt bay thật. Trên web quản trị, mục **Đợt bay** → **Đăng ký đợt bay (bổ sung ảnh sau)** tạo một đợt ở trạng thái "Chờ ảnh". Ảnh trực giao (GeoTIFF, thường nặng hàng GB) được bổ sung sau trên **máy trạm AI**:
+1. Chạy `docker compose up` gồm PostGIS và `services/detection`.
+2. Mở web quản trị trỏ vào API trên máy trạm.
+3. Bấm "Bổ sung ảnh" ở đợt bay đó. AI xử lý xong sẽ tạo nghi vấn ở trang **Nghi vấn AI**.
+
+Bản online không nhận tải file ảnh trực giao.
 
 ## Chuyển dữ liệu cũ
 `backend\venv\Scripts\python scripts\migrate_reports_to_cases.py` mở hồ sơ cho các báo cáo cũ chưa có hồ sơ. Chạy lại nhiều lần cũng an toàn.

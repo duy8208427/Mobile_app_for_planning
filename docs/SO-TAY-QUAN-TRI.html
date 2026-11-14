@@ -3,132 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sổ tay quản trị — QuyHoạch AI v1.0</title>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <title>Sổ tay quản trị — QuyHoạch AI v2.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <style>
-    :root {
-      --primary: #0A4ABF;
-      --text: #1a1a1a;
-      --muted: #555;
-      --border: #d0d7de;
-      --bg-soft: #f6f8fa;
-    }
+    :root { --primary: #0A4ABF; --text: #1a1a1a; --muted: #555; --border: #d0d7de; --bg-soft: #f6f8fa; }
     * { box-sizing: border-box; }
-    body {
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      line-height: 1.55;
-      max-width: 210mm;
-      margin: 0 auto;
-      padding: 24px 28px 48px;
-      background: #fff;
-      font-size: 11pt;
-    }
-    .cover {
-      min-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      border-bottom: 3px solid var(--primary);
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      page-break-after: always;
-    }
-    .cover .brand {
-      font-size: 0.9rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--primary);
-      font-weight: 700;
-    }
-    .cover h1 {
-      font-size: 2rem;
-      margin: 0.4rem 0 0.6rem;
-      color: var(--primary);
-    }
+    body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--text); line-height: 1.55; max-width: 210mm; margin: 0 auto; padding: 24px 28px 48px; background: #fff; font-size: 11pt; }
+    .cover { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; border-bottom: 3px solid var(--primary); margin-bottom: 2rem; padding-bottom: 2rem; page-break-after: always; }
+    .cover .brand { font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+    .cover h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; color: var(--primary); }
     .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
-    .cover-meta {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 420px;
-    }
-    .cover-meta th, .cover-meta td {
-      border: 1px solid var(--border);
-      padding: 8px 12px;
-      text-align: left;
-    }
+    .cover-meta { border-collapse: collapse; width: 100%; max-width: 520px; }
+    .cover-meta th, .cover-meta td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
     .cover-meta th { background: var(--bg-soft); width: 38%; }
-    h2 {
-      color: var(--primary);
-      border-bottom: 2px solid var(--primary);
-      padding-bottom: 0.25rem;
-      margin-top: 2rem;
-      page-break-after: avoid;
-    }
+    h2 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.25rem; margin-top: 2rem; page-break-after: avoid; }
     h3 { color: #0d3a8f; margin-top: 1.4rem; page-break-after: avoid; }
-    h4 { margin-top: 1.1rem; page-break-after: avoid; }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 0.75rem 0 1rem;
-      font-size: 0.95em;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      vertical-align: top;
-    }
+    table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1rem; font-size: 0.95em; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; vertical-align: top; }
     th { background: var(--bg-soft); text-align: left; }
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.88em;
-      background: var(--bg-soft);
-      padding: 0.1em 0.35em;
-      border-radius: 3px;
-    }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: var(--bg-soft); padding: 0.1em 0.35em; border-radius: 3px; }
+    pre { background: #f3f5f7; border: 1px solid var(--border); border-radius: 4px; padding: 0.6rem 0.8rem; overflow-x: auto; font-size: 0.85em; white-space: pre-wrap; word-break: break-all; page-break-inside: avoid; }
+    pre code { background: none; padding: 0; }
     ul, ol { padding-left: 1.35rem; }
     li { margin: 0.25rem 0; }
     a { color: var(--primary); }
-    .toc {
-      background: var(--bg-soft);
-      border: 1px solid var(--border);
-      padding: 1rem 1.25rem;
-      margin: 1rem 0 2rem;
-      page-break-after: always;
-    }
+    .toc { background: var(--bg-soft); border: 1px solid var(--border); padding: 1rem 1.25rem; margin: 1rem 0 2rem; page-break-after: always; }
     .toc ol { margin: 0.4rem 0 0; }
     .toc a { text-decoration: none; }
-    .toc a:hover { text-decoration: underline; }
-    .mermaid {
-      background: #fafbfc;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      margin: 1rem 0;
-      overflow-x: auto;
-      page-break-inside: avoid;
-    }
-    .note {
-      background: #fff8e6;
-      border-left: 4px solid #e6a700;
-      padding: 0.6rem 0.9rem;
-      margin: 0.8rem 0;
-    }
+    .mermaid { background: #fafbfc; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 1rem 0; overflow-x: auto; page-break-inside: avoid; }
+    .note { background: #fff8e6; border-left: 4px solid #e6a700; padding: 0.6rem 0.9rem; margin: 0.8rem 0; }
+    .warn { background: #fdecec; border-left: 4px solid #c62828; padding: 0.6rem 0.9rem; margin: 0.8rem 0; }
     .chapter { page-break-before: always; }
     .chapter:first-of-type { page-break-before: auto; }
-    footer.doc-footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
+    .checklist li { list-style: none; margin-left: -1.1rem; }
+    .checklist li::before { content: "☐ "; }
+    footer.doc-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
     @media print {
       body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
       .cover { min-height: auto; }
       a { color: inherit; text-decoration: none; }
-      .mermaid { break-inside: avoid; }
+      .mermaid, pre { break-inside: avoid; }
       h2, h3 { break-after: avoid; }
     }
     @page { size: A4; margin: 14mm 12mm; }
@@ -139,378 +53,300 @@
   <section class="cover">
     <div class="brand">QuyHoạch AI</div>
     <h1>Sổ tay quản trị</h1>
-    <p class="subtitle">Quy trình · Phân quyền · Lưu đồ hệ thống</p>
+    <p class="subtitle">Nạp dữ liệu · Đợt bay trên máy trạm AI · Triển khai · Danh sách việc trước khi chạy thật</p>
     <table class="cover-meta">
-      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch &amp; trật tự xây dựng</td></tr>
-      <tr><th>Loại tài liệu</th><td>Sổ tay quản trị</td></tr>
-      <tr><th>Phiên bản</th><td>1.0</td></tr>
-      <tr><th>Ngày</th><td>24/08/2026</td></tr>
-      <tr><th>Đối tượng</th><td>IT vận hành, cán bộ phụ trách hệ thống, người nạp dữ liệu</td></tr>
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch và trật tự xây dựng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Sổ tay quản trị, vận hành</td></tr>
+      <tr><th>Phiên bản</th><td>2.0 — giai đoạn demo</td></tr>
+      <tr><th>Ngày</th><td>14/11/2026</td></tr>
+      <tr><th>Đối tượng</th><td>Kỹ thuật vận hành, người nạp dữ liệu, người phụ trách hệ thống</td></tr>
     </table>
   </section>
 
-  <nav class="toc" id="muc-luc">
+  <nav class="toc">
     <strong>Mục lục</strong>
     <ol>
-      <li><a href="#s1">Tổng quan hệ thống</a></li>
+      <li><a href="#s1">Thành phần hệ thống</a></li>
       <li><a href="#s2">Vai trò và phân quyền</a></li>
-      <li><a href="#s3">Quy trình và lưu đồ</a></li>
-      <li><a href="#s4">Vận hành hàng ngày</a></li>
-      <li><a href="#s5">Dữ liệu GIS</a></li>
-      <li><a href="#s6">Phụ lục</a></li>
+      <li><a href="#s3">Nạp dữ liệu</a></li>
+      <li><a href="#s4">Đợt bay flycam trên máy trạm AI</a></li>
+      <li><a href="#s5">Triển khai Vercel và biến môi trường</a></li>
+      <li><a href="#s6">Chụp lại ảnh cho bộ hướng dẫn</a></li>
+      <li><a href="#s7">Vận hành hằng ngày và sao lưu</a></li>
+      <li><a href="#s8">Danh sách việc trước khi chạy thật</a></li>
+      <li><a href="#s9">Tài liệu và file tham chiếu</a></li>
     </ol>
   </nav>
 
-  <p>Tài liệu này mô tả <strong>hành vi đã triển khai trong mã nguồn</strong>. Hướng dẫn chạy máy / triển khai chi tiết: <code>HUONG-DAN-CHAY-DU-AN.md</code>, <code>HUONG-DAN-WEB.md</code>, <code>HUONG-DAN-5-PHAN-DU-LIEU-ANH-QUY-HOACH-DONG-THAP.md</code>.</p>
+  <p>Sổ tay này dành cho người vận hành kỹ thuật. Hướng dẫn nghiệp vụ theo vai trò: xem <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>.</p>
+  <div class="warn"><strong>Bảo mật:</strong> Không ghi chuỗi kết nối cơ sở dữ liệu, mật khẩu, khóa bí mật vào tài liệu, tin nhắn hoặc Git. Giá trị thật chỉ nằm trong <code>backend/.env</code> trên máy và trong phần Environment Variables của Vercel.</div>
 
   <!-- ========== 1 ========== -->
   <section class="chapter" id="s1">
-    <h2>1. Tổng quan hệ thống</h2>
-
-    <h3>1.1. Mục đích</h3>
-    <ul>
-      <li><strong>Người dân:</strong> báo cáo vi phạm, tra cứu pháp luật / thủ tục / nhà ở xã hội / GPXD, so sánh ảnh quy hoạch–viễn thám bằng AI.</li>
-      <li><strong>Cán bộ:</strong> thống kê, duyệt báo cáo, bản đồ quy hoạch, xác nhận / bác bỏ nghi vấn vi phạm GIS.</li>
-    </ul>
-
-    <h3>1.2. Thành phần kỹ thuật</h3>
+    <h2>1. Thành phần hệ thống</h2>
     <table>
-      <thead><tr><th>Thành phần</th><th>Thư mục</th><th>Công nghệ</th><th>Vai trò</th></tr></thead>
+      <thead><tr><th>Thành phần</th><th>Thư mục</th><th>Công nghệ</th><th>Địa chỉ online</th></tr></thead>
       <tbody>
-        <tr><td>App công dân</td><td><code>frontend/</code></td><td>Expo / React Native</td><td>UI người dân + quản trị báo cáo mobile</td></tr>
-        <tr><td>Web quản trị</td><td><code>web/</code></td><td>Vite + React + MapLibre</td><td>Dashboard, bản đồ, vi phạm, báo cáo</td></tr>
-        <tr><td>API</td><td><code>backend/</code></td><td>FastAPI + Motor</td><td>REST <code>/api/*</code>, JWT, seed</td></tr>
-        <tr><td>CSDL</td><td>MongoDB</td><td>DB <code>quyhoach</code></td><td>Users, reports, GIS, nội dung tra cứu</td></tr>
+        <tr><td>API</td><td><code>backend/</code></td><td>FastAPI + MongoDB</td><td><a href="https://quyhoach-api.vercel.app/health">https://quyhoach-api.vercel.app/health</a></td></tr>
+        <tr><td>Web quản trị</td><td><code>web/</code></td><td>Vite + React + MapLibre</td><td><a href="https://quyhoach-web.vercel.app">https://quyhoach-web.vercel.app</a></td></tr>
+        <tr><td>App (người dân, cán bộ)</td><td><code>frontend/</code></td><td>Expo / React Native, bản web</td><td><a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a></td></tr>
+        <tr><td>Cơ sở dữ liệu</td><td>—</td><td>MongoDB Atlas</td><td>—</td></tr>
+        <tr><td>AI phát hiện nhà</td><td><code>services/detection/</code></td><td>Docker: PostGIS + worker YOLO</td><td>Chỉ chạy trên máy trạm AI</td></tr>
       </tbody>
     </table>
+    <div class="note">Bản cài điện thoại chưa phát hành. Cấu hình build EAS có sẵn trong <code>frontend/eas.json</code> để làm APK (Android) và TestFlight (iOS) sau này.</div>
 
-    <h3>1.3. Kiến trúc production</h3>
     <div class="mermaid">
 flowchart LR
-  subgraph clients [May_khach]
-    Citizen[App_cong_dan_Vercel]
-    AdminWeb[Web_quan_tri_Vercel]
+  subgraph online["Online — Vercel"]
+    APP["App<br/>quyhoach-citizen"]
+    WEB["Web quản trị<br/>quyhoach-web"]
+    API["API<br/>quyhoach-api"]
   end
-  subgraph cloud [Ha_tang]
-    API[API_Railway_FastAPI]
-    DB[(MongoDB_quyhoach)]
+  DB[("MongoDB Atlas")]
+  subgraph ws["Máy trạm AI"]
+    WEBL["Web quản trị<br/>trỏ API cục bộ"]
+    APIL["API cục bộ<br/>port 8000"]
+    COG["data/cog<br/>ảnh GeoTIFF"]
+    DET["detection-worker"]
+    PG[("PostGIS")]
   end
-  Citizen --> API
-  AdminWeb --> API
+  APP --> API
+  WEB --> API
   API --> DB
+  WEBL --> APIL
+  APIL --> COG
+  APIL --> DB
+  DET --> COG
+  DET --> PG
+  DET --> DB
     </div>
-
-    <table>
-      <thead><tr><th>Thành phần</th><th>URL production</th></tr></thead>
-      <tbody>
-        <tr><td>API</td><td><code>https://quyhoach-api-production.up.railway.app</code></td></tr>
-        <tr><td>Web quản trị</td><td><code>https://quyhoach-web.vercel.app</code></td></tr>
-        <tr><td>App công dân</td><td><code>https://quyhoach-citizen.vercel.app</code></td></tr>
-      </tbody>
-    </table>
-
-    <h3>1.4. Tài khoản demo (seed)</h3>
-    <table>
-      <thead><tr><th>Vai trò</th><th>Email</th><th>Mật khẩu</th></tr></thead>
-      <tbody>
-        <tr><td>Admin</td><td><code>admin@quyhoach.vn</code></td><td><code>Admin@123</code></td></tr>
-        <tr><td>Công dân</td><td><code>citizen@quyhoach.vn</code></td><td><code>Citizen@123</code></td></tr>
-      </tbody>
-    </table>
-    <div class="note"><strong>Bắt buộc đổi mật khẩu</strong> trước khi đưa môi trường production thật.</div>
-
-    <h3>1.5. Collections MongoDB chính</h3>
-    <table>
-      <thead><tr><th>Collection</th><th>Nguồn</th><th>Chỉnh sửa trong app?</th></tr></thead>
-      <tbody>
-        <tr><td><code>users</code></td><td>Đăng ký / seed</td><td>Hồ sơ cá nhân; không có API quản lý user hàng loạt</td></tr>
-        <tr><td><code>reports</code></td><td>Công dân tạo</td><td>Admin cập nhật trạng thái + phản hồi</td></tr>
-        <tr><td><code>notifications</code></td><td>Tự tạo khi gửi/cập nhật báo cáo</td><td>Đọc / đánh dấu đã đọc</td></tr>
-        <tr><td><code>legal_docs</code></td><td>Seed nếu trống</td><td>Chỉ đọc</td></tr>
-        <tr><td><code>social_housing_projects</code></td><td>Seed nếu trống</td><td>Chỉ đọc</td></tr>
-        <tr><td><code>administrative_procedures</code></td><td>Seed nếu trống</td><td>Chỉ đọc</td></tr>
-        <tr><td><code>planning_zones</code></td><td>Seed nếu trống</td><td>Chỉ đọc (API)</td></tr>
-        <tr><td><code>observed_buildings</code></td><td>Seed nếu trống</td><td>Chỉ đọc</td></tr>
-        <tr><td><code>violations</code></td><td>Seed nếu trống</td><td>Admin review</td></tr>
-      </tbody>
-    </table>
+    <p>Máy trạm AI dùng <strong>cùng cơ sở dữ liệu</strong> với bản online. Nghi vấn AI sinh trên máy trạm sẽ hiện ngay ở web online.</p>
   </section>
 
   <!-- ========== 2 ========== -->
   <section class="chapter" id="s2">
     <h2>2. Vai trò và phân quyền</h2>
-
-    <h3>2.1. Hai vai trò</h3>
-    <p>Chỉ có <code>citizen</code> và <code>admin</code>. Không có vai trò khách (guest) riêng.</p>
     <table>
-      <thead><tr><th>Khả năng</th><th>Chưa đăng nhập</th><th>Công dân</th><th>Admin</th></tr></thead>
+      <thead><tr><th>Mã</th><th>Tên trên giao diện</th><th>Đăng nhập</th><th>Quyền chính</th></tr></thead>
       <tbody>
-        <tr><td>Đăng ký / đăng nhập</td><td>Có</td><td>Có</td><td>Có</td></tr>
-        <tr><td><code>GET /api/legal</code></td><td>Có</td><td>Có</td><td>Có</td></tr>
-        <tr><td>TTHC, NOXH, planning, violations</td><td>Không</td><td>Có</td><td>Có</td></tr>
-        <tr><td>Gửi / xem báo cáo của mình</td><td>Không</td><td>Có</td><td>Có</td></tr>
-        <tr><td>Xem / cập nhật mọi báo cáo</td><td>Không</td><td>Không</td><td>Có</td></tr>
-        <tr><td><code>/api/admin/stats</code>, review violations</td><td>Không</td><td>Không</td><td>Có</td></tr>
-        <tr><td>Web quản trị / Trung tâm Quản trị app</td><td>Không</td><td>Không</td><td>Có</td></tr>
-        <tr><td>So sánh AI</td><td>Không</td><td>Có</td><td>Có</td></tr>
+        <tr><td><code>citizen</code></td><td>Người dân</td><td>App</td><td>Gửi phản ánh, xem tiến độ (không thấy người vi phạm, mức phạt). Nếu là người vi phạm: xem quyết định, báo cáo khắc phục, nộp giấy phép</td></tr>
+        <tr><td><code>manager</code></td><td>Cán bộ Xử lý</td><td>App</td><td>Chỉ hồ sơ được giao: nhận việc, lập biên bản, ghi nhận tiếp tục thi công, hậu kiểm, kiểm tra sau cấp phép</td></tr>
+        <tr><td><code>admin</code></td><td>Cán bộ Quản lý</td><td>Web và app</td><td>Mọi hồ sơ: tiền kiểm, giao việc, quyết định, hậu kiểm, đóng; nghi vấn AI, đợt bay, danh mục, người dùng</td></tr>
       </tbody>
     </table>
-
-    <h3>2.2. Cơ chế kiểm soát</h3>
-    <ul>
-      <li><strong>Backend:</strong> JWT Bearer; route admin dùng <code>require_admin()</code> (403 nếu không phải admin).</li>
-      <li><strong>Web:</strong> <code>AdminRoute</code> chỉ cho <code>role === "admin"</code>.</li>
-      <li><strong>Mobile:</strong> kiểm tra role; tab admin ẩn khỏi thanh tab.</li>
-    </ul>
-
-    <h3>2.3. Lưu ý — đăng ký admin</h3>
-    <div class="note">Màn đăng ký cho phép chọn <strong>Người phụ trách</strong> (<code>admin</code>). Trên production cần khóa lựa chọn này trên UI, chỉ tạo admin qua seed/MongoDB, hoặc thêm cổng phê duyệt (chưa có trong code).</div>
+    <p>Người vi phạm được xác định bằng <strong>số điện thoại</strong> nhập trong biên bản. Nếu số trùng một tài khoản <code>citizen</code>, người đó thấy hồ sơ trong mục "Quyết định xử phạt của tôi".</p>
+    <p>Máy trạng thái hồ sơ: <code>backend/case_flow.py</code>. API: <code>backend/routers/cases.py</code> (<code>/api/cases</code>). Chi tiết 16 bước: <code>LUONG-XU-LY-VI-PHAM.md</code>.</p>
   </section>
 
   <!-- ========== 3 ========== -->
   <section class="chapter" id="s3">
-    <h2>3. Quy trình và lưu đồ</h2>
+    <h2>3. Nạp dữ liệu</h2>
+    <table>
+      <thead><tr><th>Dữ liệu</th><th>Nguồn</th><th>Số lượng hiện có</th><th>Script</th></tr></thead>
+      <tbody>
+        <tr><td>Thửa đất nền địa chính</td><td><code>20250808_BanDoNenDiaChinh.gdb</code>, lớp <code>ThuaDat</code></td><td>269.822</td><td><code>scripts/import_cadastre_mongo.py</code></td></tr>
+        <tr><td>Thửa đất nội thị TP. Cao Lãnh</td><td><code>TPCaoLanh.gdb</code>, lớp <code>ThuaDat_TNMT_DC</code></td><td>61.782 (chỉ các phường chưa có)</td><td><code>scripts/import_cadastre_mongo.py … --append</code></td></tr>
+        <tr><td>Quy hoạch sử dụng đất đến năm 2030</td><td><code>TPCaoLanh.gdb</code>, lớp <code>SuDungDat_TNMT_QH</code></td><td>11.293 vùng</td><td><code>scripts/import_planning_zones.py</code></td></tr>
+        <tr><td>Giấy phép xây dựng</td><td><strong>Dữ liệu mẫu</strong> gắn trên thửa thật (<code>is_demo: true</code>)</td><td>30</td><td><code>scripts/seed_demo_permits.py</code></td></tr>
+        <tr><td>Báo cáo cũ → hồ sơ vụ việc</td><td>Collection <code>reports</code></td><td>—</td><td><code>scripts/migrate_reports_to_cases.py</code></td></tr>
+      </tbody>
+    </table>
+    <p>Tổng số thửa: <strong>331.604</strong>.</p>
 
-    <h3>3.1. Đăng nhập và phiên JWT</h3>
-    <p><strong>Mục đích:</strong> Xác thực và cấp token. <strong>Thời hạn JWT:</strong> 30 ngày. Token: app <code>qh_token</code> / web <code>qh_web_token</code>.</p>
+    <h3>3.1. Chuẩn bị</h3>
     <ol>
-      <li><code>POST /api/auth/login</code> → bcrypt + JWT.</li>
-      <li>Client lưu token + user.</li>
-      <li>Request sau: <code>Authorization: Bearer</code>; <code>GET /api/auth/me</code> khôi phục phiên.</li>
+      <li>Mở PowerShell tại thư mục gốc của repo.</li>
+      <li>Kiểm tra <code>backend/.env</code> có <code>MONGO_URL</code> và <code>DB_NAME</code> trỏ đúng cơ sở dữ liệu cần nạp. Các script tự đọc file này.</li>
+      <li>Script đọc GDB cần GDAL: chạy bằng Python của QGIS, <code>C:\Program Files\QGIS 4.0.3\bin\python-qgis.bat</code>.</li>
+      <li>Script không đọc GDB: chạy bằng Python trong venv của backend, <code>backend\venv\Scripts\python</code>.</li>
     </ol>
-    <div class="mermaid">
-sequenceDiagram
-  participant Client as App_hoac_Web
-  participant API as FastAPI
-  participant DB as MongoDB
-  Client->>API: POST /auth/login
-  API->>DB: Tim user theo email
-  API->>API: bcrypt + JWT 30 ngay
-  API-->>Client: access_token + user
-  Client->>Client: Luu token local
-  Client->>API: GET /auth/me Bearer
-  API-->>Client: UserPublic
-    </div>
 
-    <h3>3.2. Công dân gửi báo cáo vi phạm</h3>
-    <p><strong>Tác nhân:</strong> Công dân (app). Trạng thái ban đầu: <code>received</code>.</p>
-    <table>
-      <thead><tr><th>Mã</th><th>Nhãn mobile</th><th>Nhãn web</th></tr></thead>
-      <tbody>
-        <tr><td><code>received</code></td><td>Tiếp nhận</td><td>Tiếp nhận</td></tr>
-        <tr><td><code>processing</code></td><td>Đang xử lý</td><td>Đang xử lý</td></tr>
-        <tr><td><code>resolved</code></td><td>Đã duyệt</td><td>Đã giải quyết</td></tr>
-        <tr><td><code>rejected</code></td><td>Từ chối</td><td>Từ chối</td></tr>
-      </tbody>
-    </table>
-    <div class="mermaid">
-sequenceDiagram
-  participant U as Cong_dan
-  participant App as report.tsx
-  participant API as Backend
-  participant DB as MongoDB
-  U->>App: Tieu de mo ta dia chi anh GPS
-  App->>API: POST /reports
-  API->>DB: Insert report status received
-  API->>DB: Insert notification
-  API-->>App: Bao cao moi
-  App->>U: Thong bao gui thanh cong
-    </div>
+    <h3>3.2. Thửa đất nền địa chính (thay toàn bộ)</h3>
+    <p>Lệnh này <strong>xóa hết</strong> collection <code>parcels</code> rồi nạp lại.</p>
+<pre><code>&amp; "C:\Program Files\QGIS 4.0.3\bin\python-qgis.bat" scripts\import_cadastre_mongo.py "&lt;thư mục dữ liệu&gt;\BD_NenDiaChinh\GeoDatabase\20250808_BanDoNenDiaChinh.gdb" ThuaDat</code></pre>
 
-    <h3>3.3. Cán bộ xử lý báo cáo công dân</h3>
-    <p><strong>Tác nhân:</strong> Admin — web <code>/admin/reports</code> hoặc app Trung tâm Quản trị. Cập nhật qua <code>PUT /api/reports/{id}</code> → tạo thông báo cho dân.</p>
-    <div class="mermaid">
-sequenceDiagram
-  participant A as Can_bo
-  participant UI as ReportsPage
-  participant API as Backend
-  participant DB as MongoDB
-  participant C as Thong_bao_cong_dan
-  A->>UI: Dang nhap admin
-  UI->>API: GET /reports
-  A->>UI: Status + phan hoi
-  UI->>API: PUT /reports/id
-  API->>DB: Cap nhat
-  API->>DB: Notification
-  C->>C: GET /notifications
-    </div>
-    <div class="mermaid">
-stateDiagram-v2
-  [*] --> received: Cong_dan_gui
-  received --> processing: Can_bo_tiep_nhan
-  processing --> resolved: Duyet
-  processing --> rejected: Tu_choi
-  received --> resolved: Duyet_truc_tiep
-  received --> rejected: Tu_choi_truc_tiep
-    </div>
+    <h3>3.3. Bổ sung thửa nội thị TP. Cao Lãnh</h3>
+    <p>Có <code>--append</code>: giữ thửa đã có, chỉ thêm các phường/xã (<code>MaPhuongXa</code>) chưa nạp. Chạy sau bước 3.2.</p>
+<pre><code>&amp; "C:\Program Files\QGIS 4.0.3\bin\python-qgis.bat" scripts\import_cadastre_mongo.py "&lt;thư mục dữ liệu&gt;\QHSDD_tpCaoLanh\GeoDatabase\TPCaoLanh.gdb" ThuaDat_TNMT_DC --append</code></pre>
 
-    <h3>3.4. Duyệt nghi vấn vi phạm GIS</h3>
-    <p><strong>Tác nhân:</strong> Admin — <code>/admin/violations</code>. Trạng thái: <code>pending_review</code> → <code>confirmed</code> | <code>rejected</code>. API: <code>PATCH /api/violations/{id}/review</code>.</p>
-    <div class="note">Dữ liệu violations hiện là seed / nạp ngoài — chưa có rule engine tự sinh trong app.</div>
-    <div class="mermaid">
-sequenceDiagram
-  participant A as Can_bo
-  participant Web as ViolationsPage
-  participant API as Backend
-  A->>Web: /admin/violations
-  Web->>API: GET /violations
-  A->>Web: Xac nhan hoac Bac bo
-  Web->>API: PATCH /violations/id/review
-  API-->>Web: Cap nhat
-    </div>
+    <h3>3.4. Quy hoạch sử dụng đất</h3>
+    <p>Xóa hết <code>planning_zones</code> rồi nạp lại. Lớp mặc định là <code>SuDungDat_TNMT_QH</code>.</p>
+<pre><code>&amp; "C:\Program Files\QGIS 4.0.3\bin\python-qgis.bat" scripts\import_planning_zones.py "&lt;thư mục dữ liệu&gt;\QHSDD_tpCaoLanh\GeoDatabase\TPCaoLanh.gdb"</code></pre>
 
-    <h3>3.5. Xem bản đồ quy hoạch (web)</h3>
-    <ul>
-      <li>Nền: OpenStreetMap.</li>
-      <li>Vùng quy hoạch: GeoJSON tĩnh (<code>VITE_GIS_ZONES_URL</code> hoặc <code>/data/planning_zones_demo.geojson</code>) — <strong>không</strong> gọi <code>GET /api/planning/zones</code>.</li>
-      <li>Điểm nghi vấn: <code>GET /api/violations</code>.</li>
-    </ul>
-    <div class="mermaid">
-flowchart LR
-  A[Admin mo /admin/map] --> B[Tai GeoJSON tinh]
-  A --> C[GET /api/violations]
-  B --> D[Lop zones MapLibre]
-  C --> E[Lop diem vi pham]
-  D --> F[Popup vung quy hoach]
-  E --> G[Panel nghi van]
-    </div>
+    <h3>3.5. Giấy phép mẫu</h3>
+    <p>Xóa các giấy phép mẫu cũ (<code>is_demo: true</code>) rồi tạo lại. Mặc định 30 giấy phép; truyền số khác nếu cần.</p>
+<pre><code>backend\venv\Scripts\python scripts\seed_demo_permits.py 30</code></pre>
+    <div class="note">Khi có dữ liệu giấy phép thật: xóa giấy phép mẫu bằng <code>db.permits.deleteMany({is_demo: true})</code>, rồi viết script nạp với các trường <code>permit_no</code>, <code>so_to</code>, <code>so_thua</code>, <code>owner_name</code>, <code>address</code>, <code>issued_date</code>, <code>area_m2</code>, <code>floors</code>.</div>
 
-    <h3>3.6. So sánh AI ảnh</h3>
-    <p>Chỉ trên app (<code>compare.tsx</code>). <code>POST /api/ai/compare</code> — cần <code>EMERGENT_LLM_KEY</code>.</p>
-    <div class="mermaid">
-sequenceDiagram
-  participant U as Nguoi_dung
-  participant App as compare.tsx
-  participant API as Backend
-  participant AI as Gemini
-  U->>App: Chon 2 anh
-  App->>API: POST /ai/compare
-  alt Thieu EMERGENT_LLM_KEY
-    API-->>App: 500 AI key chua cau hinh
-  else Co key
-    API->>AI: LlmChat
-    AI-->>API: JSON anomalies
-    API-->>App: Do tin cay + danh sach
-  end
-    </div>
+    <h3>3.6. Chuyển báo cáo cũ sang hồ sơ vụ việc</h3>
+    <p>Mở hồ sơ cho mọi báo cáo cũ chưa có hồ sơ. Chạy lại nhiều lần vẫn an toàn.</p>
+<pre><code>backend\venv\Scripts\python scripts\migrate_reports_to_cases.py</code></pre>
 
-    <h3>3.7. Tra cứu thông tin</h3>
-    <table>
-      <thead><tr><th>Tính năng</th><th>Nguồn</th><th>Auth</th></tr></thead>
-      <tbody>
-        <tr><td>Văn bản pháp luật</td><td>Mongo seed — <code>GET /api/legal</code></td><td>Không bắt buộc</td></tr>
-        <tr><td>Thủ tục hành chính</td><td>Mongo seed</td><td>Có</td></tr>
-        <tr><td>Nhà ở xã hội</td><td>Mongo seed</td><td>Có</td></tr>
-        <tr><td>GPXD</td><td><code>frontend/src/data/constructionPermits.ts</code></td><td>UI trong app</td></tr>
-        <tr><td>Bản đồ GIS</td><td>GeoJSON + violations</td><td>Admin web</td></tr>
-      </tbody>
-    </table>
-
-    <h3>3.8. Nạp / cập nhật lớp quy hoạch</h3>
-    <p><strong>Không có nút “Xuất bản” trong app.</strong> Thay GeoJSON trong repo hoặc đặt <code>VITE_GIS_ZONES_URL</code>, rồi deploy web.</p>
-    <div class="mermaid">
-flowchart TD
-  Prep[Chuan bi GeoJSON] --> Choice{Cach nap}
-  Choice -->|File trong repo| File[Sua planning_zones_demo.geojson]
-  Choice -->|URL ngoai| Env[Dat VITE_GIS_ZONES_URL]
-  File --> Deploy[Deploy Vercel web]
-  Env --> Deploy
-  Deploy --> Map[Ban do /admin/map]
-    </div>
-
-    <h3>3.9. Cập nhật nội dung tra cứu</h3>
-    <p>Không có CMS. Sửa MongoDB (Compass/Atlas) hoặc seed trong <code>backend/server.py</code> (khi collection trống). GPXD: sửa file TypeScript rồi build lại app.</p>
-
-    <h3>3.10. Sao lưu và phục hồi</h3>
-    <p>Repo chưa có script backup. Khuyến nghị: Atlas/Railway snapshot, <code>mongodump</code>, giữ GeoJSON trong Git, không commit <code>.env</code>.</p>
-    <div class="mermaid">
-flowchart LR
-  DB[(MongoDB)] --> Dump[mongodump / Atlas snapshot]
-  GJ[GeoJSON trong Git] --> Repo[Luu tru ma nguon]
-  Dump --> Restore[mongorestore khi can]
-    </div>
+    <h3>3.7. Kiểm tra sau khi nạp</h3>
+    <ol>
+      <li>Mở web quản trị → <strong>Bản đồ</strong>. Bảng lớp phải ghi đúng tổng số thửa.</li>
+      <li>Mở một hồ sơ → khối <strong>Tiền kiểm online</strong> phải hiện thửa đất, quy hoạch, giấy phép.</li>
+    </ol>
   </section>
 
   <!-- ========== 4 ========== -->
   <section class="chapter" id="s4">
-    <h2>4. Vận hành hàng ngày</h2>
+    <h2>4. Đợt bay flycam trên máy trạm AI</h2>
+    <p><strong>Hiện trạng:</strong> chưa bay đợt nào. Bản online <strong>không nhận</strong> file ảnh trực giao: file GeoTIFF nặng hàng GB, vượt giới hạn tải lên của Vercel. Ảnh được bổ sung trên máy trạm AI.</p>
 
-    <h3>4.1. Checklist cán bộ quản lý</h3>
+    <div class="mermaid">
+sequenceDiagram
+  participant QL as Cán bộ Quản lý
+  participant WO as Web online
+  participant WS as Web trên máy trạm
+  participant API as API cục bộ
+  participant AI as detection-worker
+  participant DB as MongoDB
+  QL->>WO: Đăng ký đợt bay (bổ sung ảnh sau)
+  WO->>DB: Đợt bay "Chờ ảnh"
+  Note over QL,WS: Chép file GeoTIFF vào máy trạm
+  QL->>WS: Bổ sung ảnh ở dòng đợt bay
+  WS->>API: Tải file lên
+  API->>API: Lưu data/cog, chuyển "Chờ AI xử lý"
+  AI->>API: Đọc ảnh, tách mái nhà, đối chiếu thửa
+  AI->>DB: Ghi nghi vấn
+  QL->>WO: Nghi vấn AI: Mở hồ sơ tiền kiểm / Không vi phạm
+    </div>
+
+    <h3>4.1. Chuẩn bị máy trạm (làm một lần)</h3>
     <ol>
-      <li>Đăng nhập web quản trị.</li>
-      <li>Xem Tổng quan (chờ xử lý / đang xử lý / đã giải quyết).</li>
-      <li>Xử lý hàng đợi Báo cáo công dân + ghi phản hồi.</li>
-      <li>Duyệt nghi vấn vi phạm (xác nhận / bác bỏ).</li>
-      <li>Đối chiếu trên Bản đồ quy hoạch.</li>
-      <li>(Tùy chọn) Trung tâm Quản trị trên app khi không có máy tính.</li>
+      <li>Cài Docker Desktop, Node.js, Python.</li>
+      <li>Lấy mã nguồn từ GitHub.</li>
+      <li>Đặt mô hình <code>yolo11-seg-buildings.onnx</code> vào <code>services/detection/models/</code> (xem README trong thư mục đó).</li>
+      <li>Tạo <code>backend/.env</code> trỏ cùng cơ sở dữ liệu với bản online (<code>MONGO_URL</code>, <code>DB_NAME</code>, <code>JWT_SECRET</code> giống Vercel để đăng nhập dùng chung).</li>
+      <li>Tạo <code>web/.env</code> với <code>VITE_API_URL=http://localhost:8000</code>.</li>
     </ol>
 
-    <h3>4.2. Checklist IT vận hành</h3>
+    <h3>4.2. Mỗi lần có đợt bay</h3>
     <ol>
-      <li>API sống bình thường.</li>
-      <li>Biến môi trường: <code>MONGO_URL</code>, <code>DB_NAME</code>, <code>JWT_SECRET</code>, <code>CORS_ORIGINS</code>.</li>
-      <li>Frontend/web trỏ đúng URL API.</li>
-      <li>Sau deploy DB trống: kiểm tra seed users + nội dung.</li>
-      <li>AI: chỉ bật khi có <code>EMERGENT_LLM_KEY</code>.</li>
-      <li>Đổi mật khẩu seed; hạn chế tự đăng ký role admin.</li>
-      <li>Backup MongoDB theo lịch.</li>
+      <li>Trên web online: <strong>Đợt bay</strong> → <strong>Đăng ký đợt bay (bổ sung ảnh sau)</strong>. Đợt bay ở trạng thái <strong>Chờ ảnh</strong>.</li>
+      <li>Chép file GeoTIFF vào máy trạm.</li>
+      <li>Chạy PostGIS và worker AI. <code>MONGO_URL</code> phải có trong môi trường của lệnh (ví dụ file <code>.env</code> ở thư mục gốc repo):
+<pre><code>docker compose up -d</code></pre></li>
+      <li>Chạy API cục bộ (port 8000), theo <code>HUONG-DAN-CHAY-DU-AN.md</code> mục 5:
+<pre><code>cd backend
+venv\Scripts\uvicorn server:app --host 0.0.0.0 --port 8000</code></pre></li>
+      <li>Chạy web quản trị cục bộ:
+<pre><code>cd web
+npm run dev</code></pre></li>
+      <li>Mở web cục bộ, đăng nhập Cán bộ Quản lý → <strong>Đợt bay</strong> → bấm <strong>Bổ sung ảnh</strong> ở đúng đợt bay → chọn file. API lưu file vào <code>data/cog/</code>; đợt bay chuyển <strong>Chờ AI xử lý</strong>.</li>
+      <li>Worker tự nhận việc: <strong>Đang chạy AI</strong> → <strong>Xong</strong> (hoặc <strong>Lỗi</strong>, có ghi lý do). Xem log: <code>docker compose logs -f detection-worker</code>.</li>
+      <li>Cán bộ Quản lý mở <strong>Nghi vấn AI</strong> (online hoặc cục bộ), bấm <strong>Mở hồ sơ tiền kiểm</strong> hoặc <strong>Không vi phạm</strong>.</li>
     </ol>
+    <div class="note">Trên web online, nút <strong>Bổ sung ảnh</strong> chỉ hiện hướng dẫn chép ảnh sang máy trạm. Nút tải file chỉ hoạt động khi web trỏ vào API trên <code>localhost</code>.</div>
   </section>
 
   <!-- ========== 5 ========== -->
   <section class="chapter" id="s5">
-    <h2>5. Dữ liệu GIS</h2>
-
-    <h3>5.1. Nguồn kép</h3>
+    <h2>5. Triển khai Vercel và biến môi trường</h2>
+    <h3>5.1. Tự động triển khai</h3>
+    <p>Ba project Vercel nối với nhánh <code>main</code> trên GitHub. Mỗi lần đẩy code lên <code>main</code>, Vercel tự build và triển khai.</p>
     <table>
-      <thead><tr><th>Nguồn</th><th>Dùng ở đâu</th><th>Ghi chú</th></tr></thead>
+      <thead><tr><th>Project Vercel</th><th>Root Directory</th><th>Địa chỉ</th></tr></thead>
       <tbody>
-        <tr><td>GeoJSON tĩnh / <code>VITE_GIS_ZONES_URL</code></td><td>Bản đồ web MapLibre</td><td>Nguồn thực tế lớp vùng trên UI</td></tr>
-        <tr><td>Mongo <code>planning_zones</code>, <code>observed_buildings</code></td><td>API planning</td><td>Web map chưa consume</td></tr>
-        <tr><td>Mongo <code>violations</code></td><td>Bản đồ + trang Nghi vấn</td><td>Admin review</td></tr>
+        <tr><td><code>quyhoach-api</code></td><td><code>backend</code></td><td>https://quyhoach-api.vercel.app</td></tr>
+        <tr><td><code>quyhoach-web</code></td><td><code>web</code></td><td>https://quyhoach-web.vercel.app</td></tr>
+        <tr><td><code>quyhoach-citizen</code></td><td><code>frontend</code></td><td>https://quyhoach-citizen.vercel.app</td></tr>
       </tbody>
     </table>
+    <p>Sau mỗi lần triển khai: mở <a href="https://quyhoach-api.vercel.app/health">https://quyhoach-api.vercel.app/health</a>, rồi đăng nhập thử web và app.</p>
 
-    <h3>5.2. Chiến lược dữ liệu Đồng Tháp</h3>
-    <p>Chi tiết nguồn ảnh, chuẩn hóa vector, rule engine: xem <code>HUONG-DAN-5-PHAN-DU-LIEU-ANH-QUY-HOACH-DONG-THAP.md</code>. Pipeline upload shapefile / sinh violation tự động <strong>chưa</strong> có trong app — vận hành hiện tại: seed + file GeoJSON + review thủ công.</p>
+    <h3>5.2. Biến môi trường</h3>
+    <table>
+      <thead><tr><th>Biến</th><th>Project</th><th>Ý nghĩa</th></tr></thead>
+      <tbody>
+        <tr><td><code>MONGO_URL</code></td><td>quyhoach-api</td><td>Chuỗi kết nối MongoDB Atlas (bí mật)</td></tr>
+        <tr><td><code>DB_NAME</code></td><td>quyhoach-api</td><td>Tên cơ sở dữ liệu, mặc định <code>quyhoach</code></td></tr>
+        <tr><td><code>JWT_SECRET</code></td><td>quyhoach-api</td><td>Khóa ký phiên đăng nhập (bí mật, chuỗi dài ngẫu nhiên)</td></tr>
+        <tr><td><code>CORS_ORIGINS</code></td><td>quyhoach-api</td><td>Danh sách địa chỉ web và app được gọi API</td></tr>
+        <tr><td><code>RESET_DEMO_ACCOUNTS</code></td><td>quyhoach-api</td><td><code>true</code> trong giai đoạn demo: mỗi lần khởi động đưa 3 tài khoản demo về mật khẩu và vai trò gốc. Bỏ khi chạy thật</td></tr>
+        <tr><td><code>VITE_API_URL</code></td><td>quyhoach-web</td><td>Địa chỉ API, không có <code>/api</code></td></tr>
+        <tr><td><code>EXPO_PUBLIC_BACKEND_URL</code></td><td>quyhoach-citizen</td><td>Địa chỉ API cho app</td></tr>
+      </tbody>
+    </table>
+    <p>Đổi biến trên Vercel xong phải <strong>Redeploy</strong> project đó. Mẫu biến: <code>backend/.env.example</code>. Chi tiết: <code>HUONG-DAN-WEB.md</code>.</p>
   </section>
 
   <!-- ========== 6 ========== -->
   <section class="chapter" id="s6">
-    <h2>6. Phụ lục</h2>
+    <h2>6. Chụp lại ảnh cho bộ hướng dẫn</h2>
+    <p>Script <code>docs/capture-screens.mjs</code> chụp toàn bộ ảnh <code>web-*.png</code> và <code>app-*.png</code> trong <code>docs/images/</code>. Script đăng nhập bằng nút demo và đi một hồ sơ qua đủ 16 bước.</p>
+    <div class="warn">Script <strong>tạo một hồ sơ demo thật trên bản online</strong>, tiêu đề bắt đầu bằng "[Demo hướng dẫn &lt;ngày&gt;]", và đóng hồ sơ đó. Chạy khi được phép thêm dữ liệu demo.</div>
+    <ol>
+      <li>Mở PowerShell ở thư mục gốc repo.</li>
+      <li>Cài Playwright (một lần):
+<pre><code>npm i playwright
+npx playwright install chromium</code></pre></li>
+      <li>Chạy:
+<pre><code>node docs/capture-screens.mjs</code></pre></li>
+      <li>Ảnh ghi đè vào <code>docs/images/</code>. Có thể truyền thư mục khác làm tham số đầu tiên.</li>
+    </ol>
+    <p>Tùy chọn: biến <code>WEB</code>, <code>APP</code> để chụp bản khác bản online; <code>RESUME_CASE=&lt;id&gt;</code> để chụp tiếp một hồ sơ đã tạo từ bước 3.</p>
+    <p>Ảnh <code>citizen-*.png</code> (văn bản pháp luật, thủ tục, nhà ở xã hội, cá nhân, so sánh AI) là ảnh cũ, giữ lại vì màn hình không đổi.</p>
+  </section>
 
-    <h3>6.1. API liên quan quản trị</h3>
-    <p><strong>Auth:</strong> <code>POST /auth/register</code>, <code>POST /auth/login</code>, <code>GET /auth/me</code>, <code>PUT /auth/profile</code>, <code>POST /auth/change-password</code>.</p>
-    <p><strong>Báo cáo:</strong> <code>POST /reports</code>, <code>GET /reports/mine</code>, <code>GET /reports</code> (admin), <code>PUT /reports/{id}</code> (admin).</p>
-    <p><strong>Khác:</strong> <code>GET /admin/stats</code>, <code>GET /violations</code>, <code>PATCH /violations/{id}/review</code>, <code>GET /planning/zones</code>, <code>GET /planning/buildings</code>.</p>
-
-    <h3>6.2. Biến môi trường (tóm tắt)</h3>
-    <table>
-      <thead><tr><th>Biến</th><th>Thành phần</th><th>Mục đích</th></tr></thead>
-      <tbody>
-        <tr><td><code>MONGO_URL</code>, <code>DB_NAME</code>, <code>JWT_SECRET</code>, <code>CORS_ORIGINS</code></td><td>Backend</td><td>DB, JWT, CORS</td></tr>
-        <tr><td><code>EMERGENT_LLM_KEY</code></td><td>Backend</td><td>AI compare (tùy chọn)</td></tr>
-        <tr><td><code>EXPO_PUBLIC_BACKEND_URL</code></td><td>Frontend</td><td>Base URL API</td></tr>
-        <tr><td><code>VITE_API_URL</code>, <code>VITE_GIS_ZONES_URL</code></td><td>Web</td><td>API + GeoJSON</td></tr>
-      </tbody>
-    </table>
-    <p>Chi tiết: <code>HUONG-DAN-WEB.md</code>.</p>
-
-    <h3>6.3. Thuật ngữ trạng thái báo cáo</h3>
-    <p>Cùng mã <code>resolved</code>: app hiển thị <strong>Đã duyệt</strong>, web hiển thị <strong>Đã giải quyết</strong>.</p>
-
-    <h3>6.4. File tham chiếu nhanh</h3>
+  <!-- ========== 7 ========== -->
+  <section class="chapter" id="s7">
+    <h2>7. Vận hành hằng ngày và sao lưu</h2>
+    <h3>7.1. Kiểm tra hằng ngày</h3>
+    <ol>
+      <li>Mở <a href="https://quyhoach-api.vercel.app/health">/health</a>, thấy API trả về bình thường.</li>
+      <li>Đăng nhập web quản trị, xem <strong>Tổng quan</strong>: số hồ sơ quá hạn, nghi vấn chờ duyệt.</li>
+      <li>Xem log lỗi trên Vercel nếu người dùng báo lỗi.</li>
+    </ol>
+    <h3>7.2. Sao lưu</h3>
     <ul>
-      <li><code>backend/server.py</code> — API chính</li>
-      <li><code>backend/routers/planning.py</code> — planning / violations</li>
-      <li><code>web/src/map/PlanningMap.tsx</code> — bản đồ</li>
-      <li><code>web/public/data/planning_zones_demo.geojson</code> — GeoJSON demo</li>
-      <li><code>frontend/src/components/AdminReportCenter.tsx</code> — trung tâm báo cáo mobile</li>
-      <li><code>frontend/src/data/constructionPermits.ts</code> — GPXD tĩnh</li>
+      <li>Bật sao lưu định kỳ (snapshot) trên MongoDB Atlas, hoặc dùng <code>mongodump</code> theo lịch.</li>
+      <li>Giữ file GDB nguồn và ảnh GeoTIFF ở ổ lưu trữ riêng. Các script ở mục 3 nạp lại được từ file nguồn.</li>
+      <li>Không commit <code>.env</code> lên Git.</li>
     </ul>
   </section>
 
-  <footer class="doc-footer">Hết sổ tay quản trị — QuyHoạch AI v1.0 · Mở file này trong trình duyệt rồi In → PDF nếu cần nộp giấy.</footer>
+  <!-- ========== 8 ========== -->
+  <section class="chapter" id="s8">
+    <h2>8. Danh sách việc trước khi chạy thật</h2>
+    <ul class="checklist">
+      <li>Bỏ nút đăng nhập một chạm (chọn tài khoản demo) ở màn đăng nhập web (<code>web/src/pages/LoginPage.tsx</code>) và app (<code>frontend/app/login.tsx</code>); dùng lại ô email và mật khẩu.</li>
+      <li>Xóa biến <code>RESET_DEMO_ACCOUNTS</code> trên project <code>quyhoach-api</code>, rồi Redeploy.</li>
+      <li>Đổi mật khẩu hoặc xóa 3 tài khoản demo (mục <strong>Người dùng</strong> trên web quản trị). Tạo tài khoản thật cho Cán bộ Quản lý, Cán bộ Xử lý.</li>
+      <li>Xóa giấy phép mẫu, nạp dữ liệu giấy phép xây dựng thật (mục 3.5).</li>
+      <li>Xóa các hồ sơ demo (tiêu đề "[Demo …]") nếu không cần giữ.</li>
+      <li>Đổi <code>JWT_SECRET</code> sang chuỗi ngẫu nhiên mới (mọi người phải đăng nhập lại).</li>
+      <li>Kiểm tra gói MongoDB Atlas đủ dung lượng: hơn 331 nghìn thửa, 11 nghìn vùng quy hoạch, ảnh hồ sơ và nghi vấn AI tăng theo thời gian.</li>
+      <li>Gắn tên miền riêng cho 3 project Vercel; cập nhật <code>CORS_ORIGINS</code>, <code>VITE_API_URL</code>, <code>EXPO_PUBLIC_BACKEND_URL</code> theo tên miền mới.</li>
+      <li>Bật sao lưu Atlas (mục 7.2).</li>
+      <li>Build bản cài điện thoại bằng EAS (<code>frontend/eas.json</code>) nếu cần phát hành APK hoặc TestFlight.</li>
+      <li>Rà lại lưu ý pháp lý: khung phạt chỉ là gợi ý; người có thẩm quyền quyết định mức phạt.</li>
+    </ul>
+  </section>
+
+  <!-- ========== 9 ========== -->
+  <section class="chapter" id="s9">
+    <h2>9. Tài liệu và file tham chiếu</h2>
+    <table>
+      <thead><tr><th>File</th><th>Nội dung</th></tr></thead>
+      <tbody>
+        <tr><td><code>LUONG-XU-LY-VI-PHAM.md</code></td><td>16 bước, 5 hành vi, khung phạt, dữ liệu, đợt bay</td></tr>
+        <tr><td><code>HUONG-DAN-CHAY-DU-AN.md</code></td><td>Chạy local, Expo, API cục bộ</td></tr>
+        <tr><td><code>HUONG-DAN-WEB.md</code></td><td>Web quản trị local, triển khai Vercel, Atlas</td></tr>
+        <tr><td><code>backend/case_flow.py</code></td><td>Máy trạng thái hồ sơ, danh mục vi phạm, khung phạt</td></tr>
+        <tr><td><code>backend/routers/cases.py</code></td><td>API hồ sơ vụ việc</td></tr>
+        <tr><td><code>backend/routers/surveys.py</code></td><td>API đợt bay, nhận file ảnh</td></tr>
+        <tr><td><code>services/detection/</code></td><td>Worker AI tách mái nhà và sinh nghi vấn</td></tr>
+        <tr><td><code>scripts/</code></td><td>Script nạp dữ liệu (mục 3)</td></tr>
+        <tr><td><code>docs/capture-screens.mjs</code></td><td>Chụp ảnh cho bộ hướng dẫn (mục 6)</td></tr>
+      </tbody>
+    </table>
+    <p>Hướng dẫn theo vai trò: <a href="HUONG-DAN-TONG-QUAN.html">Tổng quan</a> · <a href="HUONG-DAN-NGUOI-DAN.html">Người dân</a> · <a href="HUONG-DAN-CAN-BO-XU-LY.html">Cán bộ Xử lý</a> · <a href="HUONG-DAN-CAN-BO-QUAN-LY.html">Cán bộ Quản lý</a>.</p>
+  </section>
+
+  <footer class="doc-footer">Hết sổ tay quản trị — QuyHoạch AI v2.0 · Mở file trong trình duyệt rồi chọn In → Lưu PDF nếu cần bản giấy.</footer>
 
   <script>
     mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });

@@ -3,7 +3,7 @@
 Web app riêng cho **cán bộ quản lý**: bản đồ quy hoạch, duyệt báo cáo công dân, quản lý người dùng. Dùng chung API FastAPI và MongoDB với app mobile Expo.
 
 Chạy app mobile / demo: [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md).  
-Hướng dẫn sử dụng admin (HTML): [docs/HUONG-DAN-ADMIN.html](docs/HUONG-DAN-ADMIN.html).
+Hướng dẫn sử dụng cho Cán bộ Quản lý (HTML): [docs/HUONG-DAN-CAN-BO-QUAN-LY.html](docs/HUONG-DAN-CAN-BO-QUAN-LY.html).
 
 ---
 

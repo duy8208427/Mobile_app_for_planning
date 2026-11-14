@@ -18,7 +18,11 @@ Hệ thống quản lý quy hoạch và trật tự xây dựng: app công dân 
 |----------|----------|
 | [HUONG-DAN-CHAY-DU-AN.md](HUONG-DAN-CHAY-DU-AN.md) | Demo online, local, Expo Go, Android Emulator |
 | [HUONG-DAN-WEB.md](HUONG-DAN-WEB.md) | Web admin local + deploy Vercel + Atlas |
-| [docs/HUONG-DAN-TONG-QUAN.html](docs/HUONG-DAN-TONG-QUAN.html) | Hướng dẫn tổng quan (mục lục theo vai trò) |
+| [docs/HUONG-DAN-TONG-QUAN.html](docs/HUONG-DAN-TONG-QUAN.html) | Hướng dẫn tổng quan: 4 vai trò, luồng 16 bước, khung phạt |
+| [docs/HUONG-DAN-NGUOI-DAN.html](docs/HUONG-DAN-NGUOI-DAN.html) | Hướng dẫn Người dân (app) |
+| [docs/HUONG-DAN-CAN-BO-XU-LY.html](docs/HUONG-DAN-CAN-BO-XU-LY.html) | Hướng dẫn Cán bộ Xử lý (app, hiện trường) |
+| [docs/HUONG-DAN-CAN-BO-QUAN-LY.html](docs/HUONG-DAN-CAN-BO-QUAN-LY.html) | Hướng dẫn Cán bộ Quản lý (web quản trị) |
+| [docs/SO-TAY-QUAN-TRI.html](docs/SO-TAY-QUAN-TRI.html) | Sổ tay quản trị: nạp dữ liệu, đợt bay, triển khai |
 
 ## Production
 

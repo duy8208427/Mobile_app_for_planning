@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hướng dẫn Cán bộ Xử lý — QuyHoạch AI v2.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <style>
+    :root { --primary: #0A4ABF; --text: #1a1a1a; --muted: #555; --border: #d0d7de; --bg-soft: #f6f8fa; }
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--text); line-height: 1.55; max-width: 210mm; margin: 0 auto; padding: 24px 28px 48px; background: #fff; font-size: 11pt; }
+    .cover { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; border-bottom: 3px solid var(--primary); margin-bottom: 2rem; padding-bottom: 2rem; page-break-after: always; }
+    .cover .brand { font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
+    .cover h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; color: var(--primary); }
+    .cover .subtitle { color: var(--muted); margin: 0 0 1.5rem; font-size: 1.05rem; }
+    .cover-meta { border-collapse: collapse; width: 100%; max-width: 520px; }
+    .cover-meta th, .cover-meta td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    .cover-meta th { background: var(--bg-soft); width: 38%; }
+    h2 { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.25rem; margin-top: 2rem; page-break-after: avoid; }
+    h3 { color: #0d3a8f; margin-top: 1.35rem; page-break-after: avoid; }
+    table { border-collapse: collapse; width: 100%; margin: 0.75rem 0 1rem; font-size: 0.95em; }
+    th, td { border: 1px solid var(--border); padding: 6px 10px; vertical-align: top; }
+    th { background: var(--bg-soft); text-align: left; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: var(--bg-soft); padding: 0.1em 0.35em; border-radius: 3px; }
+    ul, ol { padding-left: 1.35rem; }
+    li { margin: 0.25rem 0; }
+    a { color: var(--primary); }
+    .toc { background: var(--bg-soft); border: 1px solid var(--border); padding: 1rem 1.25rem; margin: 1rem 0 2rem; }
+    .toc ol { margin: 0.4rem 0 0; }
+    .toc a { text-decoration: none; }
+    .feature { border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; margin: 0.9rem 0 1.2rem; background: #fff; }
+    .note { background: #fff8e6; border-left: 4px solid #e6a700; padding: 0.55rem 0.85rem; margin: 0.6rem 0; font-size: 0.95em; }
+    .shot { margin: 0.85rem 0 1.1rem; text-align: center; page-break-inside: avoid; }
+    .shot img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); background: #fff; }
+    .shot.mobile img { max-width: 280px; }
+    .shot figcaption { margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+    .part-banner { background: var(--primary); color: #fff; padding: 0.75rem 1rem; border-radius: 6px; margin: 2rem 0 1rem; page-break-before: always; }
+    .part-banner h2 { color: #fff; border: none; margin: 0; padding: 0; font-size: 1.25rem; }
+    .part-banner p { margin: 0.35rem 0 0; opacity: 0.9; font-size: 0.95rem; }
+    .mermaid { background: #fafbfc; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 1rem 0; overflow-x: auto; page-break-inside: avoid; }
+    footer.doc-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+    @media print {
+      body { padding: 12mm 14mm; font-size: 10pt; max-width: none; }
+      .cover { min-height: auto; }
+      a { color: inherit; text-decoration: none; }
+      .feature, .part-banner, .shot, .mermaid { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+    }
+    @page { size: A4; margin: 14mm 12mm; }
+  </style>
+</head>
+<body>
+
+  <section class="cover">
+    <div class="brand">QuyHoạch AI</div>
+    <h1>Hướng dẫn Cán bộ Xử lý</h1>
+    <p class="subtitle">Kiểm tra thực địa, lập biên bản, hậu kiểm trên app tại hiện trường</p>
+    <table class="cover-meta">
+      <tr><th>Hệ thống</th><td>QuyHoạch AI — Quản lý quy hoạch và trật tự xây dựng</td></tr>
+      <tr><th>Loại tài liệu</th><td>Hướng dẫn sử dụng — vai trò Cán bộ Xử lý</td></tr>
+      <tr><th>Phiên bản</th><td>2.0 — giai đoạn demo</td></tr>
+      <tr><th>Ngày</th><td>14/11/2026</td></tr>
+      <tr><th>Ứng dụng</th><td>App QuyHoạch AI (mở bằng trình duyệt trên điện thoại)</td></tr>
+      <tr><th>Địa chỉ</th><td><a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a></td></tr>
+      <tr><th>Tài khoản demo</th><td>Phạm Văn Thực — Cán bộ Xử lý</td></tr>
+    </table>
+  </section>
+
+  <nav class="toc">
+    <strong>Mục lục</strong>
+    <ol>
+      <li><a href="#p1">Vào app và xem việc được giao</a></li>
+      <li><a href="#p2">Bước 6 — Nhận việc, đến hiện trường</a></li>
+      <li><a href="#p3">Bước 7–8 — Chụp ảnh, lập biên bản</a></li>
+      <li><a href="#p4">Vẫn tiếp tục thi công (Case 5)</a></li>
+      <li><a href="#p5">Bước 14–15 — Hậu kiểm</a></li>
+      <li><a href="#p6">Kiểm tra hiện trạng sau cấp phép (Điều 85)</a></li>
+    </ol>
+  </nav>
+
+  <p>Cán bộ Xử lý làm việc trên <strong>app</strong>, tại hiện trường. Bạn chỉ thấy các hồ sơ được giao cho mình. Bạn làm các bước 6, 7, 8, 14, 15 của quy trình 16 bước.</p>
+  <p>Toàn bộ quy trình: xem <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>.</p>
+
+  <div class="mermaid">
+flowchart TD
+  TB["Thông báo: có phiếu giao việc"] --> NV["6. Nhận việc, đến hiện trường"]
+  NV --> AN["7. Chụp ảnh bằng chứng"]
+  AN --> BB["8. Lập biên bản, gửi hồ sơ"]
+  BB --> CQL["Cán bộ Quản lý rà soát"]
+  CQL -->|Trả lại bổ sung| BB
+  CQL --> QD["Quyết định xử phạt"]
+  BB -.->|Công trình vẫn thi công| TT["Vẫn tiếp tục thi công"]
+  QD -.->|Công trình vẫn thi công| TT
+  QD --> YC["Thông báo: yêu cầu hậu kiểm"]
+  YC --> HK["14–15. Hậu kiểm, trả kết quả"]
+  HK -->|Đạt| DONG["Cán bộ Quản lý đóng hồ sơ"]
+  HK -->|Không đạt| KP["Người vi phạm khắc phục tiếp"]
+  </div>
+
+  <!-- ========== 1 ========== -->
+  <div class="part-banner" id="p1">
+    <h2>1. Vào app và xem việc được giao</h2>
+    <p>Đăng nhập, mở danh sách Việc được giao.</p>
+  </div>
+
+  <div class="feature">
+    <h3>1.1. Đăng nhập</h3>
+    <ol>
+      <li>Mở <a href="https://quyhoach-citizen.vercel.app">https://quyhoach-citizen.vercel.app</a> trên điện thoại.</li>
+      <li>Ở ô <strong>Tài khoản</strong>, chọn <strong>Phạm Văn Thực — Cán bộ Xử lý</strong>.</li>
+      <li>Bấm nút <strong>Đăng nhập</strong> (tài khoản demo đã chọn sẵn).</li>
+    </ol>
+    <div class="note">Cho phép trình duyệt dùng <strong>camera</strong> và <strong>vị trí</strong> khi được hỏi. Bạn cần camera để chụp ảnh bằng chứng.</div>
+  </div>
+
+  <div class="feature">
+    <h3>1.2. Trang chủ — Việc được giao</h3>
+    <figure class="shot mobile">
+      <img src="images/app-can-bo-xu-ly-trang-chu.png" alt="Trang chủ Cán bộ Xử lý" />
+      <figcaption>Hình 1 — Trang chủ Cán bộ Xử lý: danh sách Việc được giao</figcaption>
+    </figure>
+    <ol>
+      <li>Mục <strong>Việc được giao</strong> liệt kê hồ sơ đang chờ bạn. Mỗi thẻ ghi mã hồ sơ, bước, địa chỉ, hành vi, trạng thái.</li>
+      <li>Bấm một thẻ để mở hồ sơ.</li>
+      <li>Bấm <strong>Hồ sơ vụ việc</strong> (hoặc <strong>Tất cả hồ sơ</strong>) để xem mọi hồ sơ được giao, kể cả đã đóng.</li>
+    </ol>
+    <p>Trong hồ sơ, khu <strong>Việc cần làm</strong> chỉ hiện các nút bạn được bấm ở bước hiện tại. Bấm một nút để mở form của nó.</p>
+    <div class="note">Bạn nhận thông báo khi được giao việc, khi biên bản bị trả lại, và khi có yêu cầu hậu kiểm hoặc kiểm tra sau cấp phép.</div>
+  </div>
+
+  <!-- ========== 2 ========== -->
+  <div class="part-banner" id="p2">
+    <h2>2. Bước 6 — Nhận việc, đến hiện trường</h2>
+    <p>Xác nhận đã nhận phiếu giao việc.</p>
+  </div>
+
+  <div class="feature">
+    <ol>
+      <li>Mở hồ sơ có trạng thái <strong>Đã giao việc</strong>.</li>
+      <li>Đọc phần <strong>Giao việc</strong>: hạn kiểm tra và chỉ đạo của Cán bộ Quản lý.</li>
+      <li>Xem <strong>Thông tin vụ việc</strong>: địa chỉ, tọa độ, tờ/thửa, loại đất, ảnh phản ánh.</li>
+      <li>Ở <strong>Việc cần làm</strong>, bấm <strong>Nhận việc, đến hiện trường</strong>, rồi bấm nút cùng tên để xác nhận.</li>
+      <li>Hồ sơ chuyển sang <strong>Đang kiểm tra thực địa</strong>. Người phản ánh nhận thông báo "cán bộ đã đến hiện trường".</li>
+    </ol>
+  </div>
+
+  <!-- ========== 3 ========== -->
+  <div class="part-banner" id="p3">
+    <h2>3. Bước 7–8 — Chụp ảnh, lập biên bản</h2>
+    <p>Thu thập bằng chứng, lập biên bản hiện trường, gửi hồ sơ cho Cán bộ Quản lý.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot mobile">
+      <img src="images/app-lap-bien-ban.png" alt="Form lập biên bản hiện trường" />
+      <figcaption>Hình 2 — Phần cuối form biên bản: người vi phạm, đối tượng, yêu cầu chấm dứt, ảnh bằng chứng</figcaption>
+    </figure>
+    <ol>
+      <li>Ở <strong>Việc cần làm</strong>, bấm <strong>Lập biên bản hiện trường</strong>.</li>
+      <li>Nhập <strong>Số biên bản</strong>, ví dụ <code>12/BB-VPHC</code>.</li>
+      <li>Nhập <strong>Nội dung vi phạm</strong>: mô tả hiện trạng, hành vi.</li>
+      <li>Nhập <strong>Diện tích vi phạm</strong> (m²) nếu đo được.</li>
+      <li>Chọn <strong>Hành vi vi phạm</strong> (1 trong 5 trường hợp). Hành vi gợi ý từ bước tiền kiểm đã chọn sẵn; sửa nếu thực tế khác.</li>
+      <li>Chọn <strong>Loại công trình</strong> (a, b, c, d) và <strong>Tình trạng thi công</strong>: Đang thi công hoặc Đã thi công xong.</li>
+      <li>Nhập <strong>Người vi phạm</strong>: họ tên hoặc tên tổ chức, số điện thoại, địa chỉ.</li>
+      <li>Chọn <strong>Đối tượng</strong>: Cá nhân hoặc Tổ chức.</li>
+      <li>Giữ bật <strong>Đã yêu cầu chấm dứt hành vi vi phạm</strong>. Mục này bắt buộc theo Điều 87; tắt đi thì không gửi được.</li>
+      <li>Thêm <strong>Ảnh bằng chứng hiện trường</strong>: bấm <strong>Chụp ảnh</strong> để chụp bằng camera, hoặc <strong>Thư viện</strong>. Cần từ 1 đến 6 ảnh.</li>
+      <li>Bấm <strong>Gửi biên bản</strong>. Hồ sơ chuyển sang <strong>Chờ ra quyết định</strong>. Cán bộ Quản lý nhận thông báo.</li>
+    </ol>
+    <div class="note">
+      <strong>Số điện thoại người vi phạm rất quan trọng.</strong> Nếu trùng số của một tài khoản Người dân, người đó nhận quyết định trên app và tự gửi báo cáo khắc phục. Nếu không trùng, cán bộ phải nhập thay.<br />
+      <strong>Tình trạng "Đang thi công"</strong> với Case 1, 2 sẽ mở nhánh xin cấp phép theo Điều 85 khi ra quyết định.
+    </div>
+  </div>
+
+  <div class="feature">
+    <h3>Khi biên bản bị trả lại</h3>
+    <p>Ở bước 9, Cán bộ Quản lý có thể <strong>trả lại bổ sung biên bản</strong>. Hồ sơ quay về <strong>Đang kiểm tra thực địa</strong> và bạn nhận thông báo.</p>
+    <ol>
+      <li>Mở hồ sơ, đọc nội dung cần bổ sung trong <strong>Dòng thời gian</strong>.</li>
+      <li>Bấm <strong>Lập biên bản hiện trường</strong>. Các ô đã nhập trước đó được giữ lại.</li>
+      <li>Sửa, chụp thêm ảnh, rồi bấm <strong>Gửi biên bản</strong>.</li>
+    </ol>
+  </div>
+
+  <!-- ========== 4 ========== -->
+  <div class="part-banner" id="p4">
+    <h2>4. Vẫn tiếp tục thi công (Case 5)</h2>
+    <p>Dùng khi đã lập biên bản và yêu cầu dừng, nhưng công trình vẫn tiếp tục xây.</p>
+  </div>
+
+  <div class="feature">
+    <p>Nút <strong>Vẫn tiếp tục thi công</strong> có ở các trạng thái: Chờ ra quyết định, Chờ cấp/điều chỉnh giấy phép, Chờ khắc phục.</p>
+    <ol>
+      <li>Mở hồ sơ. Ở <strong>Việc cần làm</strong>, bấm <strong>Vẫn tiếp tục thi công</strong>.</li>
+      <li>Đọc khung cảnh báo để biết khoản áp dụng.</li>
+      <li>Nhập <strong>Mô tả hiện trạng</strong> (bắt buộc).</li>
+      <li>Thêm tối đa 3 <strong>ảnh hiện trường</strong>.</li>
+      <li>Bấm <strong>Ghi nhận vẫn tiếp tục thi công</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Thời điểm ghi nhận</th><th>Kết quả</th></tr></thead>
+      <tbody>
+        <tr><td>Trước khi có quyết định</td><td>Hồ sơ đổi sang hành vi "Tiếp tục xây dựng sau khi đã bị lập biên bản" (khoản 11 Điều 25). Khung phạt cao hơn và có hình thức bổ sung.</td></tr>
+        <tr><td>Sau khi đã có quyết định</td><td>Ghi nhận tái phạm theo khoản 12 Điều 25 để Cán bộ Quản lý xử lý tiếp.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========== 5 ========== -->
+  <div class="part-banner" id="p5">
+    <h2>5. Bước 14–15 — Hậu kiểm</h2>
+    <p>Kiểm tra lại hiện trường sau khi người vi phạm báo cáo đã khắc phục.</p>
+  </div>
+
+  <div class="feature">
+    <figure class="shot mobile">
+      <img src="images/app-hau-kiem.png" alt="Form trả kết quả hậu kiểm" />
+      <figcaption>Hình 3 — Trả kết quả hậu kiểm: chọn kết quả, chụp ảnh hiện trạng</figcaption>
+    </figure>
+    <ol>
+      <li>Khi Cán bộ Quản lý yêu cầu hậu kiểm, bạn nhận thông báo. Hồ sơ ở trạng thái <strong>Chờ hậu kiểm</strong>, ghi hạn và số ngày còn lại.</li>
+      <li>Đến hiện trường, đối chiếu với biện pháp khắc phục trong quyết định.</li>
+      <li>Ở <strong>Việc cần làm</strong>, bấm <strong>Trả kết quả hậu kiểm</strong>.</li>
+      <li>Chọn <strong>Kết quả</strong>: <strong>Đạt – đã khắc phục</strong> hoặc <strong>Không đạt</strong>.</li>
+      <li>Thêm <strong>Ảnh hiện trạng</strong>: bắt buộc, từ 1 đến 6 ảnh.</li>
+      <li>Ghi chú nếu cần. Bấm <strong>Gửi kết quả</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Kết quả</th><th>Hồ sơ chuyển sang</th></tr></thead>
+      <tbody>
+        <tr><td>Đạt – đã khắc phục</td><td>Hậu kiểm đạt. Cán bộ Quản lý đóng hồ sơ (bước 16).</td></tr>
+        <tr><td>Không đạt</td><td>Chờ khắc phục. Người vi phạm khắc phục tiếp và báo cáo lại.</td></tr>
+      </tbody>
+    </table>
+    <div class="note">Nếu người vi phạm không dùng app, bạn có thể bấm <strong>Báo cáo kết quả khắc phục (thay người vi phạm)</strong> khi hồ sơ đang ở "Chờ khắc phục".</div>
+  </div>
+
+  <!-- ========== 6 ========== -->
+  <div class="part-banner" id="p6">
+    <h2>6. Kiểm tra hiện trạng sau cấp phép (Điều 85)</h2>
+    <p>Dùng khi người vi phạm đã nộp giấy phép được cấp hoặc điều chỉnh.</p>
+  </div>
+
+  <div class="feature">
+    <ol>
+      <li>Khi người vi phạm nộp số giấy phép, bạn nhận thông báo. Hạn kiểm tra là <strong>5 ngày</strong>.</li>
+      <li>Mở hồ sơ. Đọc mục <strong>Cấp phép theo Điều 85</strong> để biết số giấy phép.</li>
+      <li>Ra hiện trường, so công trình với giấy phép.</li>
+      <li>Ở <strong>Việc cần làm</strong>, bấm <strong>Kiểm tra hiện trạng sau cấp phép</strong>.</li>
+      <li>Chọn <strong>Phù hợp giấy phép</strong> hoặc <strong>Không phù hợp</strong>. Thêm 1–6 ảnh hiện trạng.</li>
+      <li>Bấm <strong>Gửi kết quả</strong>.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Kết quả</th><th>Hồ sơ chuyển sang</th></tr></thead>
+      <tbody>
+        <tr><td>Phù hợp giấy phép</td><td>Đạt. Cán bộ Quản lý đóng hồ sơ.</td></tr>
+        <tr><td>Không phù hợp</td><td>Buộc phá dỡ trong 15 ngày. Sau đó người vi phạm báo cáo khắc phục và bạn hậu kiểm như phần 5.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="doc-footer">Hết hướng dẫn Cán bộ Xử lý — QuyHoạch AI v2.0 · Mở file trong trình duyệt rồi chọn In → Lưu PDF nếu cần bản giấy. Xem thêm: <a href="HUONG-DAN-TONG-QUAN.html">Hướng dẫn tổng quan</a>, <a href="HUONG-DAN-CAN-BO-QUAN-LY.html">Hướng dẫn Cán bộ Quản lý</a>.</footer>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+  </script>
+</body>
+</html>
