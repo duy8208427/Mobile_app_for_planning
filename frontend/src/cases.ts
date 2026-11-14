@@ -75,6 +75,8 @@ export type CatalogViolation = {
   extra_penalties?: string | null;
   fines_org: Record<string, { min: number; max: number }>;
   fines_individual: Record<string, { min: number; max: number }>;
+  fines_k12_org?: Record<string, { min: number; max: number }>;
+  fines_k12_individual?: Record<string, { min: number; max: number }>;
 };
 
 export type Catalog = {

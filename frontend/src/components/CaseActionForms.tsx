@@ -218,6 +218,9 @@ function PrecheckForm({ caseData, catalog, submit, busy }: FormProps) {
               {zone.zone_code ? ` (${zone.zone_code})` : ""}
               {zone.allow_build === false ? " · Không cho phép xây dựng" : zone.allow_build ? " · Cho phép xây dựng" : ""}
               {zone.max_floor ? ` · Tối đa ${zone.max_floor} tầng` : ""}
+              {zone.plan_year ? ` · Quy hoạch đến ${zone.plan_year}` : ""}
+              {ctx.plan_check?.current_use ? `
+Hiện trạng thửa: ${ctx.plan_check.current_use} → Quy hoạch: ${zone.zone_code || "—"}` : ""}
             </Text>
           ) : (
             <Text style={styles.ctxMuted}>Không có dữ liệu quy hoạch tại vị trí này.</Text>
@@ -230,6 +233,7 @@ function PrecheckForm({ caseData, catalog, submit, busy }: FormProps) {
             ctx.permits.map((p: any, i: number) => (
               <Text key={p.id || i} style={styles.ctxText}>
                 • {p.permit_no || "GPXD"} {p.owner_name ? `· ${p.owner_name}` : ""} {p.issued_date ? `· ${p.issued_date}` : ""}
+                {p.floors ? ` · ${p.floors} tầng` : ""}{p.area_m2 ? ` · ${p.area_m2} m²` : ""}{p.is_demo ? " · (dữ liệu mẫu)" : ""}
               </Text>
             ))
           ) : (
@@ -250,6 +254,8 @@ function PrecheckForm({ caseData, catalog, submit, busy }: FormProps) {
           {ctx.suggested_code ? (
             <Text style={[styles.ctxText, { marginTop: 8, fontWeight: "700" }]}>
               Gợi ý hành vi: {catalog?.violations.find((v) => v.code === ctx.suggested_code)?.name || ctx.suggested_code}
+              {ctx.suggestion_reason ? `
+${ctx.suggestion_reason}` : ""}
             </Text>
           ) : null}
         </View>
@@ -466,10 +472,13 @@ function DecideForm({ caseData, catalog, submit, busy }: FormProps) {
   const [usePermit, setUsePermit] = useState(true);
 
   const violation = useMemo(() => catalog?.violations.find((v) => v.code === code), [catalog, code]);
-  const range = violation && workType
-    ? (subject === "to_chuc" ? violation.fines_org : violation.fines_individual)[workType]
-    : undefined;
   const k12 = code === "TIEP_TUC_SAU_BIEN_BAN" && caseData.repeat?.clause === "k12";
+  const useK12 = k12 && !!violation?.fines_k12_org;
+  const range = violation && workType
+    ? (subject === "to_chuc"
+        ? (useK12 ? violation.fines_k12_org! : violation.fines_org)
+        : (useK12 ? violation.fines_k12_individual! : violation.fines_individual))[workType]
+    : undefined;
   const amount = parseInt(amountText.replace(/\D/g, ""), 10) || 0;
   const limit = catalog?.authority_limit?.[(subject as "to_chuc" | "ca_nhan") || "ca_nhan"];
   const exceeds = !!limit && amount > limit;
@@ -539,13 +548,12 @@ function DecideForm({ caseData, catalog, submit, busy }: FormProps) {
       <Chips options={dictOptions(catalog?.construction_states)} value={state} onChange={setState} />
 
       <FieldLabel>MỨC PHẠT (ĐỒNG) *</FieldLabel>
-      {range && !k12 ? (
-        <InfoBox>
-          Khung phạt: {formatMoney(range.min)} – {formatMoney(range.max)}
+      {range ? (
+        <InfoBox tone={k12 ? "warn" : undefined}>
+          {k12 ? "Khung khoản 12 (tái phạm sau quyết định): " : "Khung phạt: "}
+          {formatMoney(range.min)} – {formatMoney(range.max)}
           {subject === "ca_nhan" ? " (cá nhân = 1/2 mức phạt tổ chức)" : " (mức phạt đối với tổ chức)"}
         </InfoBox>
-      ) : k12 ? (
-        <InfoBox tone="warn">Áp dụng khung khoản 12 (tái phạm sau quyết định); máy chủ sẽ kiểm tra khung phạt.</InfoBox>
       ) : null}
       <Input value={amountText} onChangeText={(t) => setAmountText(t.replace(/\D/g, ""))} keyboardType="number-pad" placeholder="VD: 30000000" />
       <Text style={styles.hint}>{amount ? formatMoney(amount) : ""}</Text>

@@ -302,12 +302,38 @@ def create_case_router(db, get_current_user, require_staff, require_admin, now_u
         if so_to and so_thua:
             permits = await db.permits.find({"so_to": str(so_to), "so_thua": str(so_thua)}, {"_id": 0}).to_list(20)
         permits_total = await db.permits.estimated_document_count()
+        current_use = ((parcel or {}).get("loai_dat") or (parcel or {}).get("KyHieuLoaiDat") or "").upper() or None
+        planned_use = (zone or {}).get("zone_code")
+        plan_check = None
+        if zone:
+            plan_check = {
+                "current_use": current_use,
+                "planned_use": planned_use,
+                "planned_name": zone.get("zone_name"),
+                "plan_year": zone.get("plan_year"),
+                "housing_allowed": bool(zone.get("allow_build")),
+                "same_use": bool(current_use and planned_use and current_use == planned_use),
+            }
         suggestion = case.get("violation_code")
+        reason = None
         if not suggestion and case.get("ai_rule"):
             suggestion = flow.suggest_code(case["ai_rule"], has_permit=bool(permits))
+            reason = "Theo luật phát hiện của AI"
+        if not suggestion and plan_check:
+            if not plan_check["housing_allowed"]:
+                suggestion = "SAI_QUY_HOACH"
+                reason = f"Vị trí thuộc quy hoạch {planned_use} ({zone.get('zone_name')}), không phải đất ở"
+            elif permits:
+                suggestion = "SAI_PHEP"
+                reason = "Thửa đã có giấy phép: kiểm tra xây dựng sai nội dung giấy phép"
+            else:
+                suggestion = "KHONG_PHEP"
+                reason = "Quy hoạch cho phép đất ở nhưng chưa tìm thấy giấy phép xây dựng cho thửa"
         return {
             "parcel": parcel,
             "zone": zone,
+            "plan_check": plan_check,
+            "suggestion_reason": reason,
             "permits": permits,
             "permits_loaded": permits_total > 0,
             "suggested_code": suggestion,

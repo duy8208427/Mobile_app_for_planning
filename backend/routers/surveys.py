@@ -52,7 +52,8 @@ def create_survey_router(db, get_current_user, require_staff, now_utc):
 
     @router.post("", status_code=201)
     async def create_survey(payload: SurveyCreate, staff=Depends(require_staff)):
-        COG_DIR.mkdir(parents=True, exist_ok=True)
+        # No disk access here: on Vercel the filesystem is read-only. A mission without
+        # imagery is "draft" (Chờ ảnh) and gets its orthophoto later.
         mission_id = str(uuid.uuid4())
         status = "queued" if payload.cog_path or payload.run_mock else "draft"
         doc = {
@@ -87,10 +88,17 @@ def create_survey_router(db, get_current_user, require_staff, now_utc):
         name = file.filename or "ortho.tif"
         if not name.lower().endswith((".tif", ".tiff", ".cog")):
             raise HTTPException(status_code=400, detail="Chỉ nhận GeoTIFF/COG (.tif)")
-        COG_DIR.mkdir(parents=True, exist_ok=True)
-        dest = COG_DIR / f"{mission_id}.tif"
-        with dest.open("wb") as out:
-            shutil.copyfileobj(file.file, out)
+        try:
+            COG_DIR.mkdir(parents=True, exist_ok=True)
+            dest = COG_DIR / f"{mission_id}.tif"
+            with dest.open("wb") as out:
+                shutil.copyfileobj(file.file, out)
+        except OSError:
+            raise HTTPException(
+                status_code=503,
+                detail="Máy chủ online không nhận file ảnh trực giao. Ảnh được xử lý tại máy trạm AI "
+                       "(xem Sổ tay quản trị, mục Đợt bay).",
+            )
         await db.survey_jobs.update_one(
             {"id": mission_id},
             {
@@ -109,6 +117,8 @@ def create_survey_router(db, get_current_user, require_staff, now_utc):
         job = await db.survey_jobs.find_one({"id": mission_id})
         if not job:
             raise HTTPException(status_code=404, detail="Không tìm thấy đợt bay")
+        if not job.get("cog_path"):
+            raise HTTPException(status_code=400, detail="Đợt bay chưa có ảnh trực giao. Bổ sung ảnh trước khi chạy AI.")
         await db.survey_jobs.update_one(
             {"id": mission_id},
             {"$set": {"status": "queued", "error": None, "updated_at": now_utc()}},

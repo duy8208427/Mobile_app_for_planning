@@ -139,8 +139,12 @@ def _insert_batch(coll, batch: list[dict], attempts: int = 6) -> None:
 
 def main() -> int:
     _load_dotenv()
-    gdb = Path(sys.argv[1]) if len(sys.argv) > 1 else GDB_DEFAULT
-    layer_name = sys.argv[2] if len(sys.argv) > 2 else LAYER_DEFAULT
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    # --append: keep existing parcels and only add communes (MaPhuongXa) not loaded yet,
+    # e.g. the inner-city wards from TPCaoLanh.gdb layer ThuaDat_TNMT_DC.
+    append = "--append" in sys.argv
+    gdb = Path(args[0]) if len(args) > 0 else GDB_DEFAULT
+    layer_name = args[1] if len(args) > 1 else LAYER_DEFAULT
     if not gdb.exists():
         print(f"GDB not found: {gdb}", file=sys.stderr)
         return 1
@@ -186,8 +190,15 @@ def main() -> int:
     db_name = os.environ.get("DB_NAME", "quyhoach")
     client = MongoClient(mongo_url, serverSelectionTimeoutMS=30000, socketTimeoutMS=120000, retryWrites=True)
     db = client[db_name]
-    print(f"Clearing Mongo.{db_name}.parcels and importing {layer.GetFeatureCount()} features from {layer_name}…")
-    db.parcels.delete_many({})
+    existing_xa: set = set()
+    if append:
+        existing_xa = {x for x in db.parcels.distinct("MaPhuongXa") if x}
+        print(f"Appending {layer.GetFeatureCount()} features from {layer_name}; "
+              f"skipping {len(existing_xa)} communes already loaded…")
+    else:
+        print(f"Clearing Mongo.{db_name}.parcels and importing {layer.GetFeatureCount()} features from {layer_name}…")
+        db.parcels.delete_many({})
+    skipped_existing = 0
 
     batch: list[dict] = []
     inserted = 0
@@ -216,6 +227,10 @@ def main() -> int:
             feat = layer.GetNextFeature()
             continue
         attrs = _gdb_attrs(feat)
+        if append and attrs.get("MaPhuongXa") in existing_xa:
+            skipped_existing += 1
+            feat = layer.GetNextFeature()
+            continue
         fid = feat.GetFID()
         loai = _first(attrs, "KyHieuLoaiDat", "MucDichSuDungDat")
         loai_norm = (loai or "").upper().strip() or None
@@ -227,6 +242,10 @@ def main() -> int:
             cy = sum(p[1] for p in ring) / len(ring)
         except Exception:
             pass
+        if cx is None or not (105.0 <= cx <= 106.3 and 10.0 <= cy <= 11.3):  # Đồng Tháp
+            skipped += 1  # broken coordinates (e.g. x=57132 in TPCaoLanh.gdb)
+            feat = layer.GetNextFeature()
+            continue
         doc = {
             **attrs,
             "id": str(thua_id),
@@ -267,9 +286,18 @@ def main() -> int:
     db.parcels.create_index([("cx", 1), ("cy", 1)], name="parcels_cx_cy")
 
     west, south, east, north = extent or [105.4, 10.2, 105.9, 10.9]
+    previous = db.cadastre_meta.find_one({"id": "current"}) if append else None
+    sources = [{"gdb": str(gdb), "layer": layer_name, "count": inserted}]
+    if previous:
+        west, south = min(west, previous.get("west", west)), min(south, previous.get("south", south))
+        east, north = max(east, previous.get("east", east)), max(north, previous.get("north", north))
+        sources = (previous.get("sources") or [{"gdb": previous.get("gdb"), "layer": previous.get("layer"),
+                                                "count": previous.get("count")}]) + sources
     meta = {
         "id": "current",
-        "count": inserted,
+        "count": db.parcels.estimated_document_count(),
+        "sources": sources,
+        "skipped_existing_communes": skipped_existing,
         "skipped": skipped,
         "layer": layer_name,
         "gdb": str(gdb),

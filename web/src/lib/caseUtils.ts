@@ -91,12 +91,15 @@ export function findViolation(
 export function fineRange(
   v: CatalogViolation | undefined,
   workType: WorkType,
-  subject: SubjectType
+  subject: SubjectType,
+  k12 = false
 ): FineRange | undefined {
   if (!v) return undefined;
-  const org = v.fines_org?.[workType];
+  // Khoản 12 (tái phạm sau khi đã bị xử phạt) has its own, higher ranges
+  const useK12 = k12 && !!v.fines_k12_org;
+  const org = (useK12 ? v.fines_k12_org : v.fines_org)?.[workType];
   if (subject === "to_chuc") return org;
-  const ind = v.fines_individual?.[workType];
+  const ind = (useK12 ? v.fines_k12_individual : v.fines_individual)?.[workType];
   if (ind) return ind;
   return org ? { min: org.min / 2, max: org.max / 2 } : undefined;
 }

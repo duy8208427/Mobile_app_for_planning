@@ -116,28 +116,8 @@ export default function ViolationDetail() {
                 )}
               </TouchableOpacity>
             ) : null}
-            {isStaff && item.status === "pending_review" ? (
+            {isStaff && item.status === "pending_review" && !item.case_id ? (
               <View style={styles.actions}>
-                <TouchableOpacity
-                  disabled={busy}
-                  style={styles.confirmBtn}
-                  onPress={async () => {
-                    setBusy(true);
-                    try {
-                      const updated = await api(`/violations/${item.id}/review`, {
-                        method: "PATCH",
-                        body: { status: "confirmed" },
-                      });
-                      setItem(updated);
-                    } catch (e: any) {
-                      setError(e?.message || "Không duyệt được");
-                    } finally {
-                      setBusy(false);
-                    }
-                  }}
-                >
-                  <Text style={styles.confirmText}>Xác nhận vi phạm</Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                   disabled={busy}
                   style={styles.rejectBtn}
@@ -150,13 +130,13 @@ export default function ViolationDetail() {
                       });
                       setItem(updated);
                     } catch (e: any) {
-                      setError(e?.message || "Không bác bỏ được");
+                      setError(e?.message || "Không cập nhật được");
                     } finally {
                       setBusy(false);
                     }
                   }}
                 >
-                  <Text style={styles.rejectText}>Bác bỏ</Text>
+                  <Text style={styles.rejectText}>Không vi phạm</Text>
                 </TouchableOpacity>
               </View>
             ) : null}

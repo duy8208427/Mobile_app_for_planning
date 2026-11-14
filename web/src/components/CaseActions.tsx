@@ -255,7 +255,21 @@ function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
           <div className="border border-border-subtle bg-background-base p-3">
             <p className="mb-2 text-xs font-semibold uppercase text-text-muted">Quy hoạch</p>
             {ctx.zone ? (
-              <InfoGrid rows={primitiveEntries(ctx.zone)} />
+              <>
+                <InfoGrid
+                  rows={[
+                    ["Quy hoạch tại vị trí", `${ctx.zone.zone_code ?? "—"} — ${ctx.zone.zone_name ?? ""}`],
+                    ["Năm quy hoạch", ctx.zone.plan_year ? String(ctx.zone.plan_year) : null],
+                    ["Hiện trạng (thửa)", ctx.plan_check?.current_use ?? null],
+                    ["Cho phép xây nhà ở", ctx.zone.allow_build ? "Có (đất ở)" : "Không"],
+                  ]}
+                />
+                {ctx.plan_check && !ctx.plan_check.housing_allowed && (
+                  <p className="mt-2 text-xs font-semibold text-alert">
+                    Vị trí không thuộc quy hoạch đất ở: công trình nhà ở mới có dấu hiệu xây dựng không đúng quy hoạch.
+                  </p>
+                )}
+              </>
             ) : (
               <p className="text-text-muted">Vị trí không nằm trong vùng quy hoạch đã nạp.</p>
             )}
@@ -270,7 +284,10 @@ function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
               <ul className="space-y-2">
                 {ctx.permits.map((pm, i) => (
                   <li key={i} className="border-b border-border-subtle pb-2 last:border-0">
-                    <InfoGrid rows={primitiveEntries(pm, 6)} />
+                    {pm.is_demo ? (
+                      <p className="mb-1 text-xs font-semibold text-warning">Dữ liệu mẫu để demo</p>
+                    ) : null}
+                    <InfoGrid rows={primitiveEntries(pm, 7)} />
                   </li>
                 ))}
               </ul>
@@ -302,6 +319,7 @@ function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
       {suggested && (
         <Notice tone="info">
           Gợi ý hành vi: <strong>{findViolation(catalog, suggested)?.name || suggested}</strong>
+          {ctx?.suggestion_reason ? <span className="block text-xs">{ctx.suggestion_reason}</span> : null}
         </Notice>
       )}
 
@@ -451,7 +469,7 @@ function DecideForm({ c, catalog, submit, busy }: FormProps) {
   );
   const [state, setState] = useState<ConstructionState>(c.construction_state || "dang_thi_cong");
   const entry = findViolation(catalog, code);
-  const range = fineRange(entry, workType, subject);
+  const range = fineRange(entry, workType, subject, code === "TIEP_TUC_SAU_BIEN_BAN" && c.repeat?.clause === "k12");
   const [amount, setAmount] = useState<string>("");
   const [remedy, setRemedy] = useState(entry?.remedy || "");
   const [extra, setExtra] = useState(entry?.extra_penalties || "");
@@ -577,7 +595,7 @@ function DecideForm({ c, catalog, submit, busy }: FormProps) {
         </p>
         {isRepeatK12 && (
           <p className="mt-1 text-xs text-accent-warning">
-            Tái phạm sau quyết định (khoản 12): khung phạt cao hơn, hệ thống sẽ kiểm tra khi ban hành.
+            Tái phạm sau quyết định: áp dụng khung phạt khoản 12 Điều 25 (cao hơn khoản 11).
           </p>
         )}
       </div>

@@ -116,6 +116,7 @@ export interface SurveyJob {
   crs: string;
   gsd_cm?: number | null;
   cog_path?: string | null;
+  notes?: string | null;
   status: "draft" | "queued" | "running" | "done" | "error" | string;
   building_count?: number;
   violation_count?: number;
@@ -187,6 +188,8 @@ export interface CatalogViolation {
   extra_penalties?: string | null;
   fines_org: Record<WorkType, FineRange>;
   fines_individual?: Record<WorkType, FineRange>;
+  fines_k12_org?: Record<WorkType, FineRange>;
+  fines_k12_individual?: Record<WorkType, FineRange>;
 }
 
 export interface CatalogStatusInfo {
@@ -370,5 +373,14 @@ export interface PrecheckContext {
   permits: Record<string, unknown>[];
   permits_loaded: boolean;
   suggested_code?: string | null;
+  suggestion_reason?: string | null;
+  plan_check?: {
+    current_use: string | null;
+    planned_use: string | null;
+    planned_name?: string | null;
+    plan_year?: number | null;
+    housing_allowed: boolean;
+    same_use: boolean;
+  } | null;
   duplicates: { id: string; code: string; status: string; source: CaseSource }[];
 }

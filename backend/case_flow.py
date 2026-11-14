@@ -591,5 +591,10 @@ def catalog_public() -> list[dict]:
         row["fines_org"] = {wt: {"min": lo * MILLION, "max": hi * MILLION} for wt, (lo, hi) in entry["fines"].items()}
         row["fines_individual"] = {wt: {"min": lo * MILLION // 2, "max": hi * MILLION // 2}
                                    for wt, (lo, hi) in entry["fines"].items()}
+        if "fines_k12" in entry:
+            row["fines_k12_org"] = {wt: {"min": lo * MILLION, "max": hi * MILLION}
+                                    for wt, (lo, hi) in entry["fines_k12"].items()}
+            row["fines_k12_individual"] = {wt: {"min": lo * MILLION // 2, "max": hi * MILLION // 2}
+                                           for wt, (lo, hi) in entry["fines_k12"].items()}
         out.append(row)
     return out
