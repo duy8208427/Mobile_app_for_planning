@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -110,6 +111,32 @@ def _expand_extent(ext: list[float] | None, geom) -> list[float]:
     return ext
 
 
+def _insert_batch(coll, batch: list[dict], attempts: int = 6) -> None:
+    """insert_many that survives a flaky link to Atlas.
+
+    pymongo sets _id on each dict before sending, so a retry after a dropped
+    connection re-sends the same _ids: rows that already landed come back as
+    duplicate-key errors (11000), which are treated as done.
+    """
+    from pymongo.errors import BulkWriteError, ConnectionFailure
+
+    for attempt in range(1, attempts + 1):
+        try:
+            coll.insert_many(batch, ordered=False)
+            return
+        except BulkWriteError as exc:
+            errors = exc.details.get("writeErrors", [])
+            if errors and all(e.get("code") == 11000 for e in errors) and not exc.details.get("writeConcernErrors"):
+                return
+            raise
+        except ConnectionFailure as exc:
+            if attempt == attempts:
+                raise
+            wait = 5 * attempt
+            print(f"  network error ({type(exc).__name__}), retry {attempt}/{attempts - 1} in {wait}s…")
+            time.sleep(wait)
+
+
 def main() -> int:
     _load_dotenv()
     gdb = Path(sys.argv[1]) if len(sys.argv) > 1 else GDB_DEFAULT
@@ -157,7 +184,7 @@ def main() -> int:
 
     mongo_url = os.environ.get("MONGO_URL", "mongodb://127.0.0.1:27017")
     db_name = os.environ.get("DB_NAME", "quyhoach")
-    client = MongoClient(mongo_url, serverSelectionTimeoutMS=8000)
+    client = MongoClient(mongo_url, serverSelectionTimeoutMS=30000, socketTimeoutMS=120000, retryWrites=True)
     db = client[db_name]
     print(f"Clearing Mongo.{db_name}.parcels and importing {layer.GetFeatureCount()} features from {layer_name}…")
     db.parcels.delete_many({})
@@ -221,7 +248,7 @@ def main() -> int:
         extent = _expand_extent(extent, geom)
         batch.append(doc)
         if len(batch) >= BATCH:
-            db.parcels.insert_many(batch, ordered=False)
+            _insert_batch(db.parcels, batch)
             inserted += len(batch)
             batch = []
             if inserted % 5000 == 0:
@@ -229,7 +256,7 @@ def main() -> int:
         feat = layer.GetNextFeature()
 
     if batch:
-        db.parcels.insert_many(batch, ordered=False)
+        _insert_batch(db.parcels, batch)
         inserted += len(batch)
 
     db.parcels.create_index([("geometry", GEOSPHERE)], name="parcels_geometry_2dsphere")
