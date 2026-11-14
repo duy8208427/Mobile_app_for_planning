@@ -1,3 +1,5 @@
+import { api } from "../api";
+
 export type ConstructionPermit = {
   id: string;
   title: string;
@@ -9,71 +11,57 @@ export type ConstructionPermit = {
   projectType?: string;
   status?: string;
   note?: string;
+  isDemo?: boolean;
 };
 
-export const constructionPermits: ConstructionPermit[] = [
-  {
-    id: "1",
-    title: "02 căn biệt thự thuộc DA Khu nhà ở Cty Thành Phúc",
-    permitCode: "43/PLGPXD",
-    permitDate: "22/4/2020",
-    investor: "Cty TNHH ĐT Thành Phúc",
-    address: "P.Phú Hữu, Q.9",
-    district: "Quận 9",
-    projectType: "Biệt thự",
-    status: "Đã cấp phép",
-    note: "Giấy phép xây dựng 02 căn biệt thự trong dự án khu nhà ở.",
-  },
-  {
-    id: "2",
-    title: "Bệnh viện Hoàn Mỹ phía Tây",
-    permitCode: "38/GPXD",
-    permitDate: "10/4/2020",
-    investor: "Cty CP Bệnh viện Hoàn Mỹ phía Tây",
-    address: "512 Lê Trọng Tấn, P.Tây Thạnh, Q.Tân Phú",
-    district: "Quận Tân Phú",
-    projectType: "Công trình y tế",
-    status: "Đã cấp phép",
-    note: "Xây dựng bệnh viện đa khoa theo quy hoạch sử dụng đất.",
-  },
-  {
-    id: "3",
-    title: "Nhà ở kết hợp Khách sạn",
-    permitCode: "37/GPXD",
-    permitDate: "09/4/2020",
-    investor: "Vũ Tiến Hưng - Phạm Thị Vui",
-    address: "146-148 Ký Con, P.Nguyễn Thái Bình, Q.1",
-    district: "Quận 1",
-    projectType: "Nhà ở kết hợp dịch vụ lưu trú",
-    status: "Đã cấp phép",
-    note: "Công trình nhà ở kết hợp khách sạn tại khu vực trung tâm.",
-  },
-  {
-    id: "4",
-    title: "VP làm việc",
-    permitCode: "36/GPXD",
-    permitDate: "06/4/2020",
-    investor: "Trương Vĩnh Tùng - Hồ Công Cẩn",
-    address: "28-30 Nguyễn Cư Trinh, P.Phạm Ngũ Lão, Q.1",
-    district: "Quận 1",
-    projectType: "Văn phòng làm việc",
-    status: "Đã cấp phép",
-    note: "Xây dựng văn phòng làm việc theo giấy phép quy hoạch.",
-  },
-  {
-    id: "5",
-    title: "Nhà thờ, Nhà sinh hoạt",
-    permitCode: "35/GPXD",
-    permitDate: "03/4/2020",
-    investor: "Giáo xứ Bà Điểm",
-    address: "10/8 Ấp Trung Lân, xã Bà Điểm, H.Hóc Môn",
-    district: "Huyện Hóc Môn",
-    projectType: "Công trình tôn giáo",
-    status: "Đã cấp phép",
-    note: "Xây dựng nhà thờ và nhà sinh hoạt cộng đồng.",
-  },
-];
+type PermitRow = {
+  id: string;
+  permit_no: string;
+  so_to?: string;
+  so_thua?: string;
+  owner_name?: string;
+  address?: string;
+  floors?: number;
+  area_m2?: number;
+  issued_date?: string;
+  issuer?: string;
+  is_demo?: boolean;
+};
 
-export function getPermitById(id: string): ConstructionPermit | undefined {
-  return constructionPermits.find((p) => p.id === id);
+let cache: ConstructionPermit[] | null = null;
+
+function viDate(iso?: string): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.slice(0, 10).split("-");
+  return d && m && y ? `${Number(d)}/${Number(m)}/${y}` : iso;
+}
+
+function toPermit(p: PermitRow): ConstructionPermit {
+  const floors = p.floors ? `${p.floors} tầng` : "";
+  return {
+    id: p.id,
+    title: `Nhà ở riêng lẻ${floors ? ` ${floors}` : ""} — tờ ${p.so_to ?? "?"}, thửa ${p.so_thua ?? "?"}`,
+    permitCode: p.permit_no,
+    permitDate: viDate(p.issued_date),
+    investor: p.owner_name || "—",
+    address: p.address || "TP. Cao Lãnh, Đồng Tháp",
+    district: "TP. Cao Lãnh",
+    projectType: "Nhà ở riêng lẻ",
+    status: p.is_demo ? "Đã cấp phép (dữ liệu mẫu)" : "Đã cấp phép",
+    note: [p.area_m2 ? `Diện tích xây dựng ${p.area_m2} m²` : "", floors, p.issuer || ""].filter(Boolean).join(" · "),
+    isDemo: !!p.is_demo,
+  };
+}
+
+/** Building permits from the API (collection `permits`). Demo permits are flagged isDemo. */
+export async function loadPermits(force = false): Promise<ConstructionPermit[]> {
+  if (cache && !force) return cache;
+  const res = await api("/permits");
+  cache = ((res?.items || []) as PermitRow[]).map(toPermit);
+  return cache;
+}
+
+export async function getPermitById(id: string): Promise<ConstructionPermit | undefined> {
+  const list = await loadPermits();
+  return list.find((p) => p.id === id);
 }

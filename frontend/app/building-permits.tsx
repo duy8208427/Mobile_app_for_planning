@@ -1,12 +1,22 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { constructionPermits } from "../src/data/constructionPermits";
+import { loadPermits, type ConstructionPermit } from "../src/data/constructionPermits";
 import { colors, spacing } from "../src/theme";
 
 export default function BuildingPermits() {
   const router = useRouter();
+  const [items, setItems] = useState<ConstructionPermit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    loadPermits(true)
+      .then(setItems)
+      .catch((e: any) => setError(e?.message || "Không tải được giấy phép"))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <SafeAreaView style={styles.container} testID="building-permits-screen">
@@ -23,7 +33,19 @@ export default function BuildingPermits() {
       </View>
 
       <FlatList
-        data={constructionPermits}
+        data={items}
+        ListHeaderComponent={
+          loading ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : error ? (
+            <Text style={styles.infoLine}>{error}</Text>
+          ) : items.some((p) => p.isDemo) ? (
+            <Text style={[styles.infoLine, { marginBottom: spacing.md }]}>
+              Danh sách đang là dữ liệu mẫu để demo, sẽ thay bằng dữ liệu giấy phép thật.
+            </Text>
+          ) : null
+        }
+        ListEmptyComponent={!loading && !error ? <Text style={styles.infoLine}>Chưa có dữ liệu giấy phép.</Text> : null}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: spacing.lg }}
         ItemSeparatorComponent={() => <View style={styles.separator} />}

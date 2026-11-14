@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { getPermitById } from "../src/data/constructionPermits";
+import { getPermitById, type ConstructionPermit } from "../src/data/constructionPermits";
 import { colors, spacing } from "../src/theme";
 
 function DetailRow({ label, value }: { label: string; value: string }) {
@@ -17,7 +18,15 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 export default function BuildingPermitDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const permit = id ? getPermitById(id) : undefined;
+  const [permit, setPermit] = useState<ConstructionPermit | undefined>();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (!id) return setLoading(false);
+    getPermitById(id)
+      .then(setPermit)
+      .catch(() => setPermit(undefined))
+      .finally(() => setLoading(false));
+  }, [id]);
 
   return (
     <SafeAreaView style={styles.container} testID="building-permit-detail-screen">
@@ -34,7 +43,9 @@ export default function BuildingPermitDetail() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: spacing.lg }}>
-        {permit ? (
+        {loading ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : permit ? (
           <>
             <Text style={styles.title}>{permit.title}</Text>
             <Text style={styles.permitLine}>

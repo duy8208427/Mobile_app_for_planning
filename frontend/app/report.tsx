@@ -126,7 +126,7 @@ export default function ReportScreen() {
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="VD: Số 123 Đường Nguyễn Huệ, Quận 1, TP.HCM"
+            placeholder="VD: Số 12 Đường Lý Thường Kiệt, Phường 1, TP. Cao Lãnh"
             placeholderTextColor={colors.textMuted}
           />
 
