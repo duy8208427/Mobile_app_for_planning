@@ -191,13 +191,6 @@ function pickStr(obj: Record<string, unknown> | null | undefined, ...keys: strin
   return null;
 }
 
-function primitiveEntries(obj: Record<string, unknown>, limit = 10): [string, string][] {
-  return Object.entries(obj)
-    .filter(([k, v]) => k !== "geometry" && k !== "id" && v !== null && v !== "" && typeof v !== "object")
-    .slice(0, limit)
-    .map(([k, v]) => [k, typeof v === "boolean" ? (v ? "Có" : "Không") : String(v)]);
-}
-
 function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
   const [ctx, setCtx] = useState<PrecheckContext | null>(null);
   const [ctxError, setCtxError] = useState("");
@@ -241,7 +234,12 @@ function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
                 rows={[
                   ["Tờ / Thửa", `${pickStr(parcel, "so_to", "SoTo") || "—"} / ${pickStr(parcel, "so_thua", "SoThua") || "—"}`],
                   ["Loại đất", pickStr(parcel, "loai_dat", "KyHieuLoaiDat")],
-                  ["Diện tích", pickStr(parcel, "DienTich", "dien_tich") ? `${pickStr(parcel, "DienTich", "dien_tich")} m²` : null],
+                  [
+                    "Diện tích",
+                    pickStr(parcel, "DienTich", "dien_tich")
+                      ? `${Number(pickStr(parcel, "DienTich", "dien_tich")).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} m²`
+                      : null,
+                  ],
                   [
                     "Được phép xây",
                     parcel.allow_build === undefined ? null : parcel.allow_build ? "Có" : "Không",
@@ -287,7 +285,15 @@ function PrecheckForm({ c, catalog, submit, busy }: FormProps) {
                     {pm.is_demo ? (
                       <p className="mb-1 text-xs font-semibold text-warning">Dữ liệu mẫu để demo</p>
                     ) : null}
-                    <InfoGrid rows={primitiveEntries(pm, 7)} />
+                    <InfoGrid
+                      rows={[
+                        ["Số giấy phép", pm.permit_no ? String(pm.permit_no) : null],
+                        ["Chủ đầu tư", pm.owner_name ? String(pm.owner_name) : null],
+                        ["Ngày cấp", pm.issued_date ? String(pm.issued_date).split("-").reverse().join("/") : null],
+                        ["Quy mô", [pm.floors ? `${pm.floors} tầng` : "", pm.area_m2 ? `${pm.area_m2} m² xây dựng` : ""].filter(Boolean).join(" · ") || null],
+                        ["Tờ / Thửa", `${pm.so_to ?? "—"} / ${pm.so_thua ?? "—"}`],
+                      ]}
+                    />
                   </li>
                 ))}
               </ul>
