@@ -92,6 +92,7 @@ class ReportCreate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     image_base64: Optional[str] = None  # data:image/jpeg;base64,....
+    images: Optional[List[str]] = None  # extra photos (data URLs), max 5 besides image_base64
     violation_type: Optional[str] = "construction"  # construction|encroachment|zoning|other
 
 ReportStatus = Literal[
@@ -118,6 +119,8 @@ class Report(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     image_base64: Optional[str] = None
+    images: Optional[List[str]] = None
+    case_id: Optional[str] = None
     violation_type: str
     status: str  # received|assigned|pending_approval|resolved|rejected
     admin_response: Optional[str] = None
@@ -185,6 +188,7 @@ class Notification(BaseModel):
     related_report_id: Optional[str] = None
     related_violation_id: Optional[str] = None
     related_mission_id: Optional[str] = None
+    related_case_id: Optional[str] = None
     read: bool
     created_at: datetime
 
@@ -231,7 +235,7 @@ async def require_admin(user=Depends(get_current_user)):
     return user
 
 async def require_staff(user=Depends(get_current_user)):
-    """Xử lý báo cáo — admin (web) hoặc manager (app Người thực hiện)."""
+    """Cán bộ: admin (Cán bộ Quản lý) hoặc manager (Cán bộ Xử lý)."""
     if user.get("role") not in ("admin", "manager"):
         raise HTTPException(status_code=403, detail="Chỉ cán bộ mới có quyền truy cập")
     return user
@@ -355,6 +359,7 @@ async def create_report(payload: ReportCreate, user=Depends(get_current_user)):
         "latitude": payload.latitude,
         "longitude": payload.longitude,
         "image_base64": payload.image_base64,
+        "images": (payload.images or [])[:5],
         "violation_type": payload.violation_type or "construction",
         "status": "received",
         "admin_response": None,
@@ -369,13 +374,16 @@ async def create_report(payload: ReportCreate, user=Depends(get_current_user)):
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
         "title": "Đã tiếp nhận báo cáo",
-        "body": f"Báo cáo \"{payload.title}\" đã được hệ thống tiếp nhận và đang chờ Admin xử lý.",
+        "body": f"Báo cáo \"{payload.title}\" đã được hệ thống tiếp nhận và đang chờ Cán bộ Quản lý tiền kiểm.",
         "type": "report_status",
         "related_report_id": report_id,
         "read": False,
         "created_at": now_utc(),
     })
     doc.pop("_id", None)
+    # Bước 1: mỗi phản ánh mở một hồ sơ vụ việc
+    case = await _cases_router.create_case_from_report(doc, user)
+    doc["case_id"] = case["id"]
     return normalize_report_doc(doc)
 
 @api_router.get("/reports/mine", response_model=List[Report])
@@ -413,6 +421,11 @@ async def update_report(report_id: str, payload: ReportUpdate, staff=Depends(req
     r = await db.reports.find_one({"id": report_id})
     if not r:
         raise HTTPException(status_code=404, detail="Không tìm thấy báo cáo")
+    if r.get("case_id"):
+        raise HTTPException(
+            status_code=409,
+            detail="Báo cáo này được xử lý trong Hồ sơ vụ việc. Vui lòng thao tác tại mục Hồ sơ vụ việc.",
+        )
 
     current = normalize_report_status(r.get("status"))
     new_status = normalize_report_status(payload.status)
@@ -1044,6 +1057,7 @@ async def seed_data():
 
 from routers.planning import create_planning_routers
 from routers.surveys import create_survey_router
+from routers.cases import create_case_router
 
 _planning_router, _violations_router, seed_planning_data = create_planning_routers(
     db, get_current_user, require_admin, now_utc, require_staff=require_staff
@@ -1052,6 +1066,18 @@ _surveys_router = create_survey_router(db, get_current_user, require_staff, now_
 api_router.include_router(_planning_router)
 api_router.include_router(_violations_router)
 api_router.include_router(_surveys_router)
+_cases_router = create_case_router(db, get_current_user, require_staff, require_admin, now_utc)
+api_router.include_router(_cases_router)
+
+
+async def ensure_case_indexes():
+    await db.cases.create_index("id", unique=True)
+    await db.cases.create_index([("status", 1), ("updated_at", -1)])
+    await db.cases.create_index("assignment.officer_id")
+    await db.cases.create_index("reporter_user_id")
+    await db.cases.create_index("violator_user_id")
+    await db.cases.create_index([("so_to", 1), ("so_thua", 1)])
+    await db.permits.create_index([("so_to", 1), ("so_thua", 1)])
 
 
 @app.on_event("startup")
@@ -1059,6 +1085,7 @@ async def on_startup():
     try:
         await seed_data()
         await seed_planning_data()
+        await ensure_case_indexes()
     except Exception:
         logging.getLogger(__name__).exception(
             "Seed failed — API still starts so health checks can pass"
