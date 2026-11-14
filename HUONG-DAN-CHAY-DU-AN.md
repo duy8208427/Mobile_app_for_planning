@@ -201,8 +201,8 @@ Khi Metro sẵn sàng, nhấn **`a`** trong terminal Expo.
 | Vai trò | Email | Mật khẩu | Dùng ở |
 |---------|-------|----------|--------|
 | Người dân | `citizen@quyhoach.vn` | `Citizen@123` | App / https://quyhoach-citizen.vercel.app |
-| Người thực hiện | `manager@quyhoach.vn` | `Manager@123` | App |
-| Admin | `admin@quyhoach.vn` | `Admin@123` | App + web admin |
+| Cán bộ Xử lý (đi hiện trường) | `manager@quyhoach.vn` | `Manager@123` | App |
+| Cán bộ Quản lý (tiền kiểm, giao việc, ra quyết định) | `admin@quyhoach.vn` | `Admin@123` | App + web quản trị |
 
 ---
 
