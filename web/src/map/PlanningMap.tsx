@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { getApiBase, getToken } from "../api/client";
 import type { CadastreExtent, GeoJSONFeatureCollection } from "../api/types";
 
-const FALLBACK_CENTER: [number, number] = [105.634, 10.457];
+// Opens on a dense part of the cadastral GDB (Cao Lãnh). The current GDB has no
+// parcels in the inner-city wards around 105.634, 10.457, so centring there showed "0 thửa".
+const FALLBACK_CENTER: [number, number] = [105.62, 10.478];
 const INITIAL_ZOOM = 14;
 const MIN_PARCEL_ZOOM = 11;
 
@@ -298,9 +300,11 @@ export function PlanningMap({ className = "", missionId }: PlanningMapProps) {
       const n = data.features.length;
       const truncated = data.properties?.truncated;
       setHint(
-        truncated
-          ? `${n} thửa đỏ trong khung (cắt limit — phóng to thêm)`
-          : `${n} thửa địa chính (đỏ) trên ảnh vệ tinh`,
+        n === 0
+          ? "Khung nhìn này chưa có dữ liệu thửa (GDB hiện chưa phủ các phường nội thị Cao Lãnh). Kéo bản đồ ra ngoài hoặc bấm “Xem toàn ranh GDB”."
+          : truncated
+            ? `${n} thửa đỏ trong khung (cắt limit — phóng to thêm)`
+            : `${n} thửa địa chính (đỏ) trên ảnh vệ tinh`,
       );
     };
     reloadRef.current = reloadParcels;
