@@ -5,8 +5,9 @@ const nav = [
   { to: "/admin", label: "Tổng quan", end: true },
   { to: "/admin/map", label: "Bản đồ" },
   { to: "/admin/surveys", label: "Đợt bay" },
-  { to: "/admin/violations", label: "Nghi vấn" },
-  { to: "/admin/reports", label: "Báo cáo công dân" },
+  { to: "/admin/cases", label: "Hồ sơ vụ việc" },
+  { to: "/admin/violations", label: "Nghi vấn AI" },
+  { to: "/admin/catalog", label: "Danh mục vi phạm" },
   { to: "/admin/users", label: "Người dùng" },
 ];
 
@@ -48,6 +49,7 @@ export function AdminLayout() {
         </nav>
         <div className="border-t border-border-subtle p-3 text-xs text-text-muted">
           <p className="font-medium text-text-main">{user?.full_name}</p>
+          <p className="text-primary">Cán bộ Quản lý</p>
           <p className="truncate">{user?.email}</p>
           <button
             type="button"

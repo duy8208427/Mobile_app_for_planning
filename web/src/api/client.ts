@@ -1,3 +1,13 @@
+import type {
+  CaseAction,
+  CaseDetail,
+  CaseOfficer,
+  CaseStats,
+  CaseSummary,
+  PrecheckContext,
+  ViolationCatalog,
+} from "./types";
+
 const PRODUCTION_API_ORIGIN = "https://quyhoach-api.vercel.app";
 
 function resolveApiHost(): string {
@@ -112,3 +122,47 @@ export async function uploadFile<T>(path: string, file: File): Promise<T> {
   }
   return data as T;
 }
+
+// ---------------------------------------------------------------------------
+// Hồ sơ vụ việc
+// ---------------------------------------------------------------------------
+
+let catalogPromise: Promise<ViolationCatalog> | null = null;
+
+/** Danh mục vi phạm ít thay đổi — cache trong phiên. */
+export function fetchCatalog(): Promise<ViolationCatalog> {
+  if (!catalogPromise) {
+    catalogPromise = api<ViolationCatalog>("/violation-catalog").catch((e) => {
+      catalogPromise = null;
+      throw e;
+    });
+  }
+  return catalogPromise;
+}
+
+export interface CaseFilters {
+  status?: string;
+  phase?: string | number;
+  violation_code?: string;
+  overdue?: boolean;
+}
+
+export function fetchCases(filters: CaseFilters = {}): Promise<CaseSummary[]> {
+  const qs = new URLSearchParams();
+  if (filters.status) qs.set("status", filters.status);
+  if (filters.phase) qs.set("phase", String(filters.phase));
+  if (filters.violation_code) qs.set("violation_code", filters.violation_code);
+  if (filters.overdue) qs.set("overdue", "true");
+  const q = qs.toString();
+  return api<CaseSummary[]>(`/cases${q ? `?${q}` : ""}`);
+}
+
+export const fetchCaseStats = () => api<CaseStats>("/cases/stats");
+export const fetchOfficers = () => api<CaseOfficer[]>("/cases/officers");
+export const fetchCase = (id: string) => api<CaseDetail>(`/cases/${id}`);
+export const fetchPrecheckContext = (id: string) =>
+  api<PrecheckContext>(`/cases/${id}/precheck-context`);
+export const openCaseFromViolation = (violationId: string) =>
+  api<CaseDetail>(`/cases/from-violation/${violationId}`, { method: "POST" });
+export const runCaseAction = (id: string, action: CaseAction, payload: unknown = {}) =>
+  api<CaseDetail>(`/cases/${id}/actions/${action}`, { method: "POST", body: payload });

@@ -5,8 +5,8 @@ import { useAuth } from "../auth/AuthContext";
 
 const ROLE_LABELS: Record<UserRole, string> = {
   citizen: "Người dân",
-  manager: "Người thực hiện",
-  admin: "Admin",
+  manager: "Cán bộ Xử lý",
+  admin: "Cán bộ Quản lý",
 };
 
 const emptyForm = {
@@ -142,8 +142,8 @@ export function UsersPage() {
             [
               ["", "Tất cả"],
               ["citizen", "Người dân"],
-              ["manager", "Người thực hiện"],
-              ["admin", "Admin"],
+              ["manager", "Cán bộ Xử lý"],
+              ["admin", "Cán bộ Quản lý"],
             ] as const
           ).map(([value, label]) => (
             <button
@@ -242,8 +242,8 @@ export function UsersPage() {
                   data-testid="user-role"
                 >
                   <option value="citizen">Người dân</option>
-                  <option value="manager">Người thực hiện</option>
-                  <option value="admin">Admin</option>
+                  <option value="manager">Cán bộ Xử lý</option>
+                  <option value="admin">Cán bộ Quản lý</option>
                 </select>
               </label>
               <label className="mt-4 block text-sm font-medium">

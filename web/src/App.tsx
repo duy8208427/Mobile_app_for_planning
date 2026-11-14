@@ -5,7 +5,9 @@ import { AdminLayout } from "./components/AdminLayout";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MapPage } from "./pages/MapPage";
-import { ReportsPage } from "./pages/ReportsPage";
+import { CaseDetailPage } from "./pages/CaseDetailPage";
+import { CasesPage } from "./pages/CasesPage";
+import { CatalogPage } from "./pages/CatalogPage";
 import { SurveysPage } from "./pages/SurveysPage";
 import { UsersPage } from "./pages/UsersPage";
 import { ViolationsPage } from "./pages/ViolationsPage";
@@ -23,7 +25,10 @@ export default function App() {
               <Route path="/admin/map" element={<MapPage />} />
               <Route path="/admin/surveys" element={<SurveysPage />} />
               <Route path="/admin/violations" element={<ViolationsPage />} />
-              <Route path="/admin/reports" element={<ReportsPage />} />
+              <Route path="/admin/cases" element={<CasesPage />} />
+              <Route path="/admin/cases/:id" element={<CaseDetailPage />} />
+              <Route path="/admin/catalog" element={<CatalogPage />} />
+              <Route path="/admin/reports" element={<Navigate to="/admin/cases" replace />} />
               <Route path="/admin/users" element={<UsersPage />} />
             </Route>
           </Route>

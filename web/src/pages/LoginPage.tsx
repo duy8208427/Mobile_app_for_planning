@@ -6,7 +6,7 @@ const ACCOUNTS = [
   {
     email: "admin@quyhoach.vn",
     password: "Admin@123",
-    label: "Trần Văn Quản — Quản trị",
+    label: "Trần Văn Quản — Cán bộ Quản lý",
   },
 ] as const;
 
@@ -30,7 +30,7 @@ export function LoginPage() {
     try {
       const u = await login(selected.email, selected.password);
       if (u.role !== "admin") {
-        setError("Tài khoản không có quyền quản trị web. Chỉ Admin mới đăng nhập được.");
+        setError("Tài khoản không có quyền quản trị web. Chỉ Cán bộ Quản lý mới đăng nhập được.");
         return;
       }
       navigate("/admin");

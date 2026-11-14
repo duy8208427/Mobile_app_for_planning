@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { api } from "../api/client";
-import type { Violation } from "../api/types";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { api, fetchCatalog, openCaseFromViolation } from "../api/client";
+import type { Violation, ViolationCatalog } from "../api/types";
+import { findViolation } from "../lib/caseUtils";
 
 const SEVERITY_LABEL: Record<string, string> = {
   high: "Cao",
@@ -12,7 +13,7 @@ const SEVERITY_LABEL: Record<string, string> = {
 const STATUS_LABEL: Record<string, string> = {
   pending_review: "Chờ duyệt",
   confirmed: "Đã xác nhận",
-  rejected: "Bác bỏ",
+  rejected: "Không vi phạm",
 };
 
 const RULE_LABEL: Record<string, string> = {
@@ -28,6 +29,14 @@ export function ViolationsPage() {
   const [filter, setFilter] = useState("pending_review");
   const [error, setError] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<ViolationCatalog | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchCatalog()
+      .then(setCatalog)
+      .catch(() => undefined);
+  }, []);
 
   const load = useCallback(() => {
     const qs = new URLSearchParams();
@@ -58,11 +67,27 @@ export function ViolationsPage() {
     }
   };
 
+  const openCase = async (id: string) => {
+    setLoadingId(id);
+    setError("");
+    try {
+      const c = await openCaseFromViolation(id);
+      navigate(`/admin/cases/${c.id}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Lỗi mở hồ sơ");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const suggestion = (rule: string) =>
+    findViolation(catalog, catalog?.ai_rule_suggestion[rule])?.name;
+
   return (
     <div className="flex flex-1 flex-col overflow-auto p-6">
       <h1 className="text-2xl font-bold">Nghi vấn nhà xây trái phép</h1>
       <p className="mt-1 text-sm text-text-muted">
-        AI chỉ gợi ý. Cán bộ xác nhận trước khi công dân thấy trên bản đồ.
+        AI chỉ gợi ý. Cán bộ Quản lý mở hồ sơ tiền kiểm hoặc xác nhận trước khi công dân thấy trên bản đồ.
         {missionId ? ` Đợt bay: ${missionId.slice(0, 8)}…` : ""}
       </p>
       <div className="mt-4 flex gap-2">
@@ -103,14 +128,37 @@ export function ViolationsPage() {
                   {v.so_to || "—"}/{v.so_thua || "—"}
                 </td>
                 <td className="p-3">{v.loai_dat || "—"}</td>
-                <td className="p-3">{RULE_LABEL[v.rule_id] || v.rule_id}</td>
+                <td className="p-3">
+                  {RULE_LABEL[v.rule_id] || v.rule_id}
+                  {suggestion(v.rule_id) && (
+                    <p className="mt-1 text-xs text-primary">Gợi ý: {suggestion(v.rule_id)}</p>
+                  )}
+                </td>
                 <td className="p-3">{v.area_m2 != null ? `${v.area_m2} m²` : "—"}</td>
                 <td className="max-w-xs p-3">{v.reason}</td>
                 <td className="p-3">{SEVERITY_LABEL[v.severity] || v.severity}</td>
                 <td className="p-3">{STATUS_LABEL[v.status] || v.status}</td>
                 <td className="p-3">
+                  {v.case_id && (
+                    <Link
+                      to={`/admin/cases/${v.case_id}`}
+                      className="mb-2 inline-block text-xs font-semibold text-primary underline"
+                    >
+                      Xem hồ sơ
+                    </Link>
+                  )}
                   {v.status === "pending_review" && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      {!v.case_id && (
+                        <button
+                          type="button"
+                          disabled={loadingId === v.id}
+                          onClick={() => openCase(v.id)}
+                          className="bg-primary px-2 py-1 text-xs text-white hover:bg-primary-hover disabled:opacity-60"
+                        >
+                          Mở hồ sơ tiền kiểm
+                        </button>
+                      )}
                       <button
                         type="button"
                         disabled={loadingId === v.id}
@@ -125,7 +173,7 @@ export function ViolationsPage() {
                         onClick={() => review(v.id, "rejected")}
                         className="border border-border-strong px-2 py-1 text-xs"
                       >
-                        Bác bỏ
+                        Không vi phạm
                       </button>
                     </div>
                   )}
