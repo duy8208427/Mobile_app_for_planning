@@ -13,7 +13,7 @@ const ACCOUNTS = [
 export function LoginPage() {
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState(ACCOUNTS[0].email);
+  const [email, setEmail] = useState<string>(ACCOUNTS[0].email);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
