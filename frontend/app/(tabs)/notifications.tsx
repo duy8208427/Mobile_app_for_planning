@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { api } from "../../src/api";
 import { colors, spacing } from "../../src/theme";
 import { useRouter, type Href } from "expo-router";
+import { caseDetailHref } from "../../src/cases";
 
 export default function Notifications() {
   const router = useRouter();
@@ -48,7 +49,9 @@ export default function Notifications() {
         await api(`/notifications/${item.id}/read`, { method: "POST" });
       } catch {}
     }
-    if (item.related_report_id) {
+    if (item.related_case_id) {
+      router.push(caseDetailHref(item.related_case_id));
+    } else if (item.related_report_id) {
       router.push({ pathname: "/report-detail", params: { id: item.related_report_id } });
     } else if (item.related_violation_id) {
       router.push({ pathname: "/violation-detail", params: { id: item.related_violation_id } } as unknown as Href);

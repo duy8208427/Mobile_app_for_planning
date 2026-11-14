@@ -8,6 +8,7 @@ import { api } from "../src/api";
 import { useAuth } from "../src/auth";
 import { colors, spacing } from "../src/theme";
 import { violationMapHtml } from "../src/mapHtml";
+import { caseDetailHref, notify } from "../src/cases";
 
 const RULE: Record<string, string> = {
   SAI_MDSD: "Sai mục đích sử dụng đất",
@@ -26,9 +27,25 @@ export default function ViolationDetail() {
   const router = useRouter();
   const { user } = useAuth();
   const isStaff = user?.role === "manager" || user?.role === "admin";
+  const isAdmin = user?.role === "admin";
   const [item, setItem] = useState<any>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [opening, setOpening] = useState(false);
+
+  const openCase = async () => {
+    if (!item) return;
+    setOpening(true);
+    try {
+      const c = await api(`/cases/from-violation/${item.id}`, { method: "POST" });
+      setItem((prev: any) => (prev ? { ...prev, case_id: c.id } : prev));
+      router.push(caseDetailHref(c.id));
+    } catch (e: any) {
+      notify("Không mở được hồ sơ", e?.message || "Vui lòng thử lại");
+    } finally {
+      setOpening(false);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -82,6 +99,23 @@ export default function ViolationDetail() {
               value={item.confidence != null ? `${Math.round(item.confidence * 100)}%` : "—"}
             />
             {item.review_note ? <Row label="Ghi chú duyệt" value={item.review_note} /> : null}
+            {isAdmin ? (
+              <TouchableOpacity
+                testID="open-precheck-case"
+                disabled={opening}
+                style={[styles.caseBtn, opening && { opacity: 0.6 }]}
+                onPress={openCase}
+              >
+                {opening ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Ionicons name="folder-open-outline" size={18} color="#fff" />
+                    <Text style={styles.caseBtnText}>{item.case_id ? "Xem hồ sơ vụ việc" : "Mở hồ sơ tiền kiểm"}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ) : null}
             {isStaff && item.status === "pending_review" ? (
               <View style={styles.actions}>
                 <TouchableOpacity
@@ -164,6 +198,16 @@ const styles = StyleSheet.create({
   value: { fontSize: 15, color: colors.text, marginTop: 2 },
   disclaimer: { marginTop: 20, fontSize: 12, color: colors.textMuted, lineHeight: 18 },
   actions: { marginTop: 16, gap: 8 },
+  caseBtn: {
+    marginTop: 12,
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  caseBtnText: { color: "#fff", fontWeight: "700" },
   confirmBtn: { backgroundColor: colors.success, paddingVertical: 12, alignItems: "center" },
   confirmText: { color: "#fff", fontWeight: "700" },
   rejectBtn: { borderWidth: 1, borderColor: colors.borderStrong, paddingVertical: 12, alignItems: "center" },

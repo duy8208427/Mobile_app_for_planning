@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Image,
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,10 +14,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { api } from "../src/api";
 import { colors, spacing } from "../src/theme";
+import { caseDetailHref, notify } from "../src/cases";
+import PhotoPicker from "../src/components/PhotoPicker";
 
 export default function ReportScreen() {
   const router = useRouter();
@@ -26,8 +26,7 @@ export default function ReportScreen() {
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [imageB64, setImageB64] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
   const [violationType, setViolationType] = useState("construction");
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,20 +36,6 @@ export default function ReportScreen() {
     { id: "zoning", label: "Sai quy hoạch" },
     { id: "other", label: "Khác" },
   ];
-
-  const pickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return Alert.alert("Cần quyền", "Cho phép truy cập thư viện ảnh");
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      base64: true,
-      quality: 0.6,
-    });
-    if (res.canceled) return;
-    const asset = res.assets[0];
-    setImageUri(asset.uri);
-    setImageB64(`data:image/jpeg;base64,${asset.base64}`);
-  };
 
   const getLocation = async () => {
     try {
@@ -68,11 +53,11 @@ export default function ReportScreen() {
 
   const onSubmit = async () => {
     if (!title || !description || !address) {
-      return Alert.alert("Thiếu thông tin", "Vui lòng nhập tiêu đề, mô tả và địa chỉ");
+      return notify("Thiếu thông tin", "Vui lòng nhập tiêu đề, mô tả và địa chỉ");
     }
     setSubmitting(true);
     try {
-      await api("/reports", {
+      const created = await api("/reports", {
         method: "POST",
         body: {
           title,
@@ -80,15 +65,19 @@ export default function ReportScreen() {
           address,
           latitude: coords?.lat,
           longitude: coords?.lng,
-          image_base64: imageB64,
+          image_base64: photos[0] || null,
+          images: photos.slice(1),
           violation_type: violationType,
         },
       });
-      Alert.alert("Thành công", "Báo cáo đã được gửi đến cơ quan quản lý", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
+      if (created?.case_id) {
+        router.replace(caseDetailHref(created.case_id));
+      } else {
+        router.back();
+      }
+      notify("Đã gửi phản ánh", "Phản ánh đã được tiếp nhận. Bạn có thể theo dõi tiến độ xử lý hồ sơ.");
     } catch (e: any) {
-      Alert.alert("Lỗi", e.message || "Gửi báo cáo thất bại");
+      notify("Lỗi", e.message || "Gửi báo cáo thất bại");
     } finally {
       setSubmitting(false);
     }
@@ -150,17 +139,13 @@ export default function ReportScreen() {
             </Text>
           </TouchableOpacity>
 
-          <Text style={styles.label}>HÌNH ẢNH HIỆN TRẠNG</Text>
-          <TouchableOpacity testID="report-image-picker" style={styles.imageBox} onPress={pickImage}>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-            ) : (
-              <View style={styles.imagePlaceholder}>
-                <Ionicons name="camera-outline" size={32} color={colors.textMuted} />
-                <Text style={styles.imageHint}>Chọn ảnh từ thư viện</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+          <PhotoPicker
+            label="HÌNH ẢNH HIỆN TRẠNG (TỐI ĐA 5)"
+            photos={photos}
+            onChange={setPhotos}
+            max={5}
+            testID="report-image-picker"
+          />
 
           <Text style={styles.label}>MÔ TẢ CHI TIẾT</Text>
           <TextInput
@@ -232,17 +217,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   gpsText: { color: colors.text, fontSize: 13 },
-  imageBox: {
-    height: 160,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderStyle: "dashed",
-    overflow: "hidden",
-  },
-  imagePreview: { width: "100%", height: "100%" },
-  imagePlaceholder: { flex: 1, alignItems: "center", justifyContent: "center", gap: 6 },
-  imageHint: { color: colors.textMuted },
   submit: {
     marginTop: spacing.lg,
     backgroundColor: colors.primary,

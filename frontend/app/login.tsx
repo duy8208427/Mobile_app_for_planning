@@ -24,12 +24,12 @@ const ACCOUNTS = [
   {
     email: "manager@quyhoach.vn",
     password: "Manager@123",
-    label: "Phạm Văn Thực — Người thực hiện",
+    label: "Phạm Văn Thực — Cán bộ Xử lý",
   },
   {
     email: "admin@quyhoach.vn",
     password: "Admin@123",
-    label: "Trần Văn Quản — Quản trị",
+    label: "Trần Văn Quản — Cán bộ Quản lý",
   },
 ] as const;
 

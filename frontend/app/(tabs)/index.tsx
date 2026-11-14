@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   ActivityIndicator,
   View,
@@ -10,24 +10,39 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter, type Href } from "expo-router";
+import { useFocusEffect, useRouter, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../src/auth";
 import { api } from "../../src/api";
 import { colors, spacing } from "../../src/theme";
+import { PHASE_SHORT, caseDetailHref, casesHref, roleLabel } from "../../src/cases";
+import CaseRow, { sortByDeadline, type CaseListItem } from "../../src/components/CaseRow";
 
 type ReportItem = {
   id: string;
   title: string;
   address: string;
   status: string;
+  case_id?: string | null;
+};
+
+type CaseStats = {
+  total: number;
+  open: number;
+  overdue: number;
+  by_phase: Record<string, number>;
 };
 
 export default function Home() {
   const router = useRouter();
   const { user } = useAuth();
   const isManager = user?.role === "manager";
+  const isAdmin = user?.role === "admin";
+  const isStaff = isManager || isAdmin;
   const [recent, setRecent] = useState<ReportItem[]>([]);
+  const [stats, setStats] = useState<CaseStats | null>(null);
+  const [myCases, setMyCases] = useState<CaseListItem[]>([]);
+  const [violatorCases, setViolatorCases] = useState<CaseListItem[]>([]);
   const [loadingHome, setLoadingHome] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -35,36 +50,57 @@ export default function Home() {
   const [latestFlight, setLatestFlight] = useState("");
 
   const load = useCallback(async () => {
-    if (isManager) {
-      setLoadError("");
+    setLoadError("");
+    if (isAdmin) {
       setRecent([]);
       try {
-        const vs = await api("/violations/stats");
-        setPendingViolations(vs.pending_review || 0);
-        setLatestFlight(vs.latest_mission?.flight_date || "");
-      } catch {
-        setPendingViolations(0);
+        const [st, vs] = await Promise.all([
+          api("/cases/stats"),
+          api("/violations/stats").catch(() => null),
+        ]);
+        setStats(st);
+        setPendingViolations(vs?.pending_review || 0);
+        setLatestFlight(vs?.latest_mission?.flight_date || "");
+      } catch (e: any) {
+        setLoadError(e?.message || "Không tải được thống kê hồ sơ");
       } finally {
         setLoadingHome(false);
       }
       return;
     }
-    setLoadError("");
+    if (isManager) {
+      setRecent([]);
+      try {
+        const list: CaseListItem[] = await api("/cases");
+        setMyCases(sortByDeadline(list.filter((c) => c.status !== "da_dong" && c.status !== "khong_vi_pham")));
+      } catch (e: any) {
+        setLoadError(e?.message || "Không tải được việc được giao");
+        setMyCases([]);
+      } finally {
+        setLoadingHome(false);
+      }
+      return;
+    }
     try {
-      const r = await api("/reports/mine");
+      const [r, v] = await Promise.all([
+        api("/reports/mine"),
+        api("/cases?role_view=violator").catch(() => []),
+      ]);
       setRecent(r.slice(0, 5));
+      setViolatorCases(Array.isArray(v) ? v : []);
     } catch (e: any) {
       setLoadError(e?.message || "Không thể tải dữ liệu trang chủ");
       setRecent([]);
     } finally {
       setLoadingHome(false);
     }
-  }, [isManager]);
+  }, [isManager, isAdmin]);
 
-  useEffect(() => {
-    setLoadingHome(true);
-    load();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -153,31 +189,21 @@ export default function Home() {
             <View
               style={[
                 styles.roleBadge,
-                (user?.role === "manager" || user?.role === "admin") && styles.roleAdmin,
+                isStaff && styles.roleAdmin,
               ]}
             >
               <Ionicons
-                name={
-                  user?.role === "manager" || user?.role === "admin"
-                    ? "shield-checkmark-outline"
-                    : "person-outline"
-                }
+                name={isStaff ? "shield-checkmark-outline" : "person-outline"}
                 size={14}
-                color={
-                  user?.role === "manager" || user?.role === "admin" ? "#fff" : colors.primary
-                }
+                color={isStaff ? "#fff" : colors.primary}
               />
               <Text
                 style={[
                   styles.roleText,
-                  (user?.role === "manager" || user?.role === "admin") && { color: "#fff" },
+                  isStaff && { color: "#fff" },
                 ]}
               >
-                {user?.role === "manager"
-                  ? "Người thực hiện"
-                  : user?.role === "admin"
-                    ? "Admin"
-                    : "Người dân"}
+                {roleLabel(user?.role)}
               </Text>
             </View>
           </View>
@@ -185,14 +211,16 @@ export default function Home() {
           <View style={styles.headerHint}>
             <Ionicons name="information-circle-outline" size={14} color={colors.primary} />
             <Text style={styles.headerHintText}>
-              {isManager
-                ? "Xem thống kê và xử lý báo cáo người dân tại Trung tâm Quản trị"
-                : "Theo dõi quy hoạch, báo cáo vi phạm và tra cứu thông tin tại một nơi"}
+              {isAdmin
+                ? "Theo dõi hồ sơ vụ việc, tiền kiểm, giao việc và ra quyết định xử lý"
+                : isManager
+                  ? "Kiểm tra thực địa, lập biên bản và hậu kiểm các hồ sơ được giao"
+                  : "Theo dõi quy hoạch, báo cáo vi phạm và tra cứu thông tin tại một nơi"}
             </Text>
           </View>
         </View>
 
-        {!isManager && (
+        {!isStaff && (
         <TouchableOpacity
           testID="compare-feature-card"
           style={styles.heroCard}
@@ -217,7 +245,7 @@ export default function Home() {
         </TouchableOpacity>
         )}
 
-        {!isManager && (
+        {!isStaff && (
         <View style={styles.sectionWrap}>
           <Text style={styles.sectionTitle}>TIỆN ÍCH NHANH</Text>
           <View style={styles.quickGrid}>
@@ -240,7 +268,7 @@ export default function Home() {
         </View>
         )}
 
-        {!isManager && (
+        {!isStaff && (
         <View style={styles.sectionWrap}>
           <Text style={styles.sectionTitle}>TRA CỨU CHUYÊN SÂU</Text>
           {highlightFeatures.map((item) => (
@@ -264,47 +292,180 @@ export default function Home() {
         </View>
         )}
 
-        {isManager && (
+        {isAdmin && (
           <View style={styles.sectionWrap}>
-            <Text style={styles.sectionTitle}>QUẢN TRỊ</Text>
+            <Text style={styles.sectionTitle}>HỒ SƠ VỤ VIỆC</Text>
+            {loadingHome ? (
+              <View style={styles.loadingCard}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.loadingText}>Đang tải thống kê...</Text>
+              </View>
+            ) : loadError ? (
+              <View style={styles.emptyCard}>
+                <Ionicons name="alert-circle-outline" size={28} color={colors.alert} />
+                <Text style={styles.emptyText}>{loadError}</Text>
+                <TouchableOpacity style={styles.retryBtn} onPress={load}>
+                  <Text style={styles.retryText}>Thử lại</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <View style={styles.statRow}>
+                  <TouchableOpacity
+                    testID="stat-open"
+                    style={styles.statCard}
+                    onPress={() => router.push(casesHref())}
+                  >
+                    <Text style={styles.statNum}>{stats?.open ?? 0}</Text>
+                    <Text style={styles.statLabel}>Đang mở</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    testID="stat-overdue"
+                    style={[styles.statCard, (stats?.overdue ?? 0) > 0 && styles.statCardAlert]}
+                    onPress={() => router.push(casesHref({ overdue: "1" }))}
+                  >
+                    <Text style={[styles.statNum, (stats?.overdue ?? 0) > 0 && { color: colors.alert }]}>
+                      {stats?.overdue ?? 0}
+                    </Text>
+                    <Text style={styles.statLabel}>Quá hạn</Text>
+                  </TouchableOpacity>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statNum}>{stats?.total ?? 0}</Text>
+                    <Text style={styles.statLabel}>Tổng hồ sơ</Text>
+                  </View>
+                </View>
+                <View style={styles.phaseGrid}>
+                  {[1, 2, 3, 4].map((p) => (
+                    <TouchableOpacity
+                      key={p}
+                      testID={`stat-phase-${p}`}
+                      style={styles.phaseCard}
+                      onPress={() => router.push(casesHref({ phase: String(p) }))}
+                    >
+                      <Text style={styles.phaseNum}>{stats?.by_phase?.[String(p)] ?? 0}</Text>
+                      <Text style={styles.phaseLabel}>
+                        GĐ {p}. {PHASE_SHORT[p]}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
+            <TouchableOpacity
+              testID="open-cases"
+              style={[styles.adminShortcut, { marginTop: spacing.md }]}
+              onPress={() => router.push(casesHref())}
+            >
+              <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#DBEAFE" }]}>
+                <Ionicons name="folder-open-outline" size={21} color={colors.primary} />
+              </View>
+              <View style={styles.featureTextWrap}>
+                <Text style={styles.featureTitle}>Hồ sơ vụ việc</Text>
+                <Text style={styles.featureDesc}>Tiền kiểm, giao việc, ra quyết định, hậu kiểm</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
             <TouchableOpacity
               testID="open-latest-survey-violations"
-              style={styles.adminShortcut}
+              style={[styles.adminShortcut, { marginTop: spacing.sm }]}
               onPress={() => router.push("/violations-map" as Href)}
             >
               <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#FEE2E2" }]}>
                 <Ionicons name="airplane-outline" size={21} color={colors.alert} />
               </View>
               <View style={styles.featureTextWrap}>
-                <Text style={styles.featureTitle}>Nghi vấn đợt bay mới nhất</Text>
+                <Text style={styles.featureTitle}>Nghi vấn flycam</Text>
                 <Text style={styles.featureDesc}>
                   {latestFlight
-                    ? `${latestFlight} · ${pendingViolations} chờ duyệt`
-                    : "Chưa có đợt bay"}
+                    ? `Đợt bay ${latestFlight} · ${pendingViolations} chờ duyệt`
+                    : "Cảnh báo AI từ ảnh flycam"}
                 </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              testID="open-admin-dashboard"
-              style={styles.adminShortcut}
-              onPress={() => router.push("/(tabs)/admin")}
-            >
-              <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#DBEAFE" }]}>
-                <Ionicons name="shield-checkmark-outline" size={21} color={colors.primary} />
-              </View>
-              <View style={styles.featureTextWrap}>
-                <Text style={styles.featureTitle}>Trung tâm Quản trị</Text>
-                <Text style={styles.featureDesc}>Xem thống kê và xử lý báo cáo người dùng</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
         )}
 
-        {!isManager && (
+        {isManager && (
+          <View style={styles.sectionWrap}>
+            <View style={styles.sectionHead}>
+              <Text style={styles.sectionTitle}>VIỆC ĐƯỢC GIAO</Text>
+              <TouchableOpacity onPress={() => router.push(casesHref())} testID="open-cases-link">
+                <Text style={styles.sectionLink}>Tất cả hồ sơ</Text>
+              </TouchableOpacity>
+            </View>
+            {loadingHome ? (
+              <View style={styles.loadingCard}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.loadingText}>Đang tải việc được giao...</Text>
+              </View>
+            ) : loadError ? (
+              <View style={styles.emptyCard}>
+                <Ionicons name="alert-circle-outline" size={28} color={colors.alert} />
+                <Text style={styles.emptyText}>{loadError}</Text>
+                <TouchableOpacity style={styles.retryBtn} onPress={load}>
+                  <Text style={styles.retryText}>Thử lại</Text>
+                </TouchableOpacity>
+              </View>
+            ) : myCases.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Ionicons name="checkmark-done-outline" size={28} color={colors.success} />
+                <Text style={styles.emptyTitle}>Không có việc đang chờ</Text>
+                <Text style={styles.emptyText}>Hồ sơ mới được giao sẽ hiển thị tại đây.</Text>
+              </View>
+            ) : (
+              myCases.map((c) => <CaseRow key={c.id} item={c} />)
+            )}
+            <TouchableOpacity
+              testID="open-cases"
+              style={[styles.adminShortcut, { marginTop: spacing.sm }]}
+              onPress={() => router.push(casesHref())}
+            >
+              <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#DBEAFE" }]}>
+                <Ionicons name="folder-open-outline" size={21} color={colors.primary} />
+              </View>
+              <View style={styles.featureTextWrap}>
+                <Text style={styles.featureTitle}>Hồ sơ vụ việc</Text>
+                <Text style={styles.featureDesc}>Toàn bộ hồ sơ được giao, kể cả đã đóng</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {!isStaff && violatorCases.length > 0 && (
+          <View style={styles.sectionWrap}>
+            <TouchableOpacity
+              testID="my-decisions-card"
+              style={styles.decisionCard}
+              onPress={() => router.push(casesHref({ view: "violator" }))}
+              activeOpacity={0.86}
+            >
+              <View style={[styles.iconBox, styles.featureIcon, { backgroundColor: "#FEE2E2" }]}>
+                <Ionicons name="hammer-outline" size={21} color={colors.alert} />
+              </View>
+              <View style={styles.featureTextWrap}>
+                <Text style={styles.featureTitle}>Quyết định xử phạt của tôi</Text>
+                <Text style={styles.featureDesc}>
+                  {violatorCases.length} hồ sơ ·{" "}
+                  {violatorCases.filter((c) => c.available_actions?.length).length} cần bạn thực hiện
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {!isStaff && (
         <View style={styles.sectionWrap}>
-          <Text style={styles.sectionTitle}>BÁO CÁO CỦA TÔI</Text>
+          <View style={styles.sectionHead}>
+            <Text style={styles.sectionTitle}>BÁO CÁO CỦA TÔI</Text>
+            {recent.length > 0 ? (
+              <TouchableOpacity onPress={() => router.push(casesHref())} testID="open-my-cases">
+                <Text style={styles.sectionLink}>Xem tiến độ</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
           {loadingHome ? (
             <View style={styles.loadingCard}>
               <ActivityIndicator size="small" color={colors.primary} />
@@ -332,8 +493,8 @@ export default function Home() {
                 style={styles.reportRow}
                 onPress={() =>
                   router.push(
-                    user?.role === "manager"
-                      ? { pathname: "/admin-report", params: { id: r.id } }
+                    r.case_id
+                      ? caseDetailHref(r.case_id)
                       : { pathname: "/report-detail", params: { id: r.id } }
                   )
                 }
@@ -511,6 +672,41 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#E2E8F0",
+    borderRadius: 16,
+    padding: spacing.md,
+  },
+  sectionHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  sectionLink: { fontSize: 12, fontWeight: "700", color: colors.primary, marginBottom: spacing.sm },
+  statRow: { flexDirection: "row", gap: spacing.sm },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  statCardAlert: { borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" },
+  statNum: { fontSize: 24, fontWeight: "800", color: "#0F172A" },
+  statLabel: { fontSize: 12, color: "#64748B", marginTop: 2 },
+  phaseGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.sm },
+  phaseCard: {
+    width: "48.5%",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 14,
+    padding: 12,
+  },
+  phaseNum: { fontSize: 20, fontWeight: "800", color: colors.primary },
+  phaseLabel: { fontSize: 12, color: "#334155", marginTop: 2, fontWeight: "600" },
+  decisionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF7F7",
+    borderWidth: 1,
+    borderColor: "#FECACA",
     borderRadius: 16,
     padding: spacing.md,
   },

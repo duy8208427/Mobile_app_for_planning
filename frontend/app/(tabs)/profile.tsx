@@ -15,6 +15,7 @@ import { useAuth } from "../../src/auth";
 import { confirmAction } from "../../src/confirm";
 import { api } from "../../src/api";
 import { colors, spacing } from "../../src/theme";
+import { casesHref, roleLabel } from "../../src/cases";
 
 export default function Profile() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function Profile() {
           const r = await api("/reports/mine");
           setReportCount(r.length);
         } else {
-          const s = await api("/admin/stats");
+          const s = await api("/cases/stats");
           setReportCount(s.total);
         }
       } catch {}
@@ -125,11 +126,7 @@ export default function Profile() {
                 (user?.role === "manager" || user?.role === "admin") && { color: "#fff" },
               ]}
             >
-              {user?.role === "manager"
-                ? "Người thực hiện"
-                : user?.role === "admin"
-                  ? "Admin"
-                  : "Người dân"}
+              {roleLabel(user?.role)}
             </Text>
           </View>
         </View>
@@ -138,7 +135,11 @@ export default function Profile() {
           <View style={styles.statItem}>
             <Text style={styles.statNum}>{reportCount}</Text>
             <Text style={styles.statLabel}>
-              {user?.role === "manager" ? "Tổng báo cáo" : "Báo cáo của tôi"}
+              {user?.role === "admin"
+                ? "Tổng hồ sơ vụ việc"
+                : user?.role === "manager"
+                  ? "Hồ sơ được giao"
+                  : "Báo cáo của tôi"}
             </Text>
           </View>
         </View>
@@ -233,9 +234,23 @@ export default function Profile() {
           <Row
             icon="document-text-outline"
             label="Báo cáo đã gửi"
-            onPress={() => router.push({ pathname: "/admin", params: { mine: "1" } })}
+            onPress={() => router.push(casesHref())}
             testID="menu-my-reports"
-            hidden={user?.role === "manager"}
+            hidden={user?.role !== "citizen"}
+          />
+          <Row
+            icon="hammer-outline"
+            label="Quyết định xử phạt của tôi"
+            onPress={() => router.push(casesHref({ view: "violator" }))}
+            testID="menu-my-decisions"
+            hidden={user?.role !== "citizen"}
+          />
+          <Row
+            icon="folder-open-outline"
+            label={user?.role === "manager" ? "Việc được giao" : "Hồ sơ vụ việc"}
+            onPress={() => router.push(casesHref())}
+            testID="menu-cases"
+            hidden={user?.role === "citizen"}
           />
           <Row
             icon="key-outline"
