@@ -520,12 +520,13 @@ export default function Home() {
 
 export function StatusBadge({ status }: { status: string }) {
   const map: any = {
-    received: { c: "#FFF3E0", t: colors.warning, label: "Tiếp nhận" },
-    assigned: { c: "#E0F2FE", t: colors.primary, label: "Đã giao" },
-    processing: { c: "#E0F2FE", t: colors.primary, label: "Đã giao" },
-    pending_approval: { c: "#FEF3C7", t: "#B45309", label: "Chờ duyệt" },
-    resolved: { c: "#DCFCE7", t: colors.success, label: "Đã giải quyết" },
-    rejected: { c: "#FEE2E2", t: colors.alert, label: "Từ chối" },
+    // Citizen-facing wording for the case progress (report.status mirrors the case)
+    received: { c: "#FFF3E0", t: colors.warning, label: "Đã tiếp nhận" },
+    assigned: { c: "#E0F2FE", t: colors.primary, label: "Đang xử lý" },
+    processing: { c: "#E0F2FE", t: colors.primary, label: "Đang xử lý" },
+    pending_approval: { c: "#E0F2FE", t: colors.primary, label: "Đang xử lý" },
+    resolved: { c: "#DCFCE7", t: colors.success, label: "Đã xử lý xong" },
+    rejected: { c: "#F1F5F9", t: colors.textMuted, label: "Không vi phạm" },
   };
   const s = map[status] || map.received;
   return (

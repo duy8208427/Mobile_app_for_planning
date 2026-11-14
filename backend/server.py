@@ -24,7 +24,9 @@ JWT_SECRET = os.environ['JWT_SECRET']
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
 # DB
-client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+# tz_aware: datetimes come back as UTC-aware and serialise with +00:00,
+# so browsers show local (Vietnam) time instead of reading UTC as local.
+client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000, tz_aware=True)
 db = client[DB_NAME]
 
 app = FastAPI(title="QuyHoạch AI API")

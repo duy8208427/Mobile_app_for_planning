@@ -24,6 +24,14 @@ LIST_PROJECTION = {
 }
 
 
+def _vn_date(iso: Optional[str]) -> str:
+    """'2026-11-17' -> '17/11/2026' for notification text."""
+    if not iso:
+        return "—"
+    y, m, d = str(iso)[:10].split("-")
+    return f"{d}/{m}/{y}"
+
+
 def _digits(phone: Optional[str]) -> str:
     return re.sub(r"\D", "", phone or "")
 
@@ -426,7 +434,7 @@ def create_case_router(db, get_current_user, require_staff, require_admin, now_u
             "precheck": ([reporter_id] if updated["status"] == "khong_vi_pham" else [],
                          "Kết quả tiền kiểm", f"{code}: không phát hiện vi phạm, hồ sơ đã đóng."),
             "assign": ([officer_id], "Bạn được giao kiểm tra thực địa",
-                       f"{code}: hạn {(updated.get('assignment') or {}).get('due_date')}."),
+                       f"{code}: hạn {_vn_date((updated.get('assignment') or {}).get('due_date'))}."),
             "accept": ([reporter_id], "Đang kiểm tra thực địa", f"{code}: cán bộ đã đến hiện trường."),
             "submit_record": (admins, "Biên bản hiện trường chờ ra quyết định", f"{code}: đã lập biên bản."),
             "return_record": ([officer_id], "Biên bản cần bổ sung", f"{code}: {entry.get('note') or ''}"),
@@ -439,7 +447,7 @@ def create_case_router(db, get_current_user, require_staff, require_admin, now_u
                                f"{code}: tự phá dỡ trong {flow.DEMOLISH_DAYS} ngày."),
             "report_remediation": (admins, "Có báo cáo khắc phục mới", f"{code}: chờ yêu cầu hậu kiểm."),
             "request_reinspection": ([officer_id], "Yêu cầu hậu kiểm thực địa",
-                                     f"{code}: hạn {(updated.get('reinspection') or {}).get('due_date')}."),
+                                     f"{code}: hạn {_vn_date((updated.get('reinspection') or {}).get('due_date'))}."),
             "reinspect": (admins + ([violator_id] if updated["status"] == "cho_khac_phuc" else []),
                           "Kết quả hậu kiểm",
                           f"{code}: {'đạt' if updated['status'] == 'hau_kiem_dat' else 'không đạt, cần tiếp tục khắc phục'}."),

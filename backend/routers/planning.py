@@ -567,10 +567,12 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
             latest = await db.survey_jobs.find_one({}, {"_id": 0}, sort=[("created_at", -1)])
             pending = await db.violations.count_documents({"status": "pending_review"})
             if staff and latest:
-                await db.notifications.insert_many(
-                    [
-                        {
-                            "id": str(uuid.uuid4()),
+                # One alert per officer and mission, keyed so concurrent cold starts cannot duplicate it
+                for u in staff:
+                    await db.notifications.update_one(
+                        {"id": f"flight-{latest.get('id')}-{u['id']}"},
+                        {"$setOnInsert": {
+                            "id": f"flight-{latest.get('id')}-{u['id']}",
                             "user_id": u["id"],
                             "title": f"Đợt bay {latest.get('flight_date')}: {pending} nghi vấn",
                             "body": (
@@ -583,9 +585,8 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
                             "related_mission_id": latest.get("id"),
                             "read": False,
                             "created_at": now_utc(),
-                        }
-                        for u in staff
-                    ]
-                )
+                        }},
+                        upsert=True,
+                    )
 
     return planning_router, violations_router, seed_planning_data
