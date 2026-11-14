@@ -81,7 +81,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:8081
 
 Atlas: đổi `MONGO_URL` thành `mongodb+srv://...` (xem [backend/.env.example](backend/.env.example)).
 
-Backend tự seed và **luôn reset** mật khẩu/role 3 tài khoản demo mỗi lần khởi động.
+Backend tự tạo 3 tài khoản demo nếu chưa có. Tài khoản đã có thì giữ nguyên, nên mật khẩu đổi trên production không bị ghi đè. Muốn đặt lại về mật khẩu demo (chỉ dùng khi demo local), thêm `RESET_DEMO_ACCOUNTS=true` vào `backend/.env`.
 
 Nếu PowerShell chặn `Activate.ps1`:
 

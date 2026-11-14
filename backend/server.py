@@ -816,8 +816,10 @@ DEMO_USERS = [
 
 
 async def seed_data():
-    # Insert demo accounts if missing; always reset demo passwords/roles so
-    # documented credentials keep working after someone changes them in CMS.
+    # Insert demo accounts if missing. Existing accounts are left alone so a
+    # password changed in production stays changed; set RESET_DEMO_ACCOUNTS=true
+    # to force the documented demo passwords/roles back (local demos only).
+    reset_demo = os.environ.get("RESET_DEMO_ACCOUNTS", "").strip().lower() in ("1", "true", "yes")
     for demo in DEMO_USERS:
         existing = await db.users.find_one({"email": demo["email"]})
         password_hash = hash_password(demo["password"])
@@ -831,7 +833,7 @@ async def seed_data():
                 "role": demo["role"],
                 "created_at": now_utc(),
             })
-        else:
+        elif reset_demo:
             await db.users.update_one(
                 {"email": demo["email"]},
                 {"$set": {

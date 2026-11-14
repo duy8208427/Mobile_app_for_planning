@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { WebView } from "react-native-webview";
+import MapHtmlView from "../src/components/MapHtmlView";
 import { api } from "../src/api";
 import { useAuth } from "../src/auth";
 import { colors, spacing } from "../src/theme";
@@ -67,7 +67,7 @@ export default function ViolationDetail() {
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
           {html ? (
             <View style={{ height: 220 }}>
-              <WebView originWhitelist={["*"]} source={{ html }} />
+              <MapHtmlView html={html} />
             </View>
           ) : null}
           <View style={styles.body}>

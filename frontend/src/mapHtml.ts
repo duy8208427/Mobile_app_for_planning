@@ -17,8 +17,12 @@ const map = new maplibregl.Map({
   container: 'map',
   style: {
     version: 8,
-    sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
-    layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+    sources: {
+      // Esri imagery sits under OSM so the map still has a basemap on networks that block OSM tiles.
+      sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 18, attribution: 'Esri, Maxar, Earthstar Geographics' },
+      osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '© OpenStreetMap' }
+    },
+    layers: [{ id: 'sat', type: 'raster', source: 'sat' }, { id: 'osm', type: 'raster', source: 'osm' }]
   },
   center: [${lng}, ${lat}],
   zoom: 15

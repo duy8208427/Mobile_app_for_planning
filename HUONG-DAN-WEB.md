@@ -55,7 +55,7 @@ Mở trình duyệt: http://localhost:5173
 |-------|----------|
 | `admin@quyhoach.vn` | `Admin@123` |
 
-Backend tự seed và **luôn reset** mật khẩu/role tài khoản demo mỗi lần khởi động.
+Backend tự tạo tài khoản demo nếu chưa có và không ghi đè tài khoản đã có. Đặt `RESET_DEMO_ACCOUNTS=true` để đưa mật khẩu demo về như tài liệu (chỉ dùng khi demo local).
 
 ---
 

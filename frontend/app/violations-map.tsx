@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { WebView } from "react-native-webview";
+import MapHtmlView from "../src/components/MapHtmlView";
 import { api } from "../src/api";
 import { useAuth } from "../src/auth";
 import { colors, spacing } from "../src/theme";
@@ -97,7 +97,7 @@ export default function ViolationsMap() {
           : "Chỉ hiện các trường hợp cán bộ đã xác nhận vi phạm."}
       </Text>
       <View style={{ height: Math.min(280, height * 0.35) }}>
-        <WebView originWhitelist={["*"]} source={{ html }} style={{ flex: 1 }} />
+        <MapHtmlView html={html} />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <FlatList

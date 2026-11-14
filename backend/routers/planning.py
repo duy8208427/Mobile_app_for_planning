@@ -145,6 +145,15 @@ def _strip_owner(fc: dict, user: dict) -> dict:
     return fc
 
 
+def _violation_proj(user: dict) -> dict:
+    """Violations copy parcel fields, owner name included: staff only."""
+    proj = {"_id": 0}
+    if not _is_staff(user):
+        for key in STAFF_ONLY_PARCEL_FIELDS:
+            proj[key] = 0
+    return proj
+
+
 def create_planning_routers(db, get_current_user, require_admin, now_utc, require_staff=None):
     planning_router = APIRouter(prefix="/planning", tags=["planning"])
     violations_router = APIRouter(prefix="/violations", tags=["violations"])
@@ -389,7 +398,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
             q["mission_id"] = mission_id
         if rule_id:
             q["rule_id"] = rule_id
-        cursor = db.violations.find(q, {"_id": 0}).sort("created_at", -1)
+        cursor = db.violations.find(q, _violation_proj(user)).sort("created_at", -1)
         return await cursor.to_list(1000)
 
     @violations_router.get("/stats")
@@ -426,7 +435,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
             q["status"] = status
         if mission_id:
             q["mission_id"] = mission_id
-        docs = await db.violations.find(q, {"_id": 0}).to_list(8000)
+        docs = await db.violations.find(q, _violation_proj(user)).to_list(8000)
         gate = asyncio.Semaphore(24)
 
         async def _keep(doc: dict):
@@ -441,7 +450,7 @@ def create_planning_routers(db, get_current_user, require_admin, now_utc, requir
 
     @violations_router.get("/{violation_id}")
     async def get_violation(violation_id: str, user=Depends(get_current_user)):
-        v = await db.violations.find_one({"id": violation_id}, {"_id": 0})
+        v = await db.violations.find_one({"id": violation_id}, _violation_proj(user))
         if not v:
             raise HTTPException(status_code=404, detail="Không tìm thấy vi phạm")
         if not _is_staff(user) and v.get("status") != "confirmed":
